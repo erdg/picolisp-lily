@@ -66,15 +66,14 @@
 [de ||: (Times . Music)
    (prin "\\repeat volta " Times " {")
    (when Music
-      (map@ @
-         (prin @ " ") )
-   (prin "}") ]
+      (mapc eval @) )
+   (prinl "}") ]
 
 [de << Music
-   (prin "<< ")
+   (prinl "<<")
    (when Music
       (mapc eval @) )
-   (prin ">> ") ]
+   (prinl ">>") ]
 
 
 
