@@ -47,9 +47,10 @@
       (mapc eval @) )
    (prinl "}") ]
 
-[de notes Notes
-   (map@ Notes
-      (prin @ " ") ]
+[de music Music
+   (mapc
+      '((N) (or (and (pair N) (eval @)) (prin N " ")))
+      Music ]
 
 [de chords (Bars . Chords)
    (<<
