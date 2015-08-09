@@ -30,6 +30,7 @@
 # fixme
 [de score Music
    (prinl "\\score {")
+   (prinl)
    (when Music
       (mapc eval @) )
    (prinl "}") ]
@@ -47,10 +48,10 @@
       (mapc eval @) )
    (prinl "}") ]
 
-[de music Music
-   (mapc
-      '((N) (or (and (pair N) (eval @)) (prin N " ")))
-      Music ]
+[de music (Obj)
+   (or 
+      (and (pair Obj) (eval @)) 
+      (prin Obj " ") ]
 
 [de chords (Bars . Chords)
    (<<
@@ -124,8 +125,9 @@
    (prinl "\\revert NoteHead #'style")
    (prinl "}") ]
    
-[de times (Sig . Music)
-   (prin "\\times " Sig " { ")
-   (when Music
-      (mapc eval @) )
-   (prinl "}") ]
+[de times "Args"
+   (let [(@Sig . @Music)  "Args"]
+      (macro
+         (prin "\\times " '@Sig " { ")
+         (mapc music '@Music)
+         (prinl "}") ]
