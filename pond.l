@@ -61,7 +61,7 @@
          (map@ @
             (prin @ " ") ]
       (prinl "}")
-      (slash Bars) ]
+      (slashes Bars) ]
 
 
 # like chords, but uses rhythmic notation
@@ -109,9 +109,9 @@
 
 [de slashes (N)   # number of bars
    (prinl "\\new Staff {")
-   (slashes
+   (sl
       (prin "\\relative c'' { ")
-      (do N (notes b4 b b b))
+      (do N (music b4 b b b))
       (prinl "}") )
    (prinl "}") ]
 
