@@ -62,6 +62,7 @@
 # musical stuff (double bar lines, meter changes, etc.)
 #
 # (chords 2 f1:min9 e:maj13+11 (|.))
+#
 [de chords "Args"
    (let [(@N . @Music)  "Args"]
       (macro
@@ -77,8 +78,17 @@
 # like chords, but uses rhythmic notation
 # needs to some how parse the durations from the chords.
 # (hits a4.:min6 b8:7 r e:7 r c:maj7)
-[de hits () ]
-
+[de hits @Music
+   (macro
+      (<<
+         (prinl "\\chords { ")
+         (prinl "\\set chordChanges = ##t")
+         (prinl "\\set minorChordModifier = \\markup { - }")
+         (prinl "\\set noChordSymbol = \"\"")   # hide 'N.C.'s 
+         (mapc music '@Music)
+         (prinl "}")
+         (rhythms '@Music) ]
+   
 
 [de || ()
    (prin "\\bar \"||\" ") ]
@@ -126,14 +136,38 @@
    (prinl "}") ]
 
 # rhythmic notation
-[de rhy Music
+[de rhythms (@Music)
+   (prinl "\\new Staff {")
+   (prinl "\\relative c'' {")
    (prinl "{")
-   (prinl "\\override NoteHead #'style = #'slash"
-   (when Music
-      (mapc eval @) )
+   (prinl "\\override NoteHead #'style = #'slash")
+   (mapc music (macro (pack-durations '@Music))
+   (prinl)
    (prinl "\\revert NoteHead #'style")
+   (prinl "}")
+   (prinl "}")
    (prinl "}") ]
-   
+
+[de pack-durations (Music)
+   (let Durs (map@ Music (get-duration @))
+      (mapc music
+         (mapcar any
+            (mapcar 
+               '((X) (if (pre? "r" X) (pack X) (pack "b" X)))
+               Durs ]
+
+
+
+# there has to be an easier way to do this
+[de get-duration (Obj)
+   (if (pre? "r" Obj)   # ignore if a rest
+      (pack @)
+      (let Dur (mapcar any (car (split (chop Obj) ":")))
+         (pack
+            (member
+               (find num? Dur)
+               Dur ]
+
 [de times "Args"
    (let [(@Sig . @Music)  "Args"]
       (macro
