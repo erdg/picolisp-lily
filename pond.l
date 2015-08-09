@@ -53,16 +53,16 @@
       (and (pair Obj) (eval @)) 
       (prin Obj " ") ]
 
-[de chords (Bars . Chords)
-   (<<
-      (prinl "\\chords { ")
-      (prinl "\\set chordChanges = ##t")
-#      (prinl "\\set minorChordModifier = \\markup { - }")
-      [when Chords
-         (map@ @
-            (prin @ " ") ]
-      (prinl "}")
-      (slashes Bars) ]
+[de chords "Args"
+   (let [(@N . @Music)  "Args"]
+      (macro
+         (<<
+            (prinl "\\chords { ")
+            (prinl "\\set chordChanges = ##t")
+            (prinl "\\set minorChordModifier = \\markup { - }")
+            (mapc music '@Music) 
+            (prinl "}")
+            (slashes '@N) ]
 
 
 # like chords, but uses rhythmic notation
@@ -112,7 +112,7 @@
    (prinl "\\new Staff {")
    (sl
       (prin "\\relative c'' { ")
-      (do N (music b4 b b b))
+      (do N (mapc music '(b4 b b b)))
       (prinl "}") )
    (prinl "}") ]
 
