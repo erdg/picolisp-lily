@@ -36,8 +36,10 @@
    (prinl "}") ]
 #
 
-[de keysig (Note Type)
-   (prinl "\\key " Note " \\" Type " ") ]
+[de keysig "Args"
+   (let [(@Note . @Type)  "Args"]
+      (macro
+         (prinl "\\key " '@Note " \\" '@Type " ") ]
 
 [de timesig Sig
    (prinl "\\time " Sig) ]
@@ -53,6 +55,13 @@
       (and (pair Obj) (eval @)) 
       (prin Obj " ") ]
 
+# (chords 2 f1:min9 e:maj13+11)
+#
+# generates sheet music for given chord progression.
+# any lists will be evaluated. this allows to include other
+# musical stuff (double bar lines, meter changes, etc.)
+#
+# (chords 2 f1:min9 e:maj13+11 (|.))
 [de chords "Args"
    (let [(@N . @Music)  "Args"]
       (macro
