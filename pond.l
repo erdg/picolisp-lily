@@ -1,5 +1,3 @@
-[load "@lib/map@.l"]
-
 [symbols 'lily 'pico]
 
 
@@ -149,7 +147,7 @@
    (prinl "}") ]
 
 [de pack-durations (Music)
-   (let Durs (map@ Music (get-duration @))
+   (let Durs (map '((M) (get-duration M)) Music)
       (mapc music
          (mapcar any
             (mapcar 
