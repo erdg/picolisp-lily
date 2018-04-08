@@ -39,13 +39,15 @@
       (macro
          (prinl "\\key " '@Note " \\" '@Type " ") ]
 
-[de timesig Sig
+[de timesig (Sig)
    (prinl "\\time " Sig) ]
 
 [de relative (Note . Music)
-   (prinl "\\relative " (pack Note) " {")
+   (prinl "\\relative " (pack Note))
+   (prinl " {")
    (when Music
       (mapc eval @) )
+   (prinl)
    (prinl "}") ]
 
 [de music (Obj)
@@ -65,27 +67,33 @@
    (let [(@N . @Music)  "Args"]
       (macro
          (<<
-            (prinl "\\chords { ")
+            (prinl "\\chords")
+            (prinl "{ ")
             (prinl "\\set chordChanges = ##t")
             (prinl "\\set minorChordModifier = \\markup { - }")
             (mapc music '@Music) 
+            (prinl)
             (prinl "}")
             (slashes '@N) ]
 
 
 # like chords, but uses rhythmic notation
 # needs to some how parse the durations from the chords.
-# (hits a4.:min6 b8:7 r e:7 r c:maj7)
-[de hits @Music
+# first arg is the time signature, must be a string
+# followed by an arbitrary amount of chords
+# (hits "4/4" a4.:min6 b8:7 r e:7 r c:maj7)
+[de hits (TimeSig . @Music)
    (macro
       (<<
-         (prinl "\\chords { ")
+         (prinl "\\chords")
+         (prinl "{ ")
          (prinl "\\set chordChanges = ##t")
          (prinl "\\set minorChordModifier = \\markup { - }")
          (prinl "\\set noChordSymbol = \"\"")   # hide 'N.C.'s 
          (mapc music '@Music)
+         (prinl)
          (prinl "}")
-         (rhythms '@Music) ]
+         (rhythms '@Music TimeSig) ]
    
 
 [de || ()
@@ -95,9 +103,11 @@
    (prin "\\bar \"|.\" ") ]
 
 [de ||: (Times . Music)
-   (prin "\\repeat volta " Times " {")
+   (prinl "\\repeat volta " Times) 
+   (prinl " {")
    (when Music
       (mapc eval @) )
+   (prinl)
    (prinl "}") ]
 
 [de wrap Music
@@ -134,9 +144,13 @@
    (prinl "}") ]
 
 # rhythmic notation
-[de rhythms (@Music)
-   (prinl "\\new Staff {")
-   (prinl "\\relative c'' {")
+[de rhythms (@Music TimeSig)
+   (default TimeSig "4/4")
+   (prinl "\\new Staff") 
+   (prinl "{")
+   (prinl "\\relative c''")
+   (prinl "{")
+   (timesig (eval TimeSig))
    (prinl "{")
    (prinl "\\override NoteHead #'style = #'slash")
    (mapc music (macro (pack-durations '@Music))
@@ -147,7 +161,7 @@
    (prinl "}") ]
 
 [de pack-durations (Music)
-   (let Durs (map '((M) (get-duration M)) Music)
+   (let Durs (mapcar '((M) (get-duration M)) Music)
       (mapc music
          (mapcar any
             (mapcar 
