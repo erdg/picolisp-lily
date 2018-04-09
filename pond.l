@@ -1,22 +1,19 @@
-[symbols 'lily 'pico]
-
-
 [de lilypond "Args"
    (let [(@File . @Music)  "Args"]
       (macro
          (out (pack @File ".ly")  # write file
-            (version)
+            (lyVersion)
             (mapc eval '@Music) )
          (call 'lilypond @File)
          (call 'evince (pack @File ".pdf") ]
 
 
 # note to self - fns should print space/line as needed following fn call. 
-[de version ()
+[de lyVersion ()
    (prinl "\\version \"2.18.2\"")
    (prinl) ]
 
-[de header (Title Composer)
+[de lyHeader (Title Composer)
    (prinl "\\header {")
    (when Title
       (prin "^Ititle = ") (println Title) )
@@ -26,7 +23,7 @@
    (prinl) ]
 
 # fixme
-[de score Music
+[de lyScore Music
    (prinl "\\score {")
    (prinl)
    (when Music
@@ -34,14 +31,16 @@
    (prinl "}") ]
 #
 
-[de keysig "Args"
+[de lyKey "Args"
    (let [(@Note . @Type)  "Args"]
       (macro
          (prinl "\\key " '@Note " \\" '@Type " ") ]
 
-[de timesig (Sig)
+[de lyTime (Sig)
    (prinl "\\time " Sig) ]
 
+# this seems to be the 'melody' function
+# maybe rename to lyMelody?
 [de relative (Note . Music)
    (prinl "\\relative " (pack Note))
    (prinl " {")
@@ -50,10 +49,17 @@
    (prinl)
    (prinl "}") ]
 
+# this is a horrible function name
+# maybe lyEval?
 [de music (Obj)
    (or 
       (and (pair Obj) (eval @)) 
       (prin Obj " ") ]
+
+# this is a common pattern
+# this is a terrible function name
+[de prMusic (Lst)
+   (mapc music Lst) ]
 
 # (chords 2 f1:min9 e:maj13+11)
 #
@@ -110,7 +116,9 @@
    (prinl)
    (prinl "}") ]
 
-[de wrap Music
+# wraps music expressions in curly braces
+# sequence
+[de lyWrap Music
    (prinl "{")
    (when Music
       (mapc eval @) )
@@ -150,7 +158,7 @@
    (prinl "{")
    (prinl "\\relative c''")
    (prinl "{")
-   (timesig (eval TimeSig))
+   (lyTime (eval TimeSig))
    (prinl "{")
    (prinl "\\override NoteHead #'style = #'slash")
    (mapc music (macro (pack-durations '@Music))
@@ -180,7 +188,7 @@
                (find num? Dur)
                Dur ]
 
-[de times "Args"
+[de lyTimes "Args"
    (let [(@Sig . @Music)  "Args"]
       (macro
          (prin "\\times " '@Sig " { ")
