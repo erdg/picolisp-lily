@@ -39,13 +39,17 @@
 [de lyTime (Sig)
    (prinl "\\time " Sig) ]
 
+# Clef options - "treble", "bass", etc...
+[de lyClef (Clef)
+   (prinl "\\clef " Clef) ]
+
 # this seems to be the 'melody' function
 # maybe rename to lyMelody?
-[de relative (Note . Music)
+[de lyRelative (Note . Music)
    (prinl "\\relative " (pack Note))
    (prinl " {")
    (when Music
-      (mapc eval @) )
+      (mapc music @) )
    (prinl)
    (prinl "}") ]
 
@@ -60,6 +64,20 @@
 # this is a terrible function name
 [de prMusic (Lst)
    (mapc music Lst) ]
+
+# combined version of the above two functions
+# recursively evaluates music expressions
+# if object is atomic (e.g. "aes4." - an Ab dotted quarter not)
+# it is 'prin'ted followed by a space.
+# if it is a list, it's evaluated.
+# allows for nested musical structures.
+[de lyEval (Lst)
+   (mapc
+      '((Obj)
+         (or
+            (and (pair Obj) (eval @))
+            (prin Obj " ") ) )
+      Lst ]
 
 # (chords 2 f1:min9 e:maj13+11)
 #
@@ -100,7 +118,6 @@
          (prinl)
          (prinl "}")
          (rhythms '@Music TimeSig) ]
-   
 
 [de || ()
    (prin "\\bar \"||\" ") ]
