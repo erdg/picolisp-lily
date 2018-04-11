@@ -1,3 +1,42 @@
+(class +Melody +Entity)
+(rel id (+Key +Number))
+(rel nm (+String))
+
+(rel note (+String)) # relative note
+(rel tim (+String))  # time signature
+(rel key (+String))  # key signature
+(rel clf (+String))  # clef
+(rel mus (+List +String))  # music (lilypond symbols)
+
+(rel ly (+Blob))    # lilypond file
+(rel svg (+Blob))    # svg
+# this is a hack, but I kind of like the idea of hijacking
+# the file extentsion
+(rel preview.svg (+Blob)) # cropped svg
+
+# write lilypond file
+(dm lily> ()
+   (put!> This 'ly T)
+   (out (blob This 'ly)
+      (lyVersion)
+      (lyRelative (: note)
+         (if (: tim) (lyTime @))
+         (if (: key) (lyKey @))
+         (if (: clf) (lyClef @))
+         (lyEval (: mus)) ) ) )
+
+# render lilypond file to svg
+# will need a function to strip all '<a>' tags from the svg file
+# lilypond links to lines in the source file. not okay for sharing
+# svg's on the internet, when the source files are +Blob's in the
+# picolisp DB
+(dm render> ()
+   (put!> This 'svg T)
+   (put!> This 'preview.svg T)
+   (call 'lilypond "-dpreview" "-dbackend=svg" (blob This 'ly)) )
+
+
+# EDIT this fn for your own workflow.
 [de lilypond "Args"
    (let [(@File . @Music)  "Args"]
       (macro
@@ -31,10 +70,8 @@
    (prinl "}") ]
 #
 
-[de lyKey "Args"
-   (let [(@Note . @Type)  "Args"]
-      (macro
-         (prinl "\\key " '@Note " \\" '@Type " ") ]
+[de lyKey (Note Type)
+   (prinl "\\key " Note " \\" Type) ]
 
 [de lyTime (Sig)
    (prinl "\\time " Sig) ]
@@ -47,9 +84,8 @@
 # maybe rename to lyMelody?
 [de lyRelative (Note . Music)
    (prinl "\\relative " (pack Note))
-   (prinl " {")
-   (when Music
-      (mapc music @) )
+   (prinl "{")
+   (when Music (mapc eval @))
    (prinl)
    (prinl "}") ]
 
@@ -95,7 +131,7 @@
             (prinl "{ ")
             (prinl "\\set chordChanges = ##t")
             (prinl "\\set minorChordModifier = \\markup { - }")
-            (mapc music '@Music) 
+            (lyEval '@Music) 
             (prinl)
             (prinl "}")
             (slashes '@N) ]
@@ -114,7 +150,7 @@
          (prinl "\\set chordChanges = ##t")
          (prinl "\\set minorChordModifier = \\markup { - }")
          (prinl "\\set noChordSymbol = \"\"")   # hide 'N.C.'s 
-         (mapc music '@Music)
+         (lyEval '@Music)
          (prinl)
          (prinl "}")
          (rhythms '@Music TimeSig) ]
@@ -138,7 +174,8 @@
 [de lyWrap Music
    (prinl "{")
    (when Music
-      (mapc eval @) )
+      (lyEval @) )
+   (prinl)
    (prinl "}") ]
 
 [de << Music
@@ -164,7 +201,7 @@
    (prinl "\\new Staff {")
    (sl
       (prin "\\relative c'' { ")
-      (do N (mapc music '(b4 b b b)))
+      (do N (lyEval '(b4 b b b)))
       (prinl "}") )
    (prinl "}") ]
 
@@ -178,7 +215,7 @@
    (lyTime (eval TimeSig))
    (prinl "{")
    (prinl "\\override NoteHead #'style = #'slash")
-   (mapc music (macro (pack-durations '@Music))
+   (lyEval (macro (pack-durations '@Music))
    (prinl)
    (prinl "\\revert NoteHead #'style")
    (prinl "}")
@@ -205,9 +242,12 @@
                (find num? Dur)
                Dur ]
 
-[de lyTimes "Args"
-   (let [(@Sig . @Music)  "Args"]
-      (macro
-         (prin "\\times " '@Sig " { ")
-         (mapc music '@Music)
-         (prinl "}") ]
+# (lyTimes "2/3" "a4" "b4" "c4") -> 1/4 note triplets
+# think of it as "in the space of 2 notes, put 3"
+# (lyTimes "4/5" ...) -> in the space 4 notes, put 5
+# etc...
+(de lyTimes (Sig . Music)
+   (prinl "\\times " Sig)
+   (prinl "{ ")
+   (lyEval Music)
+   (prinl "}") )
