@@ -9,10 +9,10 @@
 (rel mus (+List +String))  # music (lilypond symbols)
 
 (rel ly (+Blob))    # lilypond file
-(rel svg (+Blob))    # svg
 # this is a hack, but I kind of like the idea of hijacking
 # the file extentsion
-(rel preview.svg (+Blob)) # cropped svg
+(rel svg (+Blob))          # svg
+(rel preview.svg (+Blob))  # cropped svg
 
 # write lilypond file
 (dm lily> ()
@@ -33,7 +33,7 @@
 (dm render> ()
    (put!> This 'svg T)
    (put!> This 'preview.svg T)
-   (call 'lilypond "-dpreview" "-dbackend=svg" (blob This 'ly)) )
+   (call 'lilypond "-dpreview" "-dbackend=svg" "-o" *Blob (blob This 'ly)) )
 
 
 # EDIT this fn for your own workflow.
