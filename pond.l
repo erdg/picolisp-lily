@@ -141,8 +141,8 @@
 # needs to some how parse the durations from the chords.
 # first arg is the time signature, must be a string
 # followed by an arbitrary amount of chords
-# (hits "4/4" a4.:min6 b8:7 r e:7 r c:maj7)
-[de hits (TimeSig . @Music)
+# (hits "4/4" "a4.:min6" "b8:7" "r8" "e8:7" "r8" "c8:maj7")
+[de hits (TimeSig Clef . @Music)
    (macro
       (<<
          (prinl "\\chords")
@@ -153,7 +153,7 @@
          (lyEval '@Music)
          (prinl)
          (prinl "}")
-         (rhythms '@Music TimeSig) ]
+         (rhythms TimeSig Clef '@Music) ]
 
 [de || ()
    (prin "\\bar \"||\" ") ]
@@ -206,28 +206,36 @@
    (prinl "}") ]
 
 # rhythmic notation
-[de rhythms (@Music TimeSig)
-   (default TimeSig "4/4")
+[de rhythms (TimeSig Clef @Music)
+   (default TimeSig "4/4" Clef "treble")
    (prinl "\\new Staff") 
    (prinl "{")
-   (prinl "\\relative c''")
+   (if (= Clef "Treble") 
+      (prinl "\\relative c''")
+      (prinl "\\relative c") )
    (prinl "{")
-   (lyTime (eval TimeSig))
+   (lyTime TimeSig)
+   (lyClef Clef)
    (prinl "{")
    (prinl "\\override NoteHead #'style = #'slash")
-   (lyEval (macro (pack-durations '@Music))
+   (lyEval (macro (pack-durations '@Music (if (= Clef "bass") T))))
    (prinl)
    (prinl "\\revert NoteHead #'style")
    (prinl "}")
    (prinl "}")
    (prinl "}") ]
 
-[de pack-durations (Music)
+[de pack-durations (Music Flg)   # flag for bass clef
    (let Durs (mapcar '((M) (get-duration M)) Music)
       (mapc music
          (mapcar any
             (mapcar 
-               '((X) (if (pre? "r" X) (pack X) (pack "b" X)))
+               '((X) 
+                  (if (pre? "r" X) 
+                     (pack X) 
+                     (ifn Flg
+                        (pack "b" X)
+                        (pack "d" X) ) ) )
                Durs ]
 
 
