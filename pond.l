@@ -210,7 +210,7 @@
    (default TimeSig "4/4" Clef "treble")
    (prinl "\\new Staff") 
    (prinl "{")
-   (if (= Clef "Treble") 
+   (if (= Clef "treble") 
       (prinl "\\relative c''")
       (prinl "\\relative c") )
    (prinl "{")
