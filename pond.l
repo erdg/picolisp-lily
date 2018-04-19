@@ -95,14 +95,13 @@
 # lyEval
 #
 # recursively evaluates music expressions
-# if object is atomic (e.g. "aes4." - an Ab dotted quarter not)
+# if object is an atom (e.g. "aes4." - an Ab dotted quarter note),
 # it is 'prin'ted followed by a space.
 # if it is a list, it's evaluated.
+#
 # allows for nested musical structures.
 #
-# still don't know if this function is actually needed.
-# most functions seem to use the (mapc eval Music) pattern
-# pattern
+# seldom used, most functions seem to use the (mapc eval Music) pattern
 [de lyEval (Lst)
    (mapc
       '((Obj)
@@ -111,22 +110,22 @@
             (prin Obj " ") ) )
       Lst ]
 
-# (chords 2 "f1:min9" "e:maj13+11")
+# (lyChanges 2 "f1:min9" "e:maj13+11")
 #
 # generates sheet music for given chord progression.
 # any lists will be evaluated. this allows to include other
 # musical stuff (double bar lines, meter changes, etc.)
 #
-# (chords 2 "f1:min9" "e:maj13+11" (|.))
+# (lyChanges 2 "f1:min9" "e:maj13+11" (|.))
 #
 # if the 'car' of a list is a number, that number of chords 
 # are added to the progression.
 #
-# (chords 32 (16 . "e1:min11") (8 . "f1:min11") (8 . "e1:min11))
+# (lyChanges 32 (16 . "e1:min11") (8 . "f1:min11") (8 . "e1:min11))
 # 
 # -> the changes to 'So What' by Miles Davis
 #
-[de chords "Args"
+[de lyChanges "Args"
    (let [(@N . @Music)  "Args"]
       (macro
          (<<
@@ -134,6 +133,7 @@
             (prinl "{ ")
             (prinl "\\set chordChanges = ##t")
             (prinl "\\set minorChordModifier = \\markup { - }")
+            # variation on 'lyEval' to allow repeated chord shorthand
             (mapc
                '((Obj)
                   (if2 (pair Obj) (num? (car Obj))
