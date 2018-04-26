@@ -25,18 +25,58 @@
    (prinl "}")
    (prinl) ]
 
+# lyEval
+#
+# recursively evaluates music expressions
+# if object is an atom (e.g. "aes4." - an Ab dotted quarter note),
+# it is 'prin'ted followed by a space.
+# if it is a list, it's evaluated.
+#
+# allows for nested musical structures.
+#
+# Note - most functions seem to use the (mapc eval Music) pattern
+[de lyEval (Lst)
+   (mapc
+      '((Obj)
+         (if (pair Obj)
+            (eval @)
+            (prin Obj " ") ) )
+      Lst )
+   (prinl) ]
+
+
 [de lyScore Music
    (prinl "\\score {")
-   (prinl)
-   (mapc eval Music
+   (mapc eval Music)
    (prinl "}") ]
+
+[de lyStaff Music
+   (prinl "\\new Staff {")
+   (mapc eval Music)
+   (prinl "}") ]
+
+# lilypond varibles
+#
+# usage - declare variable
+# (lyVar "notes" (lyRelative "c''" (lyWrap "a4" "b4" "c4" "b4" "a1")))
+#
+# -> notes = \relative c'' { a4 b4 c4 b4 a1 }
+#
+# usage - call variable
+# (lyVar "notes")
+#
+# -> \notes
+[de lyVar (Name . Music)
+   (ifn Music
+      (prinl "\\" Name)
+      (prinl Name " =")
+      (mapc eval Music) ]
 
 # wraps music expressions in curly braces
 # sequential music
 [de lyWrap Music
    (prinl "{")
    (lyEval Music)
-   (prinl)
    (prinl "}") ]
 
 # wraps music expressions with angle braces
@@ -78,6 +118,26 @@
    (prinl)
    (prinl "}") ]
 
+# (lyTuplet "3/2" "f8 g8 "a8") -> 1/8 note triplet
+[de lyTuplet (Sig . Music)
+   (prinl "\\tuplet " Sig " {")
+   (lyEval Music)
+   (prinl "}") ]
+
+# (lyTimes "2/3" "a4" "b4" "c4") -> 1/4 note triplets
+# think of it as "in the space of 2 notes, put 3"
+# (lyTimes "4/5" ...) -> in the space 4 notes, put 5
+# etc...
+(de lyTimes (Sig . Music)
+   (prinl "\\times " Sig)
+   (prinl "{ ")
+   (lyEval Music)
+   (prinl "}") )
+
+(de lyPickup (N . Music)
+   (prin "\\partial " N " ")
+   (lyEval Music) )
+
 # bar lines
 [de || ()
    (prin "\\bar \"||\" ") ]
@@ -91,24 +151,6 @@
    (mapc eval Music)
    (prinl)
    (prinl "}") ]
-
-# lyEval
-#
-# recursively evaluates music expressions
-# if object is an atom (e.g. "aes4." - an Ab dotted quarter note),
-# it is 'prin'ted followed by a space.
-# if it is a list, it's evaluated.
-#
-# allows for nested musical structures.
-#
-# seldom used, most functions seem to use the (mapc eval Music) pattern
-[de lyEval (Lst)
-   (mapc
-      '((Obj)
-         (if (pair Obj)
-            (eval @)
-            (prin Obj " ") ) )
-      Lst ]
 
 # (lyChanges 2 "f1:min9" "e:maj13+11")
 #
@@ -219,8 +261,6 @@
                         (pack "d" X) ) ) )
                Durs ]
 
-
-
 # there has to be an easier way to do this
 [de get-duration (Obj)
    (if (pre? "r" Obj)   # ignore if a rest
@@ -230,13 +270,3 @@
             (member
                (find num? Dur)
                Dur ]
-
-# (lyTimes "2/3" "a4" "b4" "c4") -> 1/4 note triplets
-# think of it as "in the space of 2 notes, put 3"
-# (lyTimes "4/5" ...) -> in the space 4 notes, put 5
-# etc...
-(de lyTimes (Sig . Music)
-   (prinl "\\times " Sig)
-   (prinl "{ ")
-   (lyEval Music)
-   (prinl "}") )
