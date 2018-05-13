@@ -167,26 +167,24 @@
 # 
 # -> the changes to 'So What' by Miles Davis
 #
-[de lyChanges "Args"
-   (let [(@N . @Music)  "Args"]
-      (macro
-         (<<
-            (prinl "\\chords")
-            (prinl "{ ")
-            (prinl "\\set chordChanges = ##t")
-            (prinl "\\set minorChordModifier = \\markup { - }")
-            # variation on 'lyEval' to allow repeated chord shorthand
-            (mapc
-               '((Obj)
-                  (if2 (pair Obj) (num? (car Obj))
-                     (do (car Obj) (prin (cdr Obj) " "))
-                     (eval @)
-                     NIL
-                     (prin Obj " ") ) )
-               '@Music )
-            (prinl)
-            (prinl "}")
-            (slashes '@N) ]
+[de lyChanges (N . "Music")
+   (<<
+      (prinl "\\chords")
+      (prinl "{ ")
+      (prinl "\\set chordChanges = ##t")
+      (prinl "\\set minorChordModifier = \\markup { - }")
+      # variation on 'lyEval' to allow repeated chord shorthand
+      (mapc
+         '((Obj)
+            (if2 (pair Obj) (num? (car Obj))
+               (do (car Obj) (prin (cdr Obj) " "))
+               (eval @)
+               NIL
+               (prin Obj " ") ) )
+         "Music" )
+      (prinl)
+      (prinl "}")
+      (slashes N) ]
 
 [de slashes (N)   # number of bars
    (prinl "\\new Staff {")
