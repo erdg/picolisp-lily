@@ -213,21 +213,20 @@
 # (hits "4/4" "treble" 
 #    "a4.:min6" "b8:7" "r8" "e8:7" "r8" "c8:maj7" )
 #
-[de hits (TimeSig Clef . @Music)
-   (macro
-      (<<
-         (prinl "\\chords")
-         (prinl "{ ")
-         (prinl "\\set chordChanges = ##t")
-         (prinl "\\set minorChordModifier = \\markup { - }")
-         (prinl "\\set noChordSymbol = \"\"")   # hide 'N.C.'s 
-         (lyEval '@Music)
-         (prinl)
-         (prinl "}")
-         (rhythms TimeSig Clef '@Music) ]
+[de lyHits (TimeSig Clef . "Music")
+   (<<
+      (prinl "\\chords")
+      (prinl "{ ")
+      (prinl "\\set chordChanges = ##t")
+      (prinl "\\set minorChordModifier = \\markup { - }")
+      (prinl "\\set noChordSymbol = \"\"")   # hide 'N.C.'s 
+      (lyEval "Music")
+      (prinl)
+      (prinl "}")
+      (rhythms TimeSig Clef "Music") ]
 
 # rhythmic notation
-[de rhythms (TimeSig Clef @Music)
+[de rhythms (TimeSig Clef "Music")
    (default TimeSig "4/4" Clef "treble")
    (prinl "\\new Staff") 
    (prinl "{")
@@ -239,7 +238,7 @@
    (lyClef Clef)
    (prinl "{")
    (prinl "\\override NoteHead #'style = #'slash")
-   (lyEval (macro (pack-durations '@Music (if (= Clef "bass") T))))
+   (lyEval (pack-durations "Music" (if (= Clef "bass") T)))
    (prinl)
    (prinl "\\revert NoteHead #'style")
    (prinl "}")
