@@ -15,6 +15,10 @@
    (prinl "\\version \"2.18.2\"")
    (prinl) ]
 
+[de lyNoIndent ()
+   (prinl "\\layout { indent = 0 }")
+   (prinl) ]
+
 # currently not using this
 [de lyHeader (Title Composer)
    (prinl "\\header {")
@@ -187,17 +191,20 @@
       (slashes N Time (if (= Clef "bass") T) ]
 
 [de slashes (N Time Flg)   # number of bars, time signature, flg for bass clef
-   (prinl "\\new Staff {")
-   (sl
-      (prinl "\\relative c" (ifn Flg "''") " {")
-      (prinl "\\time " Time)
-      (if Flg (lyClef "bass"))
-      (do N 
-         (lyEval 
-            (need (any (car (chop Time)))
-               (pack (if Flg "d" "b") (any (last (chop Time))) ) ) ) )
-      (prinl "}") )
-   (prinl "}") ]
+   (let [S     (split (chop Time) "/")
+         Beats (any (pack (car S)))
+         Pulse (any (pack (cdr S))) ]
+      (prinl "\\new Staff {")
+      (sl
+         (prinl "\\relative c" (ifn Flg "''") " {")
+         (prinl "\\time " Time)
+         (if Flg (lyClef "bass"))
+         (do N 
+            (lyEval 
+               (need Beats
+                  (pack (if Flg "d" "b") Pulse) ) ) )
+         (prinl "}") )
+      (prinl "}") ]
 
 # slash notation
 [de sl Music
