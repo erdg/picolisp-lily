@@ -9,9 +9,6 @@
          (call 'lilypond @File)
          (call 'evince (pack @File ".pdf") ]
 
-
-# note to self - fns should print space/line as needed following fn call.
-
 [de lyVersion ()
    (prinl "\\version \"2.18.2\"")
    (prinl) ]
@@ -30,25 +27,24 @@
    (prinl "}")
    (prinl) ]
 
-# lyEval
+# lyEval - recursively evaluates music expressions
 #
-# recursively evaluates music expressions
-# if object is an atom (e.g. "aes4." - an Ab dotted quarter note),
-# it is 'prin'ted followed by a space.
-# if it is a list, it's evaluated.
+# if Obj is an atom (e.g. "aes4." - an Ab dotted quarter note),
+# it's 'prin'ted followed by a space. if it's a list, it's
+# evaluated.
 #
 # allows for nested musical structures.
 #
 # Note - most functions seem to use the (mapc eval Music) pattern
+#
 [de lyEval (Lst)
    (mapc
       '((Obj)
          (if (pair Obj)
             (eval @)
             (prin Obj " ") ) )
-      Lst ) 
+      Lst )
    (prinl) ]
-
 
 [de lyScore Music
    (prinl "\\score {")
@@ -63,13 +59,13 @@
 # lilypond varibles
 #
 # usage - declare variable
-# (lyVar "notes" (lyRelative "c''" (lyWrap "a4" "b4" "c4" "b4" "a1")))
 #
+# (lyVar "notes" (lyRelative "c''" (lyWrap "a4" "b4" "c4" "b4" "a1")))
 # -> notes = \relative c'' { a4 b4 c4 b4 a1 }
 #
 # usage - call variable
-# (lyVar "notes")
 #
+# (lyVar "notes")
 # -> \notes
 [de lyVar (Name . Music)
    (ifn Music
@@ -77,48 +73,58 @@
       (prinl Name " =")
       (mapc eval Music) ]
 
-# wraps music expressions in curly braces
 # sequential music
+# wraps music expressions in curly braces
 [de lyWrap Music
    (prinl "{")
    (lyEval Music)
    (prinl "}") ]
 
-# wraps music expressions with angle braces
 # simultaneous music
+# wraps music expressions with angle braces
 [de << Music
    (prinl "<<")
    (mapc eval Music)
    (prinl ">>") ]
 
-# chord function
-# (ly<> "a" "c" "e") -> a minor chord
-# clunky and probably not needed
-# just include chord as a music symbol directly, e.g. "< a c e>"
+# chords
+#
+# (ly<> "g" "b" "d") -> G major chord
+#
+# probably not needed... just include chord as a music
+# symbol directly, e.g. "<g b d>"
 [de ly<> Music
    (prinl "< " (lyEval Music) " >") ]
 
-# this will need to be different for DB entities
-# should probably just be an entity method, e.g. 'include>'
+# include lilypond files
+#
+# Note - this will need to be different for DB entities
 [de lyInclude (File) (prinl "\\include \"" (pack File ".ly") "\"")]
 
-# Key signatures
+# key signatures
 [de lyKey (Note Type)
    (prinl "\\key " Note " \\" Type) ]
 
-# Time signatures
-[de lyTime (Sig)
-   (if (= Sig "4/4")
+# time signatures
+[de lyTime (Time)
+   (if (= Time "4/4")
       (prinl "\\numericTimeSignature")
       (prinl "\\defaultTimeSignature") )
-   (prinl "\\time " Sig) ]
+   (prinl "\\time " Time) ]
 
-# Clef options - "treble", "bass", etc...
+# clef options - "treble", "bass", etc...
+#
+# currently only "treble", "bass", and "percussion" clefs
+# are supported in 'lyChanges' and 'lyHits'. see below
+#
 [de lyClef (Clef)
    (prinl "\\clef " Clef) ]
 
-# this seems to be the 'melody' function
-# maybe rename to lyMelody?
+# melodies
+#
+# this seems to be the "melody" function
+# maybe rename to 'lyMelody'?
+#
 [de lyRelative (Note . Music)
    (prinl "\\relative " (pack Note))
    (prinl "{")
@@ -126,56 +132,79 @@
    (prinl)
    (prinl "}") ]
 
+# tuplets
+#
 # (lyTuplet "3/2" "f8 g8 "a8") -> 1/8 note triplet
+#
 [de lyTuplet (Sig . Music)
    (prinl "\\tuplet " Sig " {")
    (lyEval Music)
    (prinl "}") ]
 
+# times - like tuplets, but crazier
+#
 # (lyTimes "2/3" "a4" "b4" "c4") -> 1/4 note triplets
-# think of it as "in the space of 2 notes, put 3"
+#
+# in english, the above could be, "in the space of 2 (quarter notes),
+# put 3 (quarter notes)"
+#
 # (lyTimes "4/5" ...) -> in the space 4 notes, put 5
-# etc...
+#
 (de lyTimes (Sig . Music)
    (prinl "\\times " Sig)
    (prinl "{ ")
    (lyEval Music)
    (prinl "}") )
 
+# pickup notes
+#
+# (lyPickup "2" "a4 b4") -> 2 quarter notes
+#
 (de lyPickup (N . Music)
    (prin "\\partial " N " ")
    (lyEval Music) )
 
-# bar lines
-[de || ()
-   (prin "\\bar \"||\" ") ]
+# single bar (lilypond bar check)
+[de ly| () (prin "\\bar \"|\" ")]
 
-[de |. ()
-   (prin "\\bar \"|.\" ") ]
+# double bar
+[de ly|| () (prin "\\bar \"||\" ")]
 
-[de ||: (Times . Music)
+# ending bar
+[de ly|. () (prin "\\bar \"|.\" ")]
+
+# repeats
+[de ly||: (Times . Music)
    (prinl "\\repeat volta " Times)
    (prinl " {")
    (mapc eval Music)
    (prinl)
    (prinl "}") ]
 
-# (lyChanges 2 "f1:min9" "e:maj13+11")
+# chord changes
 #
 # generates sheet music for given chord progression.
 # any lists will be evaluated. this allows to include other
 # musical stuff (double bar lines, meter changes, etc.)
 #
-# (lyChanges 2 "f1:min9" "e:maj13+11" (|.))
+# (lyChanges 2 "4/4" "treble"
+#    (list "f1:min9" "e1:maj13.11+" (|.)) )
+#
+# -> 2 measure chord progression... Fmin9 - Emaj7(#11) with an
+#    ending bar
 #
 # if the 'car' of a list is a number, that number of chords
 # are added to the progression.
 #
-# (lyChanges 32 (16 . "e1:min11") (8 . "f1:min11") (8 . "e1:min11))
+# (lyChanges 32 "4/4" "bass"
+#    (list
+#       (16 . "e1:min11")
+#       (8 . "f1:min11")
+#       (8 . "e1:min11) ) )
 #
-# -> the changes to 'So What' by Miles Davis
+# -> the changes to 'So What' by Miles Davis (bass clef)
 #
-[de lyChanges (N Time Clef "Music")
+[de lyChanges (N Time Clef "Music")  # number of bars, time signature, clef, music exprs
    (<<
       (prinl "\\chords")
       (prinl "{ ")
@@ -194,7 +223,7 @@
       (prinl "}")
       (lySlashes N Time Clef) ]
 
-[de lySlashes (N Time Clef)   # number of bars, time signature, flg for bass clef
+[de lySlashes (N Time Clef)  # number of bars, time signature, clef
    (let [S     (split (chop Time) "/")
          Beats (any (pack (car S)))
          Pulse (any (pack (cdr S))) ]
@@ -225,10 +254,11 @@
       (prinl "}")
       (prinl "}") ]
 
-# like chords, but uses rhythmic notation
-# first arg is the time signature, must be a string.
-# second is clef, also a string.
-# followed by an arbitrary amount of chords/rests
+# hits
+#
+# like chords, but uses rhythmic notation.
+# first arg is the time signature (string), second is
+# clef (string), followed by list of chords/rests
 #
 # (lyHits "4/4" "treble"
 #    (list "a4.:min6" "b8:7" "r8" "e8:7" "r8" "c8:maj7") )
@@ -264,7 +294,7 @@
    (prinl "}")
    (prinl "}") ]
 
-# I don't like the name of this function
+# don't like the name of this function
 [de packDurations (Music Clef)
    (let Durs (mapcar '((M) (getDuration M)) Music)
       (mapcar any
@@ -279,9 +309,12 @@
             Durs ]
 
 # get the duration of music object
+#
 # if Obj is a rest (e.g. "r4"), rest is returned unchanged
+#
+# (getDuration "r4.") -> "r4."
 # (getDuration "a4.:maj9") -> "4."
-# (getDuration "r4") -> "r4"
+#
 [de getDuration (Obj)
    (if (pre? "r" Obj)   # ignore if a rest
       (pack @)
