@@ -167,7 +167,7 @@
 # 
 # -> the changes to 'So What' by Miles Davis
 #
-[de lyChanges (N . "Music")
+[de lyChanges (N Time Clef "Music")
    (<<
       (prinl "\\chords")
       (prinl "{ ")
@@ -184,13 +184,18 @@
          "Music" )
       (prinl)
       (prinl "}")
-      (slashes N) ]
+      (slashes N Time (if (= Clef "bass") T) ]
 
-[de slashes (N)   # number of bars
+[de slashes (N Time Flg)   # number of bars, time signature, flg for bass clef
    (prinl "\\new Staff {")
    (sl
-      (prin "\\relative c'' { ")
-      (do N (lyEval '("b4" "b" "b" "b")))
+      (prinl "\\relative c" (ifn Flg "''") " {")
+      (prinl "\\time " Time)
+      (if Flg (lyClef "bass"))
+      (do N 
+         (lyEval 
+            (need (any (car (chop Time)))
+               (pack (if Flg "d" "b") (any (last (chop Time))) ) ) ) )
       (prinl "}") )
    (prinl "}") ]
 
@@ -213,7 +218,7 @@
 # (hits "4/4" "treble" 
 #    "a4.:min6" "b8:7" "r8" "e8:7" "r8" "c8:maj7" )
 #
-[de lyHits (TimeSig Clef . "Music")
+[de lyHits (TimeSig Clef "Music")
    (<<
       (prinl "\\chords")
       (prinl "{ ")
