@@ -192,9 +192,9 @@
          "Music" )
       (prinl)
       (prinl "}")
-      (slashes N Time Clef) ]
+      (lySlashes N Time Clef) ]
 
-[de slashes (N Time Clef)   # number of bars, time signature, flg for bass clef
+[de lySlashes (N Time Clef)   # number of bars, time signature, flg for bass clef
    (let [S     (split (chop Time) "/")
          Beats (any (pack (car S)))
          Pulse (any (pack (cdr S))) ]
@@ -243,10 +243,10 @@
       (lyEval "Music")
       (prinl)
       (prinl "}")
-      (rhythms TimeSig Clef "Music") ]
+      (lyRhythms TimeSig Clef "Music") ]
 
 # rhythmic notation
-[de rhythms (TimeSig Clef "Music")
+[de lyRhythms (TimeSig Clef "Music")
    (default TimeSig "4/4" Clef "treble")
    (prinl "\\new Staff")
    (prinl "{")
