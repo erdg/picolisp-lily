@@ -46,7 +46,7 @@
          (if (pair Obj)
             (eval @)
             (prin Obj " ") ) )
-      Lst )
+      Lst ) 
    (prinl) ]
 
 
@@ -233,7 +233,7 @@
 # (lyHits "4/4" "treble"
 #    (list "a4.:min6" "b8:7" "r8" "e8:7" "r8" "c8:maj7") )
 #
-[de lyHits (TimeSig Clef "Music")
+[de lyHits (Time Clef "Music")
    (<<
       (prinl "\\chords")
       (prinl "{ ")
@@ -241,45 +241,48 @@
       (prinl "\\set minorChordModifier = \\markup { - }")
       (prinl "\\set noChordSymbol = \"\"")   # hide 'N.C.'s
       (lyEval "Music")
-      (prinl)
       (prinl "}")
-      (lyRhythms TimeSig Clef "Music") ]
+      (lyRhythms Time Clef "Music") ]
 
 # rhythmic notation
-[de lyRhythms (TimeSig Clef "Music")
-   (default TimeSig "4/4" Clef "treble")
+[de lyRhythms (Time Clef "Music")
    (prinl "\\new Staff")
    (prinl "{")
-   (if (= Clef "treble")
-      (prinl "\\relative c''")
-      (prinl "\\relative c") )
+   (prinl "\\relative c"
+      (cond
+         ((= Clef "bass"))
+         ((= Clef "percussion") "'")
+         (T "''") ) )
    (prinl "{")
-   (lyTime TimeSig)
+   (lyTime Time)
    (lyClef Clef)
    (prinl "{")
    (prinl "\\override NoteHead #'style = #'slash")
-   (lyEval (pack-durations "Music" (if (= Clef "bass") T)))
-   (prinl)
+   (lyEval (packDurations "Music" Clef))
    (prinl "\\revert NoteHead #'style")
    (prinl "}")
    (prinl "}")
    (prinl "}") ]
 
-[de pack-durations (Music Flg)   # flag for bass clef
-   (let Durs (mapcar '((M) (get-duration M)) Music)
-      (lyEval
-         (mapcar any
-            (mapcar
-               '((X)
-                  (if (pre? "r" X)
-                     (pack X)
-                     (ifn Flg
-                        (pack "b" X)
-                        (pack "d" X) ) ) )
-               Durs ]
+# I don't like the name of this function
+[de packDurations (Music Clef)
+   (let Durs (mapcar '((M) (getDuration M)) Music)
+      (mapcar any
+         (mapcar
+            '((X)
+               (if (pre? "r" X)
+                  (pack @)
+                  (cond
+                     ((= Clef "bass") (pack "d" X))
+                     ((= Clef "percussion") (pack "c" X))
+                     (T (pack "b" X)) ) ) )
+            Durs ]
 
-# there has to be an easier way to do this
-[de get-duration (Obj)
+# get the duration of music object
+# if Obj is a rest (e.g. "r4"), rest is returned unchanged
+# (getDuration "a4.:maj9") -> "4."
+# (getDuration "r4") -> "r4"
+[de getDuration (Obj)
    (if (pre? "r" Obj)   # ignore if a rest
       (pack @)
       (let Dur (mapcar any (car (split (chop Obj) ":")))
