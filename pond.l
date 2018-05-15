@@ -4,12 +4,13 @@
       (macro
          (out (pack @File ".ly")  # write file
             (lyVersion)
+            (lyNoIndent)
             (mapc eval '@Music) )
          (call 'lilypond @File)
          (call 'evince (pack @File ".pdf") ]
 
 
-# note to self - fns should print space/line as needed following fn call. 
+# note to self - fns should print space/line as needed following fn call.
 
 [de lyVersion ()
    (prinl "\\version \"2.18.2\"")
@@ -101,12 +102,15 @@
 # should probably just be an entity method, e.g. 'include>'
 [de lyInclude (File) (prinl "\\include \"" (pack File ".ly") "\"")]
 
-# Key signatures 
+# Key signatures
 [de lyKey (Note Type)
    (prinl "\\key " Note " \\" Type) ]
 
 # Time signatures
 [de lyTime (Sig)
+   (if (= Sig "4/4")
+      (prinl "\\numericTimeSignature")
+      (prinl "\\defaultTimeSignature") )
    (prinl "\\time " Sig) ]
 
 # Clef options - "treble", "bass", etc...
@@ -150,7 +154,7 @@
    (prin "\\bar \"|.\" ") ]
 
 [de ||: (Times . Music)
-   (prinl "\\repeat volta " Times) 
+   (prinl "\\repeat volta " Times)
    (prinl " {")
    (mapc eval Music)
    (prinl)
@@ -164,11 +168,11 @@
 #
 # (lyChanges 2 "f1:min9" "e:maj13+11" (|.))
 #
-# if the 'car' of a list is a number, that number of chords 
+# if the 'car' of a list is a number, that number of chords
 # are added to the progression.
 #
 # (lyChanges 32 (16 . "e1:min11") (8 . "f1:min11") (8 . "e1:min11))
-# 
+#
 # -> the changes to 'So What' by Miles Davis
 #
 [de lyChanges (N Time Clef "Music")
@@ -188,42 +192,46 @@
          "Music" )
       (prinl)
       (prinl "}")
-      (slashes N Time (if (= Clef "bass") T) ]
+      (slashes N Time Clef) ]
 
-[de slashes (N Time Flg)   # number of bars, time signature, flg for bass clef
+[de slashes (N Time Clef)   # number of bars, time signature, flg for bass clef
    (let [S     (split (chop Time) "/")
          Beats (any (pack (car S)))
          Pulse (any (pack (cdr S))) ]
       (prinl "\\new Staff {")
-      (sl
-         (prinl "\\relative c" (ifn Flg "''") " {")
-         (prinl "\\time " Time)
-         (if Flg (lyClef "bass"))
-         (do N 
-            (lyEval 
-               (need Beats
-                  (pack (if Flg "d" "b") Pulse) ) ) )
-         (prinl "}") )
+      (prinl "{")
+      (prinl "\\override NoteHead #'style = #'slash")
+      (prinl "\\override Stem #'transparent = ##t")
+      (prinl "\\relative c"
+         (cond
+            ((= Clef "bass"))
+            ((= Clef "percussion") "'")
+            (T "''") )
+         " {")
+      (lyTime Time)
+      (lyClef Clef)
+      (do N
+         (lyEval
+            (need Beats
+               (pack
+                  (cond
+                     ((= Clef "bass") "d")
+                     ((= Clef "percussion") "c")
+                     (T "b" ) )
+                  Pulse) ) ) )
+      (prinl "}") )
+      (prinl "\\revert NoteHead #'style")
+      (prinl "\\revert Stem #'transparent")
+      (prinl "}")
       (prinl "}") ]
-
-# slash notation
-[de sl Music
-   (prinl "{")
-   (prinl "\\override NoteHead #'style = #'slash")
-   (prinl "\\override Stem #'transparent = ##t")
-   (mapc eval Music)
-   (prinl "\\revert NoteHead #'style")
-   (prinl "\\revert Stem #'transparent")
-   (prinl "}") ]
-
 
 # like chords, but uses rhythmic notation
 # first arg is the time signature, must be a string.
 # second is clef, also a string.
 # followed by an arbitrary amount of chords/rests
 #
-# (hits "4/4" "treble" 
-#    "a4.:min6" "b8:7" "r8" "e8:7" "r8" "c8:maj7" )
+# (lyHits "4/4" "treble"
+#    (list "a4.:min6" "b8:7" "r8" "e8:7" "r8" "c8:maj7") )
 #
 [de lyHits (TimeSig Clef "Music")
    (<<
@@ -231,7 +239,7 @@
       (prinl "{ ")
       (prinl "\\set chordChanges = ##t")
       (prinl "\\set minorChordModifier = \\markup { - }")
-      (prinl "\\set noChordSymbol = \"\"")   # hide 'N.C.'s 
+      (prinl "\\set noChordSymbol = \"\"")   # hide 'N.C.'s
       (lyEval "Music")
       (prinl)
       (prinl "}")
@@ -240,9 +248,9 @@
 # rhythmic notation
 [de rhythms (TimeSig Clef "Music")
    (default TimeSig "4/4" Clef "treble")
-   (prinl "\\new Staff") 
+   (prinl "\\new Staff")
    (prinl "{")
-   (if (= Clef "treble") 
+   (if (= Clef "treble")
       (prinl "\\relative c''")
       (prinl "\\relative c") )
    (prinl "{")
@@ -261,10 +269,10 @@
    (let Durs (mapcar '((M) (get-duration M)) Music)
       (lyEval
          (mapcar any
-            (mapcar 
-               '((X) 
-                  (if (pre? "r" X) 
-                     (pack X) 
+            (mapcar
+               '((X)
+                  (if (pre? "r" X)
+                     (pack X)
                      (ifn Flg
                         (pack "b" X)
                         (pack "d" X) ) ) )
