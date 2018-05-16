@@ -82,7 +82,7 @@
 
 # simultaneous music
 # wraps music expressions with angle braces
-[de << Music
+[de ly<< Music
    (prinl "<<")
    (mapc eval Music)
    (prinl ">>") ]
@@ -167,19 +167,44 @@
 # single bar (lilypond bar check)
 [de ly| () (prin "\\bar \"|\" ")]
 
+# dotted bar
+[de ly! () (prinl "\\bar \"!\"")]
+
 # double bar
 [de ly|| () (prin "\\bar \"||\" ")]
 
-# ending bar
+# ending double bar
 [de ly|. () (prin "\\bar \"|.\" ")]
 
 # repeats
-[de ly||: (Times . Music)
-   (prinl "\\repeat volta " Times)
-   (prinl " {")
-   (mapc eval Music)
-   (prinl)
+[de ly.|: () (prinl "\\bar \".|:\"")]  # -> ||:
+
+[de ly:|. () (prinl "\\bar \":|.\"")]  # -> :||
+
+# winged repeats                       #    //
+[de ly<|: () (prinl "\\bar \"[|:\"")]  # -> ||:
+                                       #    \\
+
+                                       #     \\
+[de ly:|> () (prinl "\\bar \":|]\"")]  # -> :||
+                                       #     //
+
+# repeat music (standard repeat signs)
+[de ly||: Music
+   (prinl "{")
+   (ly.|:)
+   (lyEval Music)
+   (ly:|.)
    (prinl "}") ]
+
+# repeat music (winged repeat signs)
+[de ly<||: Music
+   (prinl "{")
+   (ly<|:)
+   (lyEval Music)
+   (ly:|>)
+   (prinl "}") ]
+
 
 # chord changes
 #
@@ -205,7 +230,7 @@
 # -> the changes to 'So What' by Miles Davis (bass clef)
 #
 [de lyChanges (N Time Clef "Music")  # number of bars, time signature, clef, music exprs
-   (<<
+   (ly<<
       (prinl "\\chords")
       (prinl "{ ")
       (prinl "\\set chordChanges = ##t")
@@ -254,9 +279,10 @@
       (prinl "}")
       (prinl "}") ]
 
+
 # hits
 #
-# like chords, but uses rhythmic notation.
+# like changes, but uses rhythmic notation.
 # first arg is the time signature (string), second is
 # clef (string), followed by list of chords/rests
 #
@@ -264,7 +290,7 @@
 #    (list "a4.:min6" "b8:7" "r8" "e8:7" "r8" "c8:maj7") )
 #
 [de lyHits (Time Clef "Music")
-   (<<
+   (ly<<
       (prinl "\\chords")
       (prinl "{ ")
       (prinl "\\set chordChanges = ##t")
