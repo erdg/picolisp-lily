@@ -62,12 +62,14 @@
       Lst ) ]
 
 [de lyScore Music
-   (prinl "\\score {")
+   (prinl "\\score")
+   (prinl "{")
    (mapc eval Music)
    (prinl "}") ]
 
 [de lyStaff Music
-   (prinl "\\new Staff {")
+   (prinl "\\new Staff")
+   (prinl"{")
    (mapc eval Music)
    (prinl "}") ]
 
