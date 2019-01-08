@@ -1,4 +1,11 @@
-# EDIT this fn for your own workflow.
+# /path/to/lilypond
+(setq *Lily "/home/erik/bin/lilypond")
+
+# REPL
+# compiles lilypond files and opens pdf
+# to continue development, return to PL terminal and hit ^C
+# tested only with evince
+#
 [de lilypond "Args"
    (let [(@File . @Music)  "Args"]
       (macro
@@ -6,7 +13,7 @@
             (lyVersion)
             (lyNoIndent)
             (mapc eval '@Music) )
-         (call 'lilypond @File)
+         (call *Lily @File)
          (call 'evince (pack @File ".pdf") ]
 
 [de lyVersion ()
