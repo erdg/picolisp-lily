@@ -187,20 +187,22 @@
 # (lyPickup "2" "a4 b4") -> 2 quarter notes
 #
 (de lyPickup (N . Music)
-   (prin "\\partial " N " ")
+   (prinl "\\partial " N " ")
    (lyEval Music) )
 
 # single bar (lilypond bar check)
-[de ly| () (prin "\\bar \"|\" ")]
+[de ly| () (prinl "\\bar \"|\" ")]
 
 # dotted bar
 [de ly! () (prinl "\\bar \"!\"")]
 
 # double bar
-[de ly|| () (prin "\\bar \"||\" ")]
+[de ly|| () (prinl "\\bar \"||\" ")]
+
+[de lyBreak () (prinl "\\break")]
 
 # ending double bar
-[de ly|. () (prin "\\bar \"|.\" ")]
+[de ly|. () (prinl "\\bar \"|.\" ")]
 
 # repeats
 [de ly.|: () (prinl "\\bar \".|:\"")]  # -> ||:
