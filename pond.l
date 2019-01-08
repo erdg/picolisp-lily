@@ -93,6 +93,7 @@
 #
 # (lyVar "notes")
 # -> \notes
+#
 [de lyVar (Name . Music)
    (ifn Music
       (prinl "\\" Name)
@@ -101,6 +102,7 @@
 
 # sequential music
 # wraps music expressions in curly braces
+#
 [de lyWrap Music
    (prinl "{")
    (lyEval Music)
@@ -108,6 +110,7 @@
 
 # simultaneous music
 # wraps music expressions with angle braces
+#
 [de ly<< Music
    (prinl "<<")
    (mapc eval Music)
@@ -119,13 +122,15 @@
 #
 # probably not needed... just include chord as a music
 # symbol directly, e.g. "<g b d>"
+#
 [de ly<> Music
    (prinl "< " (lyEval Music) " >") ]
 
 # include lilypond files
 #
-# Note - this will need to be different for DB entities
-[de lyInclude (File) (prinl "\\include \"" (pack File ".ly") "\"")]
+# NOTE - this will need to be different for DB entities
+#
+[de lyInclude (File) (prinl "\\include \"" File "\"")]
 
 # key signatures
 [de lyKey (Note Type)
