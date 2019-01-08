@@ -58,9 +58,8 @@
       '((Obj)
          (if (pair Obj)
             (eval @)
-            (prin Obj " ") ) )
-      Lst )
-   (prinl) ]
+            (prinl Obj " ") ) )
+      Lst ) ]
 
 [de lyScore Music
    (prinl "\\score {")
