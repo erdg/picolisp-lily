@@ -155,7 +155,6 @@
    (prinl "\\relative " (pack Note))
    (prinl "{")
    (mapc eval Music)
-   (prinl)
    (prinl "}") ]
 
 # tuplets
