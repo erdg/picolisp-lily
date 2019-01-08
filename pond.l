@@ -11,7 +11,7 @@
       (macro
          (out (pack @File ".ly")  # write file
             (lyVersion)
-            (lyNoIndent)
+            (lyLayout)
             (mapc eval '@Music) )
          (call *Lily @File)
          (call 'evince (pack @File ".pdf") ]
