@@ -233,6 +233,25 @@
    (ly:|>)
    (prinl "}") ]
 
+[de lyRepeat (Times . Music)
+   (prinl "\\repeat volta " Times)
+   (prinl "{")
+   (lyEval Music)
+   (prinl "}") ]
+
+[de lyAlternative Music
+   (prinl "\\alternative ")
+   (prinl "{")
+   (mapc eval Music)
+   (prinl "}") ]
+
+[de lyChords "Music"
+   (prinl "\\chords")
+   (prinl "{ ")
+   (prinl "\\set chordChanges = ##t")
+   (prinl "\\set minorChordModifier = \\markup { - }")
+   (lyEval "Music")
+   (prinl "}") ]
 
 # chord changes
 #
