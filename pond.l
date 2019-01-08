@@ -20,7 +20,7 @@
 
 [de lyVersion () (prinl "\\version \"" *Version "\"")]
 
-[de lyLayout () 
+[de lyLayout ()
    (prinl "\\layout")
    (prinl "{")
    # no indent on first stave
