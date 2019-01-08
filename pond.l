@@ -361,13 +361,17 @@
    (lyClef Clef)
    (prinl "{")
    (prinl "\\override NoteHead #'style = #'slash")
-   (lyEval (packDurations "Music" Clef))
+   (lyEval (packDurations "Music" Clef))  # eg. -> b4 b4 b4 b4
    (prinl "\\revert NoteHead #'style")
    (prinl "}")
    (prinl "}")
    (prinl "}") ]
 
 # don't like the name of this function
+#
+# (packDurations '(a4 b4 c4 d4) "treble")          -> b4 b4 b4 b4
+# (packDurations '(b4. c8 r8 a8 r8 gis8) "bass")   -> d4. d8 r8 d8 r8 d8
+#
 [de packDurations (Music Clef)
    (let Durs (mapcar '((M) (getDuration M)) Music)
       (mapcar any
