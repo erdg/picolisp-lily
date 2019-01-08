@@ -162,7 +162,8 @@
 # (lyTuplet "3/2" "f8 g8 "a8") -> 1/8 note triplet
 #
 [de lyTuplet (Sig . Music)
-   (prinl "\\tuplet " Sig " {")
+   (prinl "\\tuplet " Sig)
+   (prinl "{")
    (lyEval Music)
    (prinl "}") ]
 
