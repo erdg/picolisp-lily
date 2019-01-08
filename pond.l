@@ -20,9 +20,18 @@
    (prinl "\\version \"2.18.2\"")
    (prinl) ]
 
-[de lyNoIndent ()
-   (prinl "\\layout { indent = 0 }")
-   (prinl) ]
+[de lyLayout () 
+   (prinl "\\layout")
+   (prinl "{")
+   # no indent on first stave
+   (prinl "indent = 0")
+   (prinl "\\context")
+   (prinl "{")
+   (prinl "\\Score")
+   # no bar numbers
+   (prinl "\\omit BarNumber")
+   (prinl "}")
+   (prinl "}") ]
 
 # currently not using this
 [de lyHeader (Title Composer)
