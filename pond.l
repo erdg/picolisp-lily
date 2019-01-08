@@ -33,15 +33,15 @@
    (prinl "}")
    (prinl "}") ]
 
-# currently not using this
 [de lyHeader (Title Composer)
-   (prinl "\\header {")
+   (prinl "\\header")
+   (prinl "{")
+   (prinl "tagline = ##f")
    (when Title
-      (println "title = " Title) )
+      (prinl "title = \"" Title "\"") )
    (when Composer
-      (println "composer = " Composer) )
-   (prinl "}")
-   (prinl) ]
+      (prinl "composer = \"" Composer "\"") )
+   (prinl "}") ]
 
 # lyEval - recursively evaluates music expressions
 #
