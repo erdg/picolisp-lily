@@ -1,5 +1,7 @@
 # /path/to/lilypond
 (setq *Lily "/home/erik/bin/lilypond")
+# version
+(setq *Version "2.19.82")
 
 # REPL
 # compiles lilypond files and opens pdf
@@ -16,9 +18,7 @@
          (call *Lily @File)
          (call 'evince (pack @File ".pdf") ]
 
-[de lyVersion ()
-   (prinl "\\version \"2.18.2\"")
-   (prinl) ]
+[de lyVersion () (prinl "\\version \"" *Version "\"")]
 
 [de lyLayout () 
    (prinl "\\layout")
