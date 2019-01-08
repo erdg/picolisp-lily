@@ -73,6 +73,15 @@
    (mapc eval Music)
    (prinl "}") ]
 
+[de lySet (Prop Val)    # context property, value
+   (prinl "\\set " Prop " = " Val) ]
+
+[de lyUnset (Prop)    # context property, value
+   (prinl "\\unset " Prop) ]
+
+[de lySetGlobalStaffSize (N)
+   (prinl "#(set-global-staff-size " N ")") ]
+
 # lilypond varibles
 #
 # usage - declare variable
