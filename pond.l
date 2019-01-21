@@ -547,6 +547,147 @@
       (call 'firefox Svg)
 ]
 
+# generic note icons with clickable staff lines
+[de lilypondNoteIconSVG (File Clef . Music)
+   # write lilypond code to file
+   (out (pack File ".ly")
+      (lyVersion)
+      (lyLayout)
+      (mapc eval Music) )
+   # create SVGs
+   (t (call *Lily "-dpreview" "-dbackend=svg" File))
+   (let [Svg (pack File ".production.svg")
+         Notes (circ 'a 'b 'c 'd 'e 'f 'g) ]
+      #if production file exists, clear it
+      (if (info Svg) (out Svg NIL))
+      # arrange notes bottom staff line first
+      [case Clef
+         ("bass" (do 2 (rot Notes)))
+         ("treble" (do 4 (rot Notes)))
+      ]
+      # fancy svg processing - attach a function to lines and spaces, ie. make
+      # them clickable
+      #
+      # how it works - for each staff '<line>', first add a "fat" white
+      # (transparent) line underneath.  this makes the space around the line
+      # clickable, so it works consistently on a touch screen.  then print the
+      # normal (black) staff line (also clickable). finally, print another
+      # "fat" transparent line with an Y offset of -0.5. this makes the space
+      # clickable.
+      (in (pack File ".preview.svg")
+         (while (line T) # -> @
+            (out (pack "+" Svg)
+               (if (pre? "<line" @) # -> @
+                  (prog
+                     # next pitch
+                     (pop 'Notes)
+                     # clickable line
+                     (prinl "<a onclick=\"alert('line " (car Notes) "')\">")   # EDIT ONCLICK FN HERE
+                     (pipe
+                        (prinl @) # <- 'if'
+                        (prinl
+                           (use Str
+                              (setq Str (split (till (eol)) " "))
+                              (patch Str '(~(chop "stroke-width=\"") @N "\"") "stroke-width=\"0.5\"")
+                              (patch Str '(~(chop "stroke=\"currentColor\"")) "stroke=\"white\"")
+                              (glue " " (mapcar pack Str)) ) ) )
+                     (prinl "</a>")
+                     # print line as is, clickable
+                     (prinl "<a onclick=\"alert('line " (car Notes) "')\">")   # EDIT ONCLICK FN HERE
+                     (prinl @) # <- 'if'
+                     (prinl "</a>")
+                     # next pitch
+                     (pop 'Notes)
+                     # clickable space
+                     (prinl "<a onclick=\"alert('space " (car Notes) "')\">")   # EDIT ONCLICK FN HERE
+                     (pipe
+                        (prinl @) # <- 'if'
+                        (prinl
+                           (till "," T) "," (format (- (any (till ")" T)) 0.5) *Scl ".")
+                           (use Str
+                              (setq Str (split (till (eol)) " "))
+                              (patch Str '(~(chop "stroke-width=\"") @N "\"") "stroke-width=\"0.5\"")
+                              (patch Str '(~(chop "stroke=\"currentColor\"")) "stroke=\"white\"")
+                              (glue " " (mapcar pack Str)) ) ) )
+                     (prinl "</a>") )
+                  (prinl @) ) ) ) ) # <- 'if'
+      # cleanup
+      (call 'rm (pack File ".ly"))
+      (call 'rm (pack File ".svg"))
+      (call 'rm (pack File ".preview.svg"))
+      # rename
+      (call 'mv Svg (pack File ".svg"))
+      # preview in browser
+      (call 'firefox (pack File ".svg"))
+]
+
+# note icons with clickable staff lines, for interacting with hyperapp-js
+[de lilypondSVG-noteIcon-hyperapp (File Clef . Music)
+   # write lilypond code to file
+   (out (pack File ".ly")
+      (lyVersion)
+      (lyLayout)
+      (mapc eval Music) )
+   # create svg
+   (t (call *Lily "-dpreview" "-dbackend=svg" File))
+   (let [Svg (pack File ".production.svg")
+         Notes (circ 'a 'b 'c 'd 'e 'f 'g) ]
+      #if production file exists, clear it
+      (if (info Svg) (out Svg NIL))
+      # arrange notes bottom staff line first
+      [case Clef
+         ("bass" (do 2 (rot Notes)))         # '(g a b c d e f .)
+         ("treble" (do 4 (rot Notes)))  # '(e f g a b c d .)
+      ]
+      # fancy svg processing - attach a function to lines and spaces, ie. make them clickable
+      (in (pack File ".preview.svg")
+         (while (line T)
+            (out (pack "+" Svg)
+               (if (pre? "<line" @)
+                  (prog
+                     # next pitch
+                     (pop 'Notes)
+                     # clickable line
+                     (prinl "<a onclick=\"window.top.main.setNote('" (car Notes) "')\">")   # EDIT ONCLICK FN HERE
+                     (pipe
+                        (prinl @)
+                        (prinl
+                           (use Str
+                              (setq Str (split (till (eol)) " "))
+                              (patch Str '(~(chop "stroke-width=\"") @N "\"") "stroke-width=\"0.5\"")
+                              (patch Str '(~(chop "stroke=\"currentColor\"")) "stroke=\"white\"")
+                              (glue " " (mapcar pack Str)) ) ) )
+                     (prinl "</a>")
+                     # print line as is, clickable
+                     (prinl "<a onclick=\"window.top.main.setNote('" (car Notes) "')\">")   # EDIT ONCLICK FN HERE
+                     (prinl @)
+                     (prinl "</a>")
+                     # next pitch
+                     (pop 'Notes)
+                     # clickable space
+                     (prinl "<a onclick=\"window.top.main.setNote('" (car Notes) "')\">")   # EDIT ONCLICK FN HERE
+                     (pipe
+                        (prinl @)
+                        (prinl
+                           (till "," T) "," (format (- (any (till ")" T)) 0.5) *Scl ".")
+                           (use Str
+                              (setq Str (split (till (eol)) " "))
+                              (patch Str '(~(chop "stroke-width=\"") @N "\"") "stroke-width=\"0.5\"")
+                              (patch Str '(~(chop "stroke=\"currentColor\"")) "stroke=\"white\"")
+                              (glue " " (mapcar pack Str)) ) ) )
+                     (prinl "</a>") )
+                  (prinl @) ) ) ) )
+
+      # cleanup
+      (call 'rm (pack File ".ly"))
+      (call 'rm (pack File ".svg"))
+      (call 'rm (pack File ".preview.svg"))
+      # rename
+      (call 'mv Svg (pack File ".svg"))
+      # preview in browser
+      (call 'firefox (pack File ".svg"))
+]
+
 # later...
 # need to loop over all durations
 # nested for loop?
