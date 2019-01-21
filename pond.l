@@ -422,7 +422,8 @@
 
 # note with staff/clef for pitch reference. no key/time signature
 (de lyNoteIcon (Note Clef)
-   # (lySetGlobalStaffSize 14)
+   (lySetGlobalStaffSize 100)
+   (lyInclude "lilyjazz.ily")
    (lyStaff
       (lyClef Clef)
       (prinl "\\omit Staff.KeySignature")
