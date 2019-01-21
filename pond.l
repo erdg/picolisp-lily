@@ -487,67 +487,10 @@
    (call 'firefox (pack File ".preview.svg")
 ]
 
+# set scale for SVG x/y values
 (scl 4)
 
-[de lilypondSVG%% (File . Music)
-   # write lilypond code to file
-   (out (pack File ".ly")
-      (lyVersion)
-      (lyLayout)
-      (mapc eval Music) )
-   # create svg
-   (t (call *Lily "-dpreview" "-dbackend=svg" File))
-   (let Svg (pack File ".production.svg")
-      #if production file exists, clear it
-      (if (info Svg) (out Svg NIL))
-
-      # this is an experiment to attach a function to
-      # the line, ie. make them clickable
-      (in (pack File ".preview.svg")
-         (while (line T)
-            (out (pack "+" Svg)
-               (if (pre? "<line" @)
-                  (prog
-                     # clickable line
-                     (prinl "<a onclick=\"alert('line')\">")
-                     (pipe
-                        (prinl @)
-                        (prinl
-                           (use Str
-                              (setq Str (split (till (eol)) " "))
-                              (patch Str '(~(chop "stroke-width=\"") @N "\"") "stroke-width=\"0.5\"")
-                              (patch Str '(~(chop "stroke=\"currentColor\"")) "stroke=\"white\"")
-                              (glue " " (mapcar pack Str)) ) ) )
-                     (prinl "</a>")
-                     # print line as is
-                     (prinl "<a onclick=\"alert('line')\">")
-                     (prinl @)
-                     (prinl "</a>")
-                     # clickable space
-                     (prinl "<a onclick=\"alert('space')\">")
-                     (pipe
-                        (prinl @)
-                        (prinl
-                           (till "," T) "," (format (- (any (till ")" T)) 0.5) *Scl ".")
-                           (use Str
-                              (setq Str (split (till (eol)) " "))
-                              (patch Str '(~(chop "stroke-width=\"") @N "\"") "stroke-width=\"0.5\"")
-                              (patch Str '(~(chop "stroke=\"currentColor\"")) "stroke=\"white\"")
-                              (glue " " (mapcar pack Str)) ) ) )
-                     (prinl "</a>") )
-                  (prinl @) ) ) ) )
-
-      # cleanup
-      (call 'rm (pack File ".ly"))
-      (call 'rm (pack File ".svg"))
-      (call 'rm (pack File ".preview.svg"))
-      # rename
-      # (call 'mv (pack @File ".production.svg") (pack @File ".svg"))
-      # preview in browser
-      (call 'firefox Svg)
-]
-
-# generic note icons with clickable staff lines
+# generic note icons with clickable staff lines/spaces
 [de lilypondNoteIconSVG (File Clef . Music)
    # write lilypond code to file
    (out (pack File ".ly")
