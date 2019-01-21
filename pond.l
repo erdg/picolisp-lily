@@ -429,8 +429,43 @@
       (prinl "\\omit Staff.KeySignature")
       (prinl "\\omit Staff.TimeSignature")
       (prinl "\\omit Staff.BarLine")
+      (prinl "\\newSpacingSection")
       (prinl "\\override Staff.NoteSpacing.space-to-barline = ##f")
-      (prinl Note) ) )
+      (prinl "\\override Score.SpacingSpanner.base-shortest-duration = #(ly:make-moment 1)")
+      (prinl "\\override Staff.Stem.no-stem-extend = ##t")
+      (prinl "\\override Staff.Stem.neutral-direction = #down")
+      (prinl "\\override Staff.StaffSymbol.ledger-line-thickness = #'(0.05 . 0.05)")
+      # << { ... } \\ { ... } >> pattern (implicit simultaneous voices)
+      (ly<<
+         (lyWrap
+            # hacks for proper stem direction
+            (case Clef
+               ("bass"
+                  (if
+                     (or
+                        (and
+                           (>= (length (fish '((C) (= C "'")) (chop Note))) 1)
+                           (or (not (= (car Note) "a")) (not (= (car Note) "b"))) )
+                        (and
+                           (= (length (fish '((C) (= C ",")) (chop Note))) 0)
+                           (not (= (car (chop Note)) "c")) ) )
+                     (prinl "\\stemDown") ) )
+               ("treble"
+                  (if (>= (length (fish '((C) (= C "'")) (chop Note))) 2)
+                     (prinl "\\stemDown") ) ) )
+            (prinl Note)
+            (prinl "\\stemNeutral") )
+         (prinl "\\\\")
+         # hidden notes 4 ledger lines above and below staff, for uniform SVG size/layout
+         (lyWrap "\\hideNotes"
+            (case Clef
+               ("bass" (prinl "c''"))
+               ("treble" (prinl "a'''")) ) )
+         (prinl "\\\\")
+         (lyWrap "\\hideNotes"
+            (case Clef
+               ("bass" (prinl "e,,"))
+               ("treble" (prinl "c")) ) ) ) ) )
 
 (de lyClefIcon (Clef)
    (lyStaff
