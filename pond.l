@@ -475,47 +475,16 @@
       (prinl "\\omit Staff.BarLine")
       (prinl "\\omit Staff.StaffSymbol") ) )
 
-[de lilypondSVG "Args"
-   (let [(@File . @Music)  "Args"]
-      (macro
-         # write lilypond code to file
-         (out (pack @File ".ly")
-            (lyVersion)
-            (lyLayout)
-            (mapc eval '@Music) )
-         # create svg
-         (t (call *Lily "-dpreview" "-dbackend=svg" @File))
-         (let File (pack @File ".production.svg")
-            #if production file exists, clear it
-            (if (info File) (out File NIL))
-
-            # # remove '<a>' tags from svg
-            # (in (pack @File ".preview.svg")
-            #    (while (line T)
-            #       (unless (or (pre? "<a" @) (pre? "</a" @))
-            #          (out (pack "+" @File ".production.svg")
-            #             (prinl @) ) ) ) )
-
-            # this is an experiment to attach a function to
-            # the line, ie. make them clickable
-            (in (pack @File ".preview.svg")
-               (while (line T)
-                  (out (pack "+" @File ".production.svg")
-                     (if (pre? "<line" @)
-                        (prog
-                           (prinl "<a onclick=\"alert('you clicked a line')\">")
-                           (prinl @)
-                           (prinl "</a>") )
-                        (prinl @) ) ) ) )
-
-            # cleanup
-            (call 'rm (pack @File ".ly"))
-            (call 'rm (pack @File ".svg"))
-            (call 'rm (pack @File ".preview.svg"))
-            # rename
-            # (call 'mv (pack @File ".production.svg") (pack @File ".svg"))
-            # preview in browser
-            (call 'firefox (pack @File ".production.svg")
+[de lilypondSVG (File . Music)
+   # write lilypond code to file
+   (out (pack File ".ly")
+      (lyVersion)
+      (lyLayout)
+      (run Music) )
+   # create SVGs
+   (t (call *Lily "-dpreview" "-dbackend=svg" File))
+   # preview in browser
+   (call 'firefox (pack File ".preview.svg")
 ]
 
 (scl 4)
