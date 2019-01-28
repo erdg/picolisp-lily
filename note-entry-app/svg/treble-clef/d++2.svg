@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.2" width="77.06mm" height="124.17mm" viewBox="0.0000 -0.0000 8.7700 14.1321">
+<a onclick="window.top.main.setNote('e')">
+<line transform="translate(0.0000, 9.0660)" stroke-linejoin="round" stroke-linecap="round" stroke-width="0.5" stroke="white" x1="0.0237" y1="-0.0000" x2="8.7700" y2="-0.0000"/>
+
+</a>
+<a onclick="window.top.main.setNote('e')">
+<line transform="translate(0.0000, 9.0660)" stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0474" stroke="currentColor" x1="0.0237" y1="-0.0000" x2="8.7700" y2="-0.0000"/>
+</a>
+<a onclick="window.top.main.setNote('f')">
+<line transform="translate(0.0000,8.5660)" stroke-linejoin="round" stroke-linecap="round" stroke-width="0.5" stroke="white" x1="0.0237" y1="-0.0000" x2="8.7700" y2="-0.0000"/>
+
+</a>
+<a onclick="window.top.main.setNote('g')">
+<line transform="translate(0.0000, 8.0660)" stroke-linejoin="round" stroke-linecap="round" stroke-width="0.5" stroke="white" x1="0.0237" y1="-0.0000" x2="8.7700" y2="-0.0000"/>
+
+</a>
+<a onclick="window.top.main.setNote('g')">
+<line transform="translate(0.0000, 8.0660)" stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0474" stroke="currentColor" x1="0.0237" y1="-0.0000" x2="8.7700" y2="-0.0000"/>
+</a>
+<a onclick="window.top.main.setNote('a')">
+<line transform="translate(0.0000,7.5660)" stroke-linejoin="round" stroke-linecap="round" stroke-width="0.5" stroke="white" x1="0.0237" y1="-0.0000" x2="8.7700" y2="-0.0000"/>
+
+</a>
+<a onclick="window.top.main.setNote('b')">
+<line transform="translate(0.0000, 7.0660)" stroke-linejoin="round" stroke-linecap="round" stroke-width="0.5" stroke="white" x1="0.0237" y1="-0.0000" x2="8.7700" y2="-0.0000"/>
+
+</a>
+<a onclick="window.top.main.setNote('b')">
+<line transform="translate(0.0000, 7.0660)" stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0474" stroke="currentColor" x1="0.0237" y1="-0.0000" x2="8.7700" y2="-0.0000"/>
+</a>
+<a onclick="window.top.main.setNote('c')">
+<line transform="translate(0.0000,6.5660)" stroke-linejoin="round" stroke-linecap="round" stroke-width="0.5" stroke="white" x1="0.0237" y1="-0.0000" x2="8.7700" y2="-0.0000"/>
+
+</a>
+<a onclick="window.top.main.setNote('d')">
+<line transform="translate(0.0000, 6.0660)" stroke-linejoin="round" stroke-linecap="round" stroke-width="0.5" stroke="white" x1="0.0237" y1="-0.0000" x2="8.7700" y2="-0.0000"/>
+
+</a>
+<a onclick="window.top.main.setNote('d')">
+<line transform="translate(0.0000, 6.0660)" stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0474" stroke="currentColor" x1="0.0237" y1="-0.0000" x2="8.7700" y2="-0.0000"/>
+</a>
+<a onclick="window.top.main.setNote('e')">
+<line transform="translate(0.0000,5.5660)" stroke-linejoin="round" stroke-linecap="round" stroke-width="0.5" stroke="white" x1="0.0237" y1="-0.0000" x2="8.7700" y2="-0.0000"/>
+
+</a>
+<a onclick="window.top.main.setNote('f')">
+<line transform="translate(0.0000, 5.0660)" stroke-linejoin="round" stroke-linecap="round" stroke-width="0.5" stroke="white" x1="0.0237" y1="-0.0000" x2="8.7700" y2="-0.0000"/>
+
+</a>
+<a onclick="window.top.main.setNote('f')">
+<line transform="translate(0.0000, 5.0660)" stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0474" stroke="currentColor" x1="0.0237" y1="-0.0000" x2="8.7700" y2="-0.0000"/>
+</a>
+<a onclick="window.top.main.setNote('g')">
+<line transform="translate(0.0000,4.5660)" stroke-linejoin="round" stroke-linecap="round" stroke-width="0.5" stroke="white" x1="0.0237" y1="-0.0000" x2="8.7700" y2="-0.0000"/>
+
+</a>
+<rect transform="translate(6.3388, 7.0660)" x="-0.0949" y="-0.8294" width="0.1897" height="3.3294" ry="0.0080" fill="currentColor"/>
+<path transform="translate(0.8000, 8.0660) scale(0.0040, -0.0040)" d="M370 -27c-5 48 -9 73 -9 73c-1 0 -7 -6 -18 -19c-39 -48 -70 -89 -93 -150c-9 -23 -13 -43 -13 -59l-1 -13l17 -3c5 -1 11 0 18 0c19 0 46 3 80 10c24 5 36 6 36 8s-1 16 -4 42s-8 63 -13 111zM635 127c-9 16 -37 36 -70 36c-41 0 -119 -40 -143 -62
+c-14 -13 -15 -16 -15 -39c0 -35 13 -166 15 -200c1 -13 3 -20 5 -20c7 0 20 9 43 25c27 19 56 49 88 88c50 64 78 113 78 159c0 7 1 10 -1 13zM332 213c0 1 -32 366 -34 368c-3 0 -12 -26 -14 -31c-129 -294 -202 -486 -214 -578c-1 -9 -2 -17 -2 -25c0 -52 23 -93 58 -113
+c3 -2 42 -20 47 -20c1 0 1 11 2 31c5 83 33 154 67 218c13 24 33 57 62 98l28 42v10zM298 1107c-10.2857 0 -11.0204 -10.2857 -11.0204 -25.8192c0 -2.58892 0.0204082 -5.32362 0.0204082 -8.18076c0 -50 6 -99 11 -146c7 -52 10 -78 12 -80c2 0 8 19 9 22
+c24 78 35 130 35 160c0 8 0 16 -2 20c-12 29 -27 47 -43 55c-4 2 -7 3 -11 3zM212 1307c0 15 14 38 30 38c13 0 19 -3 33 -11c94 -57 148 -163 148 -312c0 -79 -23 -174 -68 -287l-16 -45l2 -42c9 -164 20 -294 34 -389l2 -21l13 12c46 43 95 69 147 77c5 1 14 2 22 2
+c76 0 122 -38 142 -118c7 -27 10 -58 10 -90c0 -19 -3 -39 -5 -60c-9 -78 -20 -137 -34 -180c-21 -65 -82 -158 -138 -196c-8 -5 -47 -33 -58 -43c-3 -2 -3 -5 -3 -7v-1c8 -32 19 -103 19 -153c0 -96 -24 -203 -48 -253c-7 -14 -16 -26 -26 -34c-8 -5 -15 -8 -20 -8
+c-23 0 -31 40 -35 103l-1 21l12 20c30 53 60 135 60 206c0 19 -1 38 -5 56c-3 13 -5 21 -15 21c-8 0 -15 -1 -25 -3c-22 -5 -44 -8 -69 -8c-156 0 -249 63 -295 191c-16 48 -25 99 -25 156c0 44 5 91 15 141c22 106 81 272 175 501c48 116 75 184 80 200l4 13l-32 248
+c-21 164 -30 251 -30 255z" fill="currentColor"/>
+<a style="color:inherit;" xlink:href="textedit:///home/erik/code/pl/picolisp-lily/music-app/svg/treble-clef/d%2b%2b2.ly:29:0:1">
+<path transform="translate(6.2439, 6.0660) scale(0.0040, -0.0040)" d="M141 -87c47 0 94 47 94 94c0 15 -4 30 -10 48c-8 22 -18 31 -31 31c-55 0 -86 -55 -86 -115c0 -38 11 -58 33 -58zM347 44c0 -59 -42 -100 -125 -146c-55 -29 -103 -44 -143 -44c-24 0 -44 8 -61 30c-14 18 -18 29 -18 53c0 53 35 105 94 150c55 42 107 59 162 59
+c63 0 91 -40 91 -102z" fill="currentColor"/>
+</a>
+</svg>
