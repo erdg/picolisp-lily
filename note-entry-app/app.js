@@ -82,49 +82,7 @@ const view = (state, actions) =>
             },
             zIndex: 10
          }),
-         // h("h1", {}, state.count),
-         // h("button", { onclick: () => actions.up(1) }, "+"),
-         // h("button", { onclick: () => actions.down(1) }, "-"),
-         // HelloButton,
-         // TextButton({ text: "This is the coolest button" }),
-         // StyledButton({
-         //    text: "This is a styled button"
-         // }),
-         // RedTextButton({ text: "this button should have red text" }),
-         // h(Wrapper, {}, [h("p",{}, "pink paragraph?")])
       ]
    );
 
 window.main = app(state, actions, view, document.body);
-
-// const HelloButton = () => {
-//    return (
-//       h("button", {}, "Hello")
-//    )
-// }
-
-// const TextButton = ({ text }) => {
-//    return (
-//       h("button", {}, text)
-//    )
-// }
-
-// const RedTextButton = style(TextButton)({
-//    color: "red"
-// })
-
-// const StyledButton = ({ text }) => (
-//    h("button", {
-//          class: "styled-button",
-//          onclick: () => alert("You clicked the styled button!"),
-//       },
-//       text
-//    )
-// )
-
-// const Wrapper = style("div")({
-//    backgroundColor: "pink",
-//    ":hover": {
-//       backgroundColor: "lightblue"
-//    }
-// })
