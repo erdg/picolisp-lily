@@ -1,0 +1,20 @@
+## a simple melody app
+a proof-of-concept app. Renders a simple melody to SVG (via LilyPond), and
+displays it in the browser. Key, clef and time signature can changed and the
+melody will dynamically update. Notes can be added, but not removed or edited.
+There is no "undo".
+
+### usage
+Install deps and start the JS dev server
+```
+$ cd melody-app
+$ npm install
+$ npm start
+```
+In another terminal, start the PL server
+```
+$ cd melody-app
+$ pil server.l -main -go +
+```
+Finally, point your browser to http://localhost:8080 (or whatever port the js
+dev server tells you).
