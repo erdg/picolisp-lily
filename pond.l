@@ -199,10 +199,8 @@
 [de lyClef (Clef)
    (prinl "\\clef " Clef) ]
 
-# melodies
 #
-# this seems to be the "melody" function
-# maybe rename to 'lyMelody'?
+# melodies
 #
 [de lyRelative (Note . Music)
    (prinl "\\relative " (pack Note))
