@@ -531,18 +531,6 @@
       (prinl "\\omit Staff.BarLine")
       (prinl "\\omit Staff.StaffSymbol") ) )
 
-[de lilypondSVG (File . Music)
-   # write lilypond code to file
-   (out (pack File ".ly")
-      (lyVersion)
-      (lyLayout)
-      (run Music) )
-   # create SVGs
-   (t (call *Lily "-dpreview" "-dbackend=svg" File))
-   # preview in browser
-   (call 'firefox (pack File ".preview.svg")
-]
-
 # set scale for SVG x/y values
 (scl 4)
 
