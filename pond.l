@@ -93,6 +93,32 @@
    (mapc eval Music)
    (prinl "}") ]
 
+# (lyPianoStaff
+#    (lyStaff (lyMelody "c'" (lyClef "treble") "c4" "e" "d" "f" "e1"))
+#    (lyStaff (lyMelody "c" (lyClef "bass") "c4" "e" "d" "f" "g1")) )
+#
+[de lyPianoStaff Music
+   (prinl "\\new PianoStaff")
+   (prinl "<<")
+   (mapc eval Music)
+   (prinl ">>") ]
+
+# lyPiano - quickly sketch piano music
+#
+# (lyPiano
+#    (cons "<ees,8 g>" (need 7 "<ees g>"))                  # LH
+#    '("aes8" "ees" "bes" "ees" "aes" "ees" "aes" "ees") )  # RH
+#
+# NOTE - lists will be evaluated with 'lyEval, use 'quote for
+# a list of direct notes
+#
+[de lyPiano Music
+   (let [(@L @R) Music] # left/right hand
+      (macro
+         (lyPianoStaff
+            (lyStaff (lyClef "treble") (lyEval @L))
+            (lyStaff (lyClef "bass")   (lyEval @R)) ]
+
 [de lySet (Prop Val)    # context property, value
    (prinl "\\set " Prop " = " Val) ]
 
