@@ -2,10 +2,15 @@
 (setq *Lily "/home/erik/bin/lilypond")
 # version
 (setq *Version "2.19.82")
+###
+
+# TODO - get rid of 'lyRelative' and any '/relative' nonsense
+# it's confusing and adds needless complexity to the codebase
 
 # REPL
 # compiles lilypond files and opens pdf
 # to continue development, return to PL terminal and hit ^C
+#
 # tested only with evince
 #
 [de lilypond (File . Music)
@@ -135,8 +140,10 @@
 #
 # (ly<> "g" "b" "d") -> G major chord
 #
-# probably not needed... just include chord as a music
+# NOTE - probably not needed... just include chord as a music
 # symbol directly, e.g. "<g b d>"
+#
+# MISC - duration goes outside the chord, e.g. "<g b d>8"
 #
 [de ly<> Music
    (prinl "< " (lyEval Music) " >") ]
@@ -177,9 +184,19 @@
    (mapc eval Music)
    (prinl "}") ]
 
+#
+# same as 'lyRelative, but uses 'lyEval
+# no need to explicitly use 'lyWrap
+#
+[de lyMelody (Note . Music)
+   (prinl "\\relative " (pack Note))
+   (prinl "{")
+   (lyEval Music)
+   (prinl "}") ]
+
 # tuplets
 #
-# (lyTuplet "3/2" "f8 g8 "a8") -> 1/8 note triplet
+# (lyTuplet "3/2" "f8" "g8" "a8") -> 1/8 note triplet
 #
 [de lyTuplet (Sig . Music)
    (prinl "\\tuplet " Sig)
