@@ -8,15 +8,30 @@
 # to continue development, return to PL terminal and hit ^C
 # tested only with evince
 #
-[de lilypond "Args"
-   (let [(@File . @Music)  "Args"]
-      (macro
-         (out (pack @File ".ly")  # write file
-            (lyVersion)
-            (lyLayout)
-            (mapc eval '@Music) )
-         (call *Lily @File)
-         (call 'evince (pack @File ".pdf") ]
+[de lilypond (File . Music)
+   (out (pack File ".ly")  # write file
+      (lyVersion)
+      (lyLayout)
+      (lyHeader)
+      ### jazz font
+      # (lyInclude "lilyjazz.ily")
+      # (lyInclude "jazzchords.ly")
+      (run Music 1) )
+   (call *Lily File)
+   (call 'evince (pack File ".pdf") ]
+
+[de lilypondSVG (File . Music)
+   # write lilypond code to file
+   (out (pack File ".ly")
+      (lyVersion)
+      (lyLayout)
+      (run Music) )
+   # create SVGs
+   (t (call *Lily "-dpreview" "-dbackend=svg" File))
+   # preview in browser
+   (call 'firefox (pack File ".preview.svg")
+   (call 'firefox (pack File ".svg")
+]
 
 [de lyVersion () (prinl "\\version \"" *Version "\"")]
 
