@@ -54,39 +54,32 @@
       # to 'left% or even the top-level 'metric-modulation-in-f-minor
       (let Notes (circ (pack "c''" Dur) (pack "aes'" Dur) (pack "aes''" Dur) (pack "f'" Dur))
          (do 4 (link 
-            (fill '(lyTuplet ^(list (pack N1 "/" N2)) ^(make (do N1 (chain (list (pop 'Notes))))))))))))
-
-(de 8th-note-tuplets ())
-(de 16th-note-tuplets ())
-(de 16th-note-quintuplets ())
-(de 16th-note-septuplets ())
+            (fill '(lyTuplet ^(list (pack N1 "/" N2)) ^(make (do N1 (chain (list (pop 'Notes))))))))))))  # no wonder people don't use lisp
 
 
 # left hand part
-(de left% ()
+[de left% ()
    # read macro 
    `(fill
       '(lyWrap  
          # the notes
          ^(list "c''8" "aes'8" "aes''8" "f'8" "c''8" "aes'8" "aes''8" "f'8")
+         ^(list "c''8" "aes'8" "aes''8" "f'8" "c''8" "aes'8" "aes''8" "f'8")
          # the original idea
-         ^(make # inside 'fill, '^ means to splice in result... of 'make' in this case
+         ^(make # ^ means to splice in result... of 'make' in this case
            (let Notes (circ "c''8" "aes'8" "aes''8" "f'8")
               (do 4 (link 
                  (fill '(lyTuplet "3/2" ^ (list (pop 'Notes)) ^ (list (pop 'Notes)) ^ (list (pop 'Notes))))))))
-         # the next variation
-         ^(make 
-            (let Notes (circ "c''16" "aes'16" "aes''16" "f'16")
-               (do 4 (link 
-                  (fill '(lyTuplet "6/4" ^ (make (do 6 (chain (list (pop 'Notes)))))))))))#))))))))))))))))))))))))))))sheesh
-         # too much writing, let's make this a function
-         ^(makeTuplets 6 4 16)
-         ^(makeTuplets 5 4 16)
-         # wowza!
+         ^(makeTuplets 3 2 8)  # same as above, 8th note triplets
+         ^(do 2 (makeTuplets 4 4 16)) # same as above
+         ^(do 2 (makeTuplets 5 4 16)) 
+         ^(do 2 (makeTuplets 6 4 16))
          ^(do 2 (makeTuplets 7 4 16))
-         ^(makeTuplets 3 2 8)
-         ^(makeTuplets 3 2 8)
-         ^(makeTuplets 3 2 8) ) ) )
+         ^(do 2 (makeTuplets 6 4 16))
+         ^(do 2 (makeTuplets 5 4 16)) 
+         ^(do 2 (makeTuplets 4 4 16))
+         ^(do 2 (makeTuplets 3 2 8))
+         ^(do 4 (makeTuplets 3 2 4)) ]
 
 # This was an exercise in writing picolisp code that writes picolisp code that
 # writes lilypond code that writes sheet music
