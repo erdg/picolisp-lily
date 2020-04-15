@@ -5,6 +5,8 @@
                R (mapcar '((X) (pack (delete "'" (chop X)))) L) ]  # right hand notes, drop octave "f'8" -> "f8"
             (lyPiano
                (left%)
+               # This could also be a read macro, but the notes above would need to be outside
+               # this function, probably as a top-level (setq Notes '("c''8" ...))
                (append R R R R R R R R R) ) ] # 8 measures
 
 # read macros and nested 'fill's, madness lurks below...
@@ -81,5 +83,9 @@
          ^(do 2 (makeTuplets 3 2 8))
          ^(do 4 (makeTuplets 3 2 4)) ]
 
-# This was an exercise in writing picolisp code that writes picolisp code that
-# writes lilypond code that writes sheet music
+# a lot of repition here... couldn't i write a for-loop that writes 
+# the 'makeTuplets' code that writes the 'lyTuplet' code that writes
+# the lilypond code that writes the sheet music? to be continued...
+
+# This was an exercise in writing picolisp code that writes picolisp 
+# code (ad infinitum) that writes lilypond code that writes sheet music
