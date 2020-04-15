@@ -9,14 +9,19 @@
 
 # read macros and nested 'fill's, madness lurks below...
 
-# this was the original idea...
-# the 'make' call has been turned into a function 'makeTuplet' below
+# this was the original idea... a picolisp (read) macro that writes
+# picolisp-lilypond code that writes lilypond code that writes beautiful
+# sheet music
+# 
+# the 'make' call has been turned into a function 'makeTuplets' below
 (de left ()
    # read macro 
    `(fill
       '(lyWrap  
          ^(make # splice in result of 'make'
-            (let Notes (circ "c''8" "aes'8" "aes''8" "f'8")
+            # circular list allows to get the correct note, regardless of how
+            # many tuplets or how many notes in a single tuplet. just keep poppin'!
+            (let Notes (circ "c''8" "aes'8" "aes''8" "f'8")  
                (do 4 (link 
                   (fill '(lyTuplet "3/2" ^ (list (pop 'Notes)) ^ (list (pop 'Notes)) ^ (list (pop 'Notes)))))))))))
 
@@ -29,8 +34,19 @@
 #    (lyTuplet "3/2" "aes'8" "aes''8" "f'8") )
 
 
-# 'makeTuplets generates 'lyTuplet code above (not including 'lyWrap)
-# this needs to be defined before because 'left%, it's calling
+# i needed another variation with 16th notes
+#
+# ^(make
+#    (let Notes (circ "c''16" "aes'16" "aes''16" "f'16") # 16th notes
+#       (do 4 (link 
+#          (fill '(lyTuplet "6/4" ^ (make (do 6 (chain (list (pop 'Notes)))))))))))
+#
+# so similar, too much typing - time to make a new function!
+
+
+
+# 'makeTuplets' generates 'lyTuplet' code above (not including 'lyWrap')
+# this needs to be defined before because 'left%', it's calling
 # function, because read macro
 (de makeTuplets (N1 N2 Dur)
    (make 
