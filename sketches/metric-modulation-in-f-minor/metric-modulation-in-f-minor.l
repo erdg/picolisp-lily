@@ -7,7 +7,7 @@
                (left%)
                # This could also be a read macro, but the notes above would need to be outside
                # this function, probably as a top-level (setq Notes '("c''8" ...))
-               (append R R R R R R R R R) ) ] # 8 measures
+               (append R R R R R R R R R R R R R) ) ]  # 8 measures or so, who's counting anymore?
 
 # read macros and nested 'fill's, madness lurks below...
 
@@ -81,7 +81,7 @@
          ^(do 2 (makeTuplets 5 4 16)) 
          ^(do 2 (makeTuplets 4 4 16))
          ^(do 2 (makeTuplets 3 2 8))
-         ^(do 4 (makeTuplets 3 2 4)) ]
+         ^(list "c''8" "aes'8" "aes''8" "f'8" "c''8" "aes'8" "aes''8" "f'8") ]
 
 # a lot of repition here... couldn't i write a for-loop that writes 
 # the 'makeTuplets' code that writes the 'lyTuplet' code that writes
