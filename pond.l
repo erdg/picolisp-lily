@@ -321,6 +321,16 @@
    (lyEval Lyrics)
    (prinl "}") ]
 
+# simple leadsheets - a melody with chords and (optionally) lyrics
+#
+# (lyLeadsheet
+#    '("c1:7" "f1:maj7")                             # chords
+#    '("r4" "c'4" "d'4" "e'4" "f'8(" "g'8" "e'2.)")  # melody
+#    '("this is a song __") )                        # lyrics
+#
+# NOTE - lists will be evaluated with 'lyEval', use 'quote' for
+# a list of direct chords/notes/lyrics
+#
 [de lyLeadsheet Music
    (let [(@Chords @Melody @Lyrics) Music]
       (macro
