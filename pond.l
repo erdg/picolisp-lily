@@ -260,6 +260,7 @@
 # double bar
 [de ly|| () (prinl "\\bar \"||\" ")]
 
+# line break - useful for formatting measures per line in leadsheets
 [de lyBreak () (prinl "\\break")]
 
 # ending double bar
