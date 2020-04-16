@@ -314,6 +314,16 @@
    (lyEval "Music")
    (prinl "}") ]
 
+[de lyLeadsheet Music
+   (let [(@Chords @Melody) Music] # left/right hand
+      (macro
+         (lyScore
+            (ly<<
+               (lyChords (lyEval @Chords))  # chords here
+               (lyStaff  (lyEval @Melody))   # melody here
+               # lyrics?
+               ]
+
 # chord changes
 #
 # generates sheet music for given chord progression.
