@@ -322,14 +322,13 @@
    (prinl "}") ]
 
 [de lyLeadsheet Music
-   (let [(@Chords @Melody) Music] # left/right hand
+   (let [(@Chords @Melody @Lyrics) Music]
       (macro
          (lyScore
             (ly<<
-               (lyChords (lyEval @Chords))  # chords here
-               (lyStaff  (lyEval @Melody))   # melody here
-               # lyrics?
-               ]
+               (lyChords (lyEval @Chords))
+               (lyStaff  (lyEval @Melody))
+               (lyLyrics (lyEval @Lyrics)) ]
 
 # chord changes
 #
