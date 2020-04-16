@@ -315,6 +315,12 @@
    (lyEval "Music")
    (prinl "}") ]
 
+[de lyLyrics Lyrics
+   (prinl "\\addlyrics")
+   (prinl "{")
+   (lyEval Lyrics)
+   (prinl "}") ]
+
 [de lyLeadsheet Music
    (let [(@Chords @Melody) Music] # left/right hand
       (macro
