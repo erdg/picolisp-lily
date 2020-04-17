@@ -1,31 +1,64 @@
+# I was sitting at the piano one day, playing around with an f-minor triad (see
+# 'Notes' in 'rh' below, or just look at the first measure of the sheet music).
+# I played those opening notes probably 50 times in a row without variation. I
+# liked the sound. It had motion and purpose, yet was some sort of ethereal.
+# Like a cloud or something, a cloud of f-minor.
+
+# Then I played the same pattern of notes, this time as 8th note triplets
+# instead straight 8th notes. After one measure, the pattern landed properly on
+# its starting note, the C. How about 16th notes? Yep that will land back on
+# the C after one measure, it's just twice as fast as 8th notes. How about 16th
+# note quintuplets? I had to write it out at this point. It landed on the C.
+# 16th note triplets? Yep. Groups of 7 16th notes? Yep. 32nd notes? Yep - twice
+# as fast as 16th notes.
+
+# No matter how many notes I tried to cram into a measure, the pattern always
+# landed on the starting C at the beginning of the next measure. I thought that
+# was pretty neat. I even wrote "Neato!" next to the sketch in my music
+# notebook (see photo). This was in March 2019. The nearest date to that sketch is on the
+# next page: 2019-03-28.
+
+# About a year later, in April 2020 (present day), I began playing with the
+# picolisp-lilypond library again. I was searching through my old music
+# noteboook looking for sketches to translate and happened upon the mentioned
+# sketch.
+
+# ... more story here ... looked like it would be a good place for code
+# generation, something with a for loop. Just needed to figure it out piece by
+# piece at the repl. The rest of this file is the result of that exploration...
+
+# ...which is more an exercise in code generation than a piece of music.
+
 [de metric-modulation-in-f-minor ()
    (chdir "metric-modulation-in-f-minor"
       (lilypond "metric-modulation-in-f-minor"
-         (let [L '("c''8" "aes'8" "aes''8" "f'8" "c''8" "aes'8" "aes''8" "f'8")  # left hand notes
-               R (mapcar '((X) (pack (delete "'" (chop X)))) L) ]  # right hand notes, drop octave "f'8" -> "f8"
-            (lyPiano
-               (left%)
-               # This could also be a read macro, but the notes above would need to be outside
-               # this function, probably as a top-level (setq Notes '("c''8" ...))
-               (append R R R R R R R R R R R R R) ) ]  # 8 measures or so, who's counting anymore?
+         (lyPiano
+            (lh)
+            (rh) ) ) ) ]
 
 # read macros and nested 'fill's, madness lurks below...
 
-# this was the original idea... a picolisp (read) macro that writes
+# right hand first, much simpler - 8th notes over and over.
+(de rh ()
+   (let Notes '("c'8" "aes8" "aes'8" "f8" "c'8" "aes8" "aes'8" "f8")  # 1 measure of 8th notes
+      (append ~(need 15 'Notes) '("c'1" (ly|.))) ) )  # need 15 measures plus ending whole note and double bar
+
+# now this was the original idea... a picolisp (read) macro that writes
 # picolisp-lilypond code that writes lilypond code that writes beautiful
 # sheet music
-# 
-# the 'make' call has been turned into a function 'makeTuplets' below
-(de left ()
-   # read macro 
-   `(fill
+
+###
+# left hand, first draft
+(de lh% ()
+   `(fill  # read macro 
       '(lyWrap  
-         ^(make # splice in result of 'make'
+         # 'make' call has been turned into a function 'makeTuplets' below
+         ^(make  # ^ splice
             # circular list allows to get the correct note, regardless of how
             # many tuplets or how many notes in a single tuplet. just keep poppin'!
             (let Notes (circ "c''8" "aes'8" "aes''8" "f'8")  
                (do 4 (link 
-                  (fill '(lyTuplet "3/2" ^ (list (pop 'Notes)) ^ (list (pop 'Notes)) ^ (list (pop 'Notes)))))))))))
+                  (fill '(lyTuplet "3/2" ^(list (pop 'Notes)) ^(list (pop 'Notes)) ^(list (pop 'Notes)))))))))))
 
 # generated code looks more or less like this
 #
@@ -36,56 +69,103 @@
 #    (lyTuplet "3/2" "aes'8" "aes''8" "f'8") )
 
 
-# i needed another variation with 16th notes
+# I then needed another variation with 16th notes
 #
 # ^(make
 #    (let Notes (circ "c''16" "aes'16" "aes''16" "f'16") # 16th notes
 #       (do 4 (link 
 #          (fill '(lyTuplet "6/4" ^ (make (do 6 (chain (list (pop 'Notes)))))))))))
 #
-# so similar, too much typing - time to make a new function!
+# so similar, so much typing - time to make a new function!
 
-
-
-# 'makeTuplets' generates 'lyTuplet' code above (not including 'lyWrap')
-# this needs to be defined before because 'left%', it's calling
-# function, because read macro
+###
+# makeTuplets - generates 'lyTuplet' code above (not including 'lyWrap')
+#
+# Note - this needs to be defined before 'lh', it's calling function, because
+# of the read macro
+#
 (de makeTuplets (N1 N2 Dur)
    (make 
-      # since the whole sketch is based on this string of notes, this should really move
-      # to 'left% or even the top-level 'metric-modulation-in-f-minor
       (let Notes (circ (pack "c''" Dur) (pack "aes'" Dur) (pack "aes''" Dur) (pack "f'" Dur))
          (do 4 (link 
             (fill '(lyTuplet ^(list (pack N1 "/" N2)) ^(make (do N1 (chain (list (pop 'Notes))))))))))))  # no wonder people don't use lisp
 
 
-# left hand part
-[de left% ()
-   # read macro 
-   `(fill
-      '(lyWrap  
+# left hand, second draft
+[de lh%% ()
+   `(fill  # read macro
+      '(lyWrap
          # the notes
          ^(list "c''8" "aes'8" "aes''8" "f'8" "c''8" "aes'8" "aes''8" "f'8")
-         ^(list "c''8" "aes'8" "aes''8" "f'8" "c''8" "aes'8" "aes''8" "f'8")
-         # the original idea
-         ^(make # ^ means to splice in result... of 'make' in this case
-           (let Notes (circ "c''8" "aes'8" "aes''8" "f'8")
-              (do 4 (link 
-                 (fill '(lyTuplet "3/2" ^ (list (pop 'Notes)) ^ (list (pop 'Notes)) ^ (list (pop 'Notes))))))))
-         ^(makeTuplets 3 2 8)  # same as above, 8th note triplets
-         ^(do 2 (makeTuplets 4 4 16)) # same as above
-         ^(do 2 (makeTuplets 5 4 16)) 
-         ^(do 2 (makeTuplets 6 4 16))
-         ^(do 2 (makeTuplets 7 4 16))
-         ^(do 2 (makeTuplets 6 4 16))
-         ^(do 2 (makeTuplets 5 4 16)) 
-         ^(do 2 (makeTuplets 4 4 16))
-         ^(do 2 (makeTuplets 3 2 8))
+         # the original idea, for demonstration purposes
+         # ^(make
+         #   (let Notes (circ "c''8" "aes'8" "aes''8" "f'8")
+         #      (do 4 (link 
+         #         (fill '(lyTuplet "3/2" ^ (list (pop 'Notes)) ^ (list (pop 'Notes)) ^ (list (pop 'Notes))))))))
+         ^(do 2 (makeTuplets 3 2 8))   # generated by the 'make' call in 'lh', see below
+         ^(do 2 (makeTuplets 4 4 16))  #
+         ^(do 2 (makeTuplets 5 4 16))  #  |
+         ^(do 2 (makeTuplets 6 4 16))  #  |
+         ^(do 2 (makeTuplets 6 4 16))  #  |
+         ^(do 2 (makeTuplets 7 4 16))  #  |
+         ^(do 2 (makeTuplets 8 8 32))  #  |
+         ^(do 2 (makeTuplets 9 8 32))  #  |
+         ^(do 2 (makeTuplets 8 8 32))  #  | 
+         ^(do 2 (makeTuplets 7 4 16))  #  |
+         ^(do 2 (makeTuplets 6 4 16))  #  |
+         ^(do 2 (makeTuplets 5 4 16))  #  V
+         ^(do 2 (makeTuplets 4 4 16))  #
+         ^(do 2 (makeTuplets 3 2 8))   # end generation
          ^(list "c''8" "aes'8" "aes''8" "f'8" "c''8" "aes'8" "aes''8" "f'8") ]
 
-# a lot of repition here... couldn't i write a for-loop that writes 
+# a lot of repition here... couldn't I write a for-loop that writes 
 # the 'makeTuplets' code that writes the 'lyTuplet' code that writes
 # the lilypond code that writes the sheet music? to be continued...
 
-# This was an exercise in writing picolisp code that writes picolisp 
-# code (ad infinitum) that writes lilypond code that writes sheet music
+# left hand, final draft
+[de lh ()
+   (lyWrap
+      "c''8" "aes'8" "aes''8" "f'8" "c''8" "aes'8" "aes''8" "f'8" # original notes
+      ~(make  # generate the rest, see above
+         (for @N (append (range 3 8) (range 9 3))
+            (chain 
+               (macro 
+                  (do (if (>= @N 8) 4 2)  # do enough to fill 1 measure
+                     (makeTuplets
+                        @N                                        # n notes - i.e. triplets or quintuplets
+                        (cond ((< @N 4) 2) ((>= @N 8) 8)  (T 4))  # in the space of n...
+                        (cond ((< @N 4) 8) ((>= @N 8) 32) (T 16)) ) ) ) ) ) )  # ...8th, 16th or 32nd notes
+      "c''8" "aes'8" "aes''8" "f'8" "c''8" "aes'8" "aes''8" "f'8" # original notes again
+      "c''1" (ly|.) ]  # ending whole note and double bar
+
+# The '~' read macro calls 'macro' calls 'fill' with a lot of nested 'make'ing.
+# Many different levels of code execution going on here. Is it easier to read?
+# Absolutely not, I'll have no idea what this code means in a couple months or
+# years. But it's way cooler and uses the power of lisp code to write lisp code
+# that writes lisp code that writes lilypond code that writes sheet music!!!
+
+# Note to future self - when you have no idea what is happening here...
+#
+# : (pretty 'lh)
+#
+# that will show what the read macro expands to.
+
+# Along the way I learned that
+#
+# `(fill
+#    '(doSomething
+#       ^(make ... 
+#          (substitute @Something) ) ) )
+#
+# is functionally equivalent to
+#
+# (doSomething
+#    ~(make ... 
+#        (macro ...
+#           (subsitute @Something) ) ) )
+#
+# which I think I like better. It was pretty obvious after reading the 'read
+# macros' docs again.
+
+# Well, this concludes the exercise in writing picolisp code that writes picolisp 
+# code (ad infinitum) that writes lilypond code that writes sheet music.
