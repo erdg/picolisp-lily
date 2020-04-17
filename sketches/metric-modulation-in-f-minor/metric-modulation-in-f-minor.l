@@ -15,8 +15,8 @@
 # No matter how many notes I tried to cram into a measure, the pattern always
 # landed on the starting C at the beginning of the next measure. I thought that
 # was pretty neat. I even wrote "Neato!" next to the sketch in my music
-# notebook (see photo). This was in March 2019. The nearest date to that sketch is on the
-# next page: 2019-03-28.
+# notebook (see photo). This was in March 2019. The nearest date to that sketch
+# is on the next page: 2019-03-28.
 
 # About a year later, in April 2020 (present day), I began playing with the
 # picolisp-lilypond library again. I was searching through my old music
