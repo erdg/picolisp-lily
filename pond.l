@@ -2,13 +2,8 @@
 (setq *Lily "/home/erik/bin/lilypond")
 # version
 (setq *Version "2.19.82")
-###
 
-# TODO - get rid of 'lyRelative' and any '/relative' nonsense
-# it's confusing and adds needless complexity to the codebase
-
-# REPL
-# compiles lilypond files and opens pdf
+# lilypond REPL - compiles lilypond files and opens pdf
 # to continue development, return to PL terminal and hit ^C
 #
 # tested only with evince
