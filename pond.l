@@ -150,6 +150,7 @@
 [de lyUnset (Prop)      # context property
    (prinl "\\unset " Prop) ]
 
+# NOTE - should be called before any font configuration
 [de lySetGlobalStaffSize (N)
    (prinl "#(set-global-staff-size " N ")") ]
 
