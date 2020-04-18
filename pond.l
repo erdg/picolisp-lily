@@ -147,7 +147,7 @@
 [de lySet (Prop Val)    # context property, value
    (prinl "\\set " Prop " = " Val) ]
 
-[de lyUnset (Prop)    # context property, value
+[de lyUnset (Prop)      # context property
    (prinl "\\unset " Prop) ]
 
 [de lySetGlobalStaffSize (N)
