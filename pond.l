@@ -104,7 +104,7 @@
 #    (cons "<ees,8 g>" (need 7 "<ees g>"))                  # LH
 #    '("aes8" "ees" "bes" "ees" "aes" "ees" "aes" "ees") )  # RH
 #
-# NOTE - lists will be evaluated with 'lyEval, use 'quote for
+# NOTE - lists will be evaluated with 'lyEval', use 'quote' for
 # a list of direct notes
 #
 [de lyPiano Music
