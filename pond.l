@@ -114,6 +114,36 @@
             (lyStaff (lyClef "treble") (lyEval @L))
             (lyStaff (lyClef "bass")   (lyEval @R)) ]
 
+# lyPianoChords - lyPiano with chords
+#
+# (lyPianoChords
+#    '("bes1:7.5-")        # chord syms
+#    '("<d'' aes' e>1")    # lh
+#    '("<bes bes,>1") )    # rh
+#
+[de lyPianoChords Music
+   (let [(@Chords @L @R) Music]
+      (macro
+         (ly<<
+            (lyChords (lyEval @Chords))
+            (lyPiano @L @R) ]
+
+# lyPianoLeadsheet - lyPiano with chords/lyrics
+#
+# (lyPianoLeadsheet
+#    '("bes1:7.5-")        # chord syms
+#    '("<d'' aes' e>1")    # lh
+#    '("<bes bes,>1") )    # rh
+#    '("oooooooh") )       # lyrics
+#
+[de lyPianoLeadsheet Music
+   (let [(@Chords @L @R @Lyrics) Music]
+      (macro
+         (ly<<
+            (lyChords @Chords))
+            (lyPiano @L @R)
+            (lyLyrics @Lyrics) ]
+
 [de lySet (Prop Val)    # context property, value
    (prinl "\\set " Prop " = " Val) ]
 
