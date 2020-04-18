@@ -339,7 +339,7 @@
    (prinl "\\chords")
    (prinl "{ ")
    (prinl "\\set chordChanges = ##t")  # remove dups, only print chord sym upon changes
-   (prinl "\\set minorChordModifier = \\markup { - }")
+   # (prinl "\\set minorChordModifier = \\markup { - }")
    (lyEval "Music")
    (prinl "}") ]
 
