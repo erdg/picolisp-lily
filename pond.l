@@ -1,5 +1,7 @@
 # /path/to/lilypond
 (setq *Lily "/home/erik/bin/lilypond")
+# /path/to/picolisp-lily
+(setq *PicoLispLily "/home/erik/code/pl/picolisp-lily")
 # version
 (setq *Version "2.19.82")
 
@@ -32,6 +34,12 @@
    (call 'firefox (pack File ".preview.svg")
    (call 'firefox (pack File ".svg")
 ]
+
+# edit fn's from anywhere
+[de lyVi (Fn)
+   (chdir *PicoLispLily
+      (vi Fn)
+      (ld) ]
 
 [de lyVersion () (prinl "\\version \"" *Version "\"")]
 
