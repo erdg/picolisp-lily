@@ -193,12 +193,14 @@
 # (ly<> "g" "b" "d") -> G major chord
 #
 # NOTE - probably not needed... just include chord as a music
-# symbol directly, e.g. "<g b d>"
+# symbol directly, e.g. "<g b d>", it will be less writing.
 #
-# MISC - duration goes outside the chord, e.g. "<g b d>8"
+# it's a neat little piece of code, nonetheless.
 #
-[de ly<> Music
-   (prinl "< " (lyEval Music) " >") ]
+# MISC - duration goes outside the chord, e.g. "<g b d>4"
+#
+[de ly<> (Dur . @Notes)
+   (macro (prinl "<" ^(list (glue " " @Notes)) ">" Dur) ]
 
 # include lilypond files
 #
