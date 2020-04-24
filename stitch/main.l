@@ -11,8 +11,8 @@
 (rel preview.svg (+Blob))  # cropped svg
 (rel clean.preview.svg (+Blob))
 
-# +MusicObj creator
-#   - creates picolisp file with fn
+# '+MusicObj' creator method
+#   - creates picolisp file with unique fn, e.g. 'blob2' (see 'blobFn')
 (dm T ()
    (put!> This 'id (genKey 'id '+MusicObj))
    (put!> This 'l T)
@@ -153,6 +153,7 @@
             (split (chop (blob Obj)) "/") ) )
       "/" ) )
 
+# returns fn from +MusicObj
 (de blobFn (Obj)
    (and (blob Obj)
       (chop @)
