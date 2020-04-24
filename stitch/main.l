@@ -7,7 +7,9 @@
 (rel l (+Blob))            # pl file
 (rel ly (+Blob))           # ly file
 (rel svg (+Blob))          # svg
+(rel clean.svg (+Blob))    # 'sanitize>'d svg
 (rel preview.svg (+Blob))  # cropped svg
+(rel clean.preview.svg (+Blob))
 
 (dm T ()
    (put!> This 'id (genKey 'id '+MusicObj))
