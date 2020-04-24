@@ -74,14 +74,12 @@
                         (link @) ) ) ) ) ) )
       (out (blob This 'clean.preview.svg) (prin CleanPreviewSvg)) ) )
 
-(de sendMusic ()
-   (serverSend *Sse
-      (ht:Pack
-         (make
-            (for Obj (collect 'id '+MusicObj)
-               (chain
-                  (<span> '(draggable (style . "width: min-content; position: fixed;"))
-                     (<img> (pack "http://localhost:8080/" (blob Obj 'clean.preview.svg))) ) ) ) ) ) ) )
+(de sendMusic (Obj)
+   (let @Sse (any (pack "*Obj" (; Obj id)))
+      (macro
+         (serverSend @Sse
+            # see https://stackoverflow.com/questions/1077041/refresh-image-with-a-new-one-at-the-same-url/9943419#9943419
+            (<img> (pack "http://localhost:8080/" (blob Obj 'clean.preview.svg) "#" (date) (time))) ) ) ) )  # '(date)' and '(time)' to fool browser cache and update image
 
 (setq
    *Pool "db/test.db"
@@ -102,17 +100,30 @@
    (timeout)
    (redirect (baseHRef) *SesId "!musicApp") )
 
-
 (push '*JS "interact.min.js")
 
+# server sent event for each +MusicObj
+(de setupServerEvents ()
+   (for Obj (collect 'id '+MusicObj)
+      (serverSentEvent
+         (pack "obj" (; Obj id))  # connect to <div>
+         (any (pack "*Obj" (; Obj id)))) ) )
+
+# <div> containing svg for each +MusicObj
+#   - connected to sse
+#   - draggable via 'interact.js'
+(de collectMusicObjs ()
+   (for Obj (collect 'id '+MusicObj)
+         (<div>
+            (list 'draggable
+               (cons 'id (pack "obj" (; Obj id)))  # connect to sse
+               '(style . "width: min-content;") )
+            (<img> (pack "http://localhost:8080/" (blob Obj 'clean.preview.svg))) ) ) )
+
 (de musicApp ()
-   (app)
-   (html NIL "music app" NIL NIL
-      (serverSentEvent "sse" '*Sse)
-      (<div> '(id . "sse")
-         (for Obj (collect 'id '+MusicObj)
-            (<span> '(draggable (style . "width: min-content; position: fixed;"))
-               (<img> (pack "http://localhost:8080/" (blob Obj 'clean.preview.svg))) ) ) )
+   (html 0 "music app" NIL NIL
+      (setupServerEvents)
+      (collectMusicObjs)
       # this should be in another file
       (javascript NIL
          "interact('.draggable').draggable({
