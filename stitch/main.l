@@ -11,6 +11,8 @@
 (rel preview.svg (+Blob))  # cropped svg
 (rel clean.preview.svg (+Blob))
 
+# +MusicObj creator
+#   - creates picolisp file with fn
 (dm T ()
    (put!> This 'id (genKey 'id '+MusicObj))
    (put!> This 'l T)
@@ -23,7 +25,13 @@
 (dm vi> ()
    (macro
       (vi (quote ^(list (blobFn This)))) )
-   (load (blob This 'l)) )
+   (load (blob This 'l)) )  # and reload it
+   # eventually 'vi>' will also call
+   #   'ly>'
+   #   'render>'
+   #   'sanitize>'
+   #   'sendMusic'
+   # so all changes are immediately sent to the browser
 
 # write lilypond file
 (dm ly> ()
