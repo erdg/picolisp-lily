@@ -31,6 +31,9 @@
       (lyVersion)
       ((blobFn This)) ) )
 
+(dm echo> ()
+   (in (blob This 'ly) (echo)) )
+
 # render lilypond file to svg
 #
 # NOTE - will need a function to strip all '<a>' tags from the svg file
