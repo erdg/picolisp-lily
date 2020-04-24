@@ -24,7 +24,7 @@
    (load (blob This 'l)) )
 
 # write lilypond file
-(dm lilypond> ()
+(dm ly> ()
    (unless (: ly) (put!> This 'ly T))
    (out (blob This 'ly)
       # need to write variation of 'lilypond' here
@@ -45,7 +45,7 @@
    (unless (: preview.svg) (put!> This 'preview.svg T))
    (t (call 'lilypond "-dpreview" "-dbackend=svg" "-o" (blobDir This) (blob This 'ly))) )
 
-(dm sanitizeSVGs> ()
+(dm sanitize> ()
    (let CleanSvg
       (in (blob This 'svg)
          (pack
