@@ -45,16 +45,14 @@
    (in (blob This 'ly) (echo)) )
 
 # render lilypond file to svg
-#
-# NOTE - will need a function to strip all '<a>' tags from the svg file
-# lilypond links to lines in the source file. not okay for sharing
-# svg's on the internet, when the source files are +Blob's in the
-# picolisp DB
 (dm render> ()
    (unless (: svg) (put!> This 'svg T))
    (unless (: preview.svg) (put!> This 'preview.svg T))
    (t (call 'lilypond "-dpreview" "-dbackend=svg" "-o" (blobDir This) (blob This 'ly))) )
 
+# strip all '<a>' tags from svg files. lilypond links notes in svg to lines
+# in the source file. not okay for sharing svg's on the internet, when the
+# source files are +Blob's in the picolisp DB
 (dm sanitize> ()
    (let CleanSvg
       (in (blob This 'svg)
