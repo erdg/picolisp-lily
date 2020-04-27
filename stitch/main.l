@@ -81,7 +81,21 @@
       (macro
          (serverSend @Sse
             # see https://stackoverflow.com/questions/1077041/refresh-image-with-a-new-one-at-the-same-url/9943419#9943419
-            (<img> (pack "http://localhost:8080/" (blob Obj 'clean.preview.svg) "#" (date) (time))) ) ) ) )  # '(date)' and '(time)' to fool browser cache and update image
+            # '(date)' and '(time)' to fool browser cache and update image
+            (<img> (pack "http://localhost:8080/" (blob Obj 'clean.preview.svg) "#" (date) (time))) ) ) ) )
+
+# send updated SVG to the browser
+(dm send> ()
+   (let @Sse (any (pack "*Obj" (: id)))
+      (macro
+         (serverSend @Sse
+            (<MusicSVG> This) ) ) ) )
+
+# react naming convention for custom HTML functions
+(de <MusicSVG> ()
+   # see https://stackoverflow.com/questions/1077041/refresh-image-with-a-new-one-at-the-same-url/9943419#9943419
+   # '(date)' and '(time)' to fool browser cache and update image
+   (<img> (pack "http://localhost:8080/" (blob This 'clean.preview.svg) "#" (date) (time))) )
 
 (setq
    *Pool "db/test.db"
