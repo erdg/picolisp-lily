@@ -192,3 +192,47 @@
       (split @ "/" ".")
       (pack (cdr @))
       (any @) ) )
+
+NIL
+###
+# the following was an attempt to dynamically add server events after the app is running
+# i've decided it's a waste of time for now
+
+(de serverSentEvent+ (Id Var . Prg)
+# same as 'serverSentEvent' but uses 'insertAdjacentHTML' instead of 'innerHTML'
+# used to add new events to the document AFTER the document has loaded
+###
+   (allow "!ssEvt")
+   (<javascript>
+      "(new EventSource(SesId+'!ssEvt?'+'"
+      Id
+      "')).onmessage = function(ev) {if (ev.data.charAt(0) == '&') document.title = ev.data.substr(1); else document.getElementById('"
+      Id
+      "').insertAdjacentHTML = ('beforeend', ev.data);}" )
+   (if (assoc Id *SsEvts)
+      (con @ (cons Var (unless (val Var) Prg)))
+      (push '*SsEvts (cons Id Var Prg)) ) )
+
+(de serverSentEvent+js (Id Var . Prg)
+# FIXME - attempt to insert/execute script into dom, to dynamically add server
+# events after the app is running. 'serverSentEvent+' is not sufficient because
+# the browser will not run <script>'s created with
+# innerHTML/insertAdjacentHTML. need to do something like:
+#
+#    var newScript = document.createElement('script')
+#    newScript.text = script text goes here
+#    document.getElementById('id').append(newScript)
+   (allow "!ssEvt")
+   (<javascript>
+      "(new EventSource(SesId+'!ssEvt?'+'" Id "')).onmessage = function(ev) {
+         if (ev.data.charAt(0) == '&') {
+            document.title = ev.data.substr(1);
+         } else {
+            var newScript = document.createElement('script');
+            newScript.text = ev.data;
+            document.getElementById('" Id "').appendChild(newScript);
+         }
+      }" )
+   (if (assoc Id *SsEvts)
+      (con @ (cons Var (unless (val Var) Prg)))
+      (push '*SsEvts (cons Id Var Prg)) ) )
