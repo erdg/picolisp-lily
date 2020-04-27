@@ -54,6 +54,7 @@
 # in the source file. not okay for sharing svg's on the internet, when the
 # source files are +Blob's in the picolisp DB
 (dm sanitize> ()
+   (unless (: clean.svg) (put!> This 'clean.svg T))
    (let CleanSvg
       (in (blob This 'svg)
          (pack
@@ -63,6 +64,7 @@
                   (unless (or (pre? "<a" @) (pre? "</a>" @))
                      (link @) ) ) ) ) )
       (out (blob This 'clean.svg) (prin CleanSvg)) )
+   (unless (: clean.preview.svg) (put!> This 'clean.preview.svg T))
    (let CleanPreviewSvg
       (in (blob This 'preview.svg)
          (prin
