@@ -45,7 +45,7 @@
    (in (blob This 'ly) (echo)) )
 
 # render lilypond file to svg
-(dm render> ()
+(dm re> ()
    (unless (: svg) (put!> This 'svg T))
    (unless (: preview.svg) (put!> This 'preview.svg T))
    (t (call 'lilypond "-dpreview" "-dbackend=svg" "-o" (blobDir This) (blob This 'ly))) )
