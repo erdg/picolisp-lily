@@ -107,9 +107,9 @@
    # load +MusicObj's
    (for Obj (collect 'id '+MusicObj) (load (blob Obj 'l))) )
 
-(load "@lib/http.l" "@lib/xhtml.l")
-
 (de go () (server 8080 "!work"))
+
+(load "@lib/http.l" "@lib/xhtml.l")
 
 (de work ()
    (app)
