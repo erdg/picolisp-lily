@@ -118,24 +118,6 @@
 
 (push '*JS "interact.min.js")
 
-# server sent event for each +MusicObj
-(de setupServerEvents ()
-   (for Obj (collect 'id '+MusicObj)
-      (serverSentEvent
-         (pack "obj" (; Obj id))  # connect to <div>
-         (any (pack "*Obj" (; Obj id)))) ) )
-
-# <div> containing svg for each +MusicObj
-#   - connected to sse
-#   - draggable via 'interact.js'
-(de collectMusicObjs ()
-   (for Obj (collect 'id '+MusicObj)
-         (<div>
-            (list 'draggable
-               (cons 'id (pack "obj" (; Obj id)))  # connect to sse
-               '(style . "width: min-content;") )
-            (<img> (pack "http://localhost:8080/" (blob Obj 'clean.preview.svg))) ) ) )
-
 (de musicApp ()
    (html 0 "music app" NIL NIL
       (setupServerEvents)
@@ -156,6 +138,40 @@
             target.setAttribute('data-x', x)
             target.setAttribute('data-y', y)
          }" ) ) )
+
+# server sent event for each +MusicObj
+(de setupServerEvents ()
+   (for Obj (collect 'id '+MusicObj)
+      (serverSentEvent
+         #(sseId> Obj)
+         (pack "obj" (; Obj id))  # connect to <div>
+         #(sseVar> Obj)
+         (any (pack "*Obj" (; Obj id)))) ) )
+
+# sse helpers, e.g.  : *SsEvt(("obj3" "*Obj3)
+(dm sseVar> () (any (pack "*Obj" (: id))))
+(dm sseId>  () (pack "obj" (: id)))  # connects to <div> from 'collectMusicObjs'
+
+# <div> containing svg for each +MusicObj
+(de collectMusicObjs ()
+   (for Obj (collect 'id '+MusicObj)
+      (<div>
+         (list 'draggable  # draggable via 'interact.js'
+            (cons 'id (pack "obj" (; Obj id)))  # connect to sse
+            '(style . "width: min-content;") )
+         (<img> (pack "http://localhost:8080/" (blob Obj 'clean.preview.svg))) ) ) )
+
+# <div> containing svg for each +MusicObj
+(de collectMusicObjs% ()
+   (for Obj (collect 'id '+MusicObj)
+      (<MusicDiv> Obj) ) )
+
+(de <MusicDiv> (Obj)
+   (<div>
+      (list 'draggable  # draggable via 'interact.js'
+         (cons 'id (sseId> Obj)  # connect to sse
+         '(style . "width: min-content;") )
+      (<MusicSVG> Obj) ) ) )
 
 ### utils
 
