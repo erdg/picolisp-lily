@@ -133,12 +133,10 @@
 (de setupServerEvents ()
    (for Obj (collect 'id '+MusicObj)
       (serverSentEvent
-         #(sseId> Obj)
-         (pack "obj" (; Obj id))  # connect to <div>
-         #(sseVar> Obj)
-         (any (pack "*Obj" (; Obj id)))) ) )
+         (sseId> Obj)
+         (sseVar> Obj) ) ) )
 
-# sse helpers, e.g.  : *SsEvt(("obj3" "*Obj3)
+# sse helpers, e.g. *SsEvt -> (("obj3" "*Obj3) ... )
 (dm sseVar> () (any (pack "*Obj" (: id))))
 (dm sseId>  () (pack "obj" (: id)))  # connects to <div> from 'collectMusicObjs'
 
