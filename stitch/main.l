@@ -90,7 +90,6 @@
          (serverSend @Sse
             (<MusicSVG> This) ) ) ) )
 
-# react naming convention for custom HTML functions
 (de <MusicSVG> ()
    # see https://stackoverflow.com/questions/1077041/refresh-image-with-a-new-one-at-the-same-url/9943419#9943419
    # '(date)' and '(time)' to fool browser cache and update image
@@ -123,28 +122,12 @@
    (timeout)
    (redirect (baseHRef) *SesId "!musicApp") )
 
-(push '*JS "interact.min.js")
-
 (de musicApp ()
    (html 0 "music app" NIL NIL
       (setupServerEvents)
       (collectMusicObjs)
       # this should be in another file
-      (javascript NIL
-         "interact('.draggable').draggable({
-            listeners: {
-               move: dragMoveListener
-            },
-            autoScroll: true
-         })
-         function dragMoveListener (event) {
-            var target = event.target
-            var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
-            var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
-            target.style.transform = 'translate(' + x + 'px, ' + y + 'px)'
-            target.setAttribute('data-x', x)
-            target.setAttribute('data-y', y)
-         }" ) ) )
+      (interactJS) ) )
 
 # server sent event for each +MusicObj
 (de setupServerEvents ()
@@ -178,7 +161,26 @@
       (list 'draggable  # draggable via 'interact.js'
          (cons 'id (sseId> Obj)  # connect to sse
          '(style . "width: min-content;") )
-      (<MusicSVG> Obj) ) ) )
+      (<MusicSVG> This) ) )
+
+(push '*JS "interact.min.js")
+
+(de interactJS ()
+   (<javascript>
+      "interact('.drag').draggable({
+         listeners: {
+            move: dragMoveListener
+         },
+         autoScroll: true
+      })
+      function dragMoveListener (event) {
+         var target = event.target
+         var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
+         var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
+         target.style.transform = 'translate(' + x + 'px, ' + y + 'px)'
+         target.setAttribute('data-x', x)
+         target.setAttribute('data-y', y)
+      }" ) )
 
 ### utils
 
