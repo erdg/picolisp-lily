@@ -28,12 +28,6 @@
    (macro
       (vi (quote ^(list (blobFn This)))) )
    (load (blob This 'l)) )  # and reload it
-   # eventually 'vi>' will also call
-   #   'ly>'
-   #   'render>'
-   #   'sanitize>'
-   #   'sendMusic'
-   # so all changes are immediately sent to the browser
 
 # write lilypond file
 (dm ly> ()
