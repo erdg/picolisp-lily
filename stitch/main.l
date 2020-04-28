@@ -143,15 +143,6 @@
 # <div> containing svg for each +MusicObj
 (de collectMusicObjs ()
    (for Obj (collect 'id '+MusicObj)
-      (<div>
-         (list 'draggable  # draggable via 'interact.js'
-            (cons 'id (pack "obj" (; Obj id)))  # connect to sse
-            '(style . "width: min-content;") )
-         (<img> (pack "http://localhost:8080/" (blob Obj 'clean.preview.svg))) ) ) )
-
-# <div> containing svg for each +MusicObj
-(de collectMusicObjs% ()
-   (for Obj (collect 'id '+MusicObj)
       (<MusicDiv> Obj) ) )
 
 (dm <MusicDiv> ()
