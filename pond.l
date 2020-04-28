@@ -392,10 +392,10 @@
 # are added to the progression.
 #
 # (lyChanges 32 "4/4" "bass"
-#    (list
+#    (quote
 #       (16 . "e1:min11")
 #       (8 . "f1:min11")
-#       (8 . "e1:min11) ) )
+#       (8 . "e1:min11") ) )
 #
 # -> the changes to 'So What' by Miles Davis (bass clef)
 #
