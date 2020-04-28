@@ -8,7 +8,9 @@
 (rel ly (+Blob))           # ly file
 (rel svg (+Blob))          # svg
 (rel clean.svg (+Blob))    # 'sanitize>'d svg
-(rel preview.svg (+Blob))  # cropped svg
+(rel cropped.svg (+Blob))
+(rel clean.cropped.svg (+Blob))
+(rel preview.svg (+Blob))
 (rel clean.preview.svg (+Blob))
 
 # '+MusicObj' creator method
@@ -48,7 +50,7 @@
 (dm re> ()
    (unless (: svg) (put!> This 'svg T))
    (unless (: preview.svg) (put!> This 'preview.svg T))
-   (t (call 'lilypond "-dpreview" "-dbackend=svg" "-o" (blobDir This) (blob This 'ly))) )
+   (t (call 'lilypond "-dcrop" "-dpreview" "-dbackend=svg" "-o" (blobDir This) (blob This 'ly))) )
 
 # strip all '<a>' tags from svg files. lilypond links notes in svg to lines
 # in the source file. not okay for sharing svg's on the internet, when the
@@ -74,15 +76,18 @@
                      # remove <a> tags from svg
                      (unless (or (pre? "<a" @) (pre? "</a>" @))
                         (link @) ) ) ) ) ) )
-      (out (blob This 'clean.preview.svg) (prin CleanPreviewSvg)) ) )
-
-(de sendMusic (Obj)
-   (let @Sse (any (pack "*Obj" (; Obj id)))
-      (macro
-         (serverSend @Sse
-            # see https://stackoverflow.com/questions/1077041/refresh-image-with-a-new-one-at-the-same-url/9943419#9943419
-            # '(date)' and '(time)' to fool browser cache and update image
-            (<img> (pack "http://localhost:8080/" (blob Obj 'clean.preview.svg) "#" (date) (time))) ) ) ) )
+      (out (blob This 'clean.preview.svg) (prin CleanPreviewSvg)) )
+   (unless (: clean.cropped.svg) (put!> This 'clean.cropped.svg T))
+   (let CleanCroppedSvg
+         (in (blob This 'cropped.svg)
+            (prin
+               (pack
+                  (make
+                     (while (line T)
+                        # remove <a> tags from svg
+                        (unless (or (pre? "<a" @) (pre? "</a>" @))
+                           (link @) ) ) ) ) ) )
+         (out (blob This 'clean.cropped.svg) (prin CleanCroppedSvg)) ) )
 
 # send updated SVG to the browser
 (dm send> ()
@@ -95,7 +100,15 @@
 (de <MusicSVG> ()
    # see https://stackoverflow.com/questions/1077041/refresh-image-with-a-new-one-at-the-same-url/9943419#9943419
    # '(date)' and '(time)' to fool browser cache and update image
-   (<img> (pack "http://localhost:8080/" (blob This 'clean.preview.svg) "#" (date) (time))) )
+   (<img> (pack "http://localhost:8080/" (blob This 'clean.cropped.svg) "#" (date) (time))) )
+
+(dm work> ()
+   (vi> This)
+   (ly> This)
+   (re> This)
+   # (cl> This)
+   (sanitize> This)
+   (send> This) )
 
 (setq
    *Pool "db/test.db"
