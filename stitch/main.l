@@ -154,10 +154,10 @@
    (for Obj (collect 'id '+MusicObj)
       (<MusicDiv> Obj) ) )
 
-(de <MusicDiv> (Obj)
+(dm <MusicDiv> ()
    (<div>
-      (list 'draggable  # draggable via 'interact.js'
-         (cons 'id (sseId> Obj)  # connect to sse
+      (list 'drag  # connect to 'interact.js'
+         (cons 'id (sseId> This))  # connect to sse
          '(style . "width: min-content;") )
       (<MusicSVG> This) ) )
 
