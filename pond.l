@@ -404,7 +404,6 @@
       (prinl "\\chords")
       (prinl "{ ")
       (prinl "\\set chordChanges = ##t")
-      (prinl "\\set minorChordModifier = \\markup { - }")
       # variation on 'lyEval' to allow repeated chord shorthand
       (mapc
          '((Obj)
