@@ -90,10 +90,10 @@
          (serverSend @Sse
             (<MusicSVG> This) ) ) ) )
 
-(de <MusicSVG> ()
+(de <MusicSVG> (Obj)
    # see https://stackoverflow.com/questions/1077041/refresh-image-with-a-new-one-at-the-same-url/9943419#9943419
    # '(date)' and '(time)' to fool browser cache and update image
-   (<img> (pack "http://localhost:8080/" (blob This 'clean.cropped.svg) "#" (date) (time))) )
+   (<img> (pack "http://localhost:8080/" (blob Obj 'clean.cropped.svg) "#" (date) (time))) )
 
 (dm work> ()
    (vi> This)
