@@ -174,6 +174,13 @@
 
 ### utils
 
+# return list of all +MusicObjs with (optional) names
+(de musicObjs ()
+   (make
+      (for Obj (collect 'id '+MusicObj)
+         (link
+            (list Obj (if (; Obj nm) @)) ) ) ) )
+
 # returns blob subdirectory
 # (blobDir '{A1}) -> "db/blob/A/"
 # (blobDir '{2}) -> "db/blob/"
