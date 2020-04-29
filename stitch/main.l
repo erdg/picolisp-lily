@@ -2,7 +2,7 @@
 
 (class +MusicObj +Entity)
 (rel id (+Need +Key +Number))
-# (rel nm (+Ref +String))
+(rel nm (+Ref +String))
 
 (rel l (+Blob))            # pl file
 (rel ly (+Blob))           # ly file
@@ -145,12 +145,14 @@
    (for Obj (collect 'id '+MusicObj)
       (<MusicDiv> Obj) ) )
 
-(dm <MusicDiv> ()
-   (<div>
-      (list 'drag  # connect to 'interact.js'
-         (cons 'id (sseId> This))  # connect to sse
-         '(style . "width: min-content;") )
-      (<MusicSVG> This) ) )
+(de <MusicDiv> (Obj)
+   (let Name (; Obj nm)
+      (<div>
+         (list 'drag  # connect to 'interact.js'
+            (cons 'id (sseId> Obj))  # connect to sse
+            '(style . "width: min-content;") )
+         (<h4> NIL Name)
+         (<MusicSVG> Obj) ) ) )
 
 (push '*JS "interact.min.js")
 
