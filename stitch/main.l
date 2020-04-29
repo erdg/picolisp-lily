@@ -126,7 +126,6 @@
    (html 0 "music app" NIL NIL
       (setupServerEvents)
       (collectMusicObjs)
-      # this should be in another file
       (interactJS) ) )
 
 # server sent event for each +MusicObj
