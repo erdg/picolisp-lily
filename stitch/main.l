@@ -14,7 +14,8 @@
 (rel clean.preview.svg (+Blob))
 
 # '+MusicObj' creator method
-#   - creates picolisp file with unique fn, e.g. 'blob2' (see 'blobFn')
+#
+#   creates picolisp file with unique fn, e.g. 'test%1' (see 'blobFn')
 (dm T ()
    (put!> This 'id (genKey 'id '+MusicObj))
    (put!> This 'l T)
@@ -104,8 +105,8 @@
    (send> This) )
 
 (setq
-   *Pool "db/test.db"
-   *Blob "db/blob/" )
+   *Pool "db/test/test.db"
+   *Blob "db/test/" )
 
 (de main ()
    (call "mkdir" "-p" *Blob)
@@ -193,11 +194,11 @@
 
 # returns fn from +MusicObj
 (de blobFn (Obj)
-   (and (blob Obj)
+   (and (blobDir Obj)
       (chop @)
       (split @ "/" ".")
-      (pack (cdr @))
-      (any @) ) )
+      (pack (cdr @) "%" (; Obj id))
+      (any @) ) )  # -> e.g. test%1 (project%id)
 
 NIL
 ###
