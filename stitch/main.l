@@ -104,6 +104,18 @@
    (sanitize> This)
    (send> This) )
 
+# start a new project or change to an existing project
+#
+# each project is a directory, with a db file and +Blob's
+(de stitch (Name)
+   (let (Pool (pack "db/" Name "/" Name ".db")
+         Blob (pack "db/" Name "/") )
+      (setq
+         *Pool Pool
+         *Blob Blob )
+      (call "mkdir" "-p" *Blob)
+      (pool *Pool) ) )
+
 (setq
    *Pool "db/test/test.db"
    *Blob "db/test/" )
@@ -181,6 +193,9 @@
       (for Obj (collect 'id '+MusicObj)
          (link
             (list Obj (if (; Obj nm) @)) ) ) ) )
+
+# list projects
+(de projects () (chdir "db/" (dir)))
 
 # returns blob subdirectory
 # (blobDir '{A1}) -> "db/blob/A/"
