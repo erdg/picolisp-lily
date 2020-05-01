@@ -338,6 +338,11 @@
    (mapc eval Music)
    (prinl "}") ]
 
+[de lyMultiMeasureRests Music
+   (prinl "\\compressFullBarRests")
+   (prinl "\\override MultiMeasureRest.expand-limit = #1")  # no unreadable classical style multi-measure rests
+   (lyEval Music) ]
+
 [de lyChords "Music"
    (prinl "\\chords")
    (prinl "{ ")
