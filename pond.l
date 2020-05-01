@@ -65,13 +65,11 @@
 
 # lyEval - recursively evaluates music expressions
 #
-# if Obj is an atom (e.g. "aes4." - an Ab dotted quarter note),
-# it's 'prin'ted followed by a space. if it's a list, it's
-# evaluated.
+# if Obj is an atom (e.g. "aes4." - an Ab dotted quarter note), it's printed
+# with 'prinl'. if it's a list, it's evaluated. allows for nested musical
+# structures.
 #
-# allows for nested musical structures.
-#
-# Note - most functions seem to use the (mapc eval Music) pattern
+# Note - most functions use the (mapc eval Music) pattern
 #
 [de lyEval (Lst)
    (mapc
