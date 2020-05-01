@@ -29,10 +29,7 @@
       (lyLayout)
       (run Music) )
    # create SVGs
-   (t (call *Lily "-dpreview" "-dbackend=svg" File))
-   # preview in browser
-   (call 'firefox (pack File ".preview.svg")
-   (call 'firefox (pack File ".svg")
+   (call *Lily "-dcrop" "-dbackend=svg" File)
 ]
 
 # edit fn's from anywhere
