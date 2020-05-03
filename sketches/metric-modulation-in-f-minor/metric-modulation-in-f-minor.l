@@ -85,11 +85,13 @@
 # of the read macro
 #
 (de makeTuplets (N1 N2 Dur)
-   (make 
+   (make
       (let Notes (circ (pack "c''" Dur) (pack "aes'" Dur) (pack "aes''" Dur) (pack "f'" Dur))
-         (do 4 (link 
-            (fill '(lyTuplet ^(list (pack N1 "/" N2)) ^(make (do N1 (chain (list (pop 'Notes))))))))))))  # no wonder people don't use lisp
-
+         (do 4
+            (link
+               (fill
+                  '(lyTuplet ^(list (pack N1 "/" N2))
+                     ^(make (do N1 (chain (list (pop 'Notes))))))))))))  # no wonder people don't use lisp
 
 # left hand, second draft
 [de lh%% ()
