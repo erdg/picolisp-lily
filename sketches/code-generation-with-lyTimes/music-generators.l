@@ -28,8 +28,21 @@
                   ((lt0 N) (pack (need N ",")))
                   ((=0 N) "")
                   ((gt0 N) (pack (need N "'"))) ) ) ) ) ) )
-         
 
+(de octave-ring ()
+   (circ ",,," ",," "," "" "'" "''" "'''" "''''" "'''''") )
+
+(de octave-ring-from-range (Lo Hi)
+   (circ
+      (make
+         (for N (range Lo Hi)
+            (link
+               (cond
+                  ((lt0 N) (pack (need N ",")))
+                  ((=0 N) "")
+                  ((gt0 N) (pack (need N "'"))) ) ) ) ) ) )
+
+# note + octave
 (de random-pitch ()
    (case (random-octave)
       (",,," (pack (random-element '("a" "ais" "bes" "b")) @)) # lowest 3 notes on piano
