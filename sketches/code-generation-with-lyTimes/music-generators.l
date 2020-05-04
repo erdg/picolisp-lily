@@ -4,7 +4,7 @@
 (de random-duration ()
    (random-element (1 2 4 8 16 32 64 128)) )
 
-(de random-note-name ()
+(de random-note ()
    (pack
       (random-element '(a b c d e f g))
       (random-element '("" "is" "es")) ) )
