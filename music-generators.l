@@ -79,6 +79,17 @@
                   (link (cons It (duration-as-128th-notes It))) ) ) ) ) ) )
 ###
 
+###
+# (map-random-notes-from-list-to-durations
+#    (with-flats (des-lydian-scale))
+#    (make (do 8 (chain (random-measure-of-durations "7/8")))) )
+#
+(de map-random-notes-from-list-to-durations (Notes Durations)
+   (mapcar
+      '((D) (pack (random-element Notes) D))
+      Durations ) )
+###
+
 (de random-note ()
    (pack
       (random-element '(a b c d e f g))
