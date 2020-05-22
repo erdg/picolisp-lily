@@ -34,6 +34,7 @@
 (de random-duration-from (Lst)
    (random-element Lst) )
 
+###
 # (random-measure-of-durations)
 # (random-measure-of-durations "17/16")
 (de random-measure-of-durations (Time)
@@ -47,11 +48,12 @@
             (let
                [Dur  # pick random duration from duration table
                   (random-element
-                     (filter
+                     (filter  # that fits in remaining space of measure
                         '((D) (<= (cdr D) (- Full Curr)))
                         *duration-as-128th-notes-table*)) ]
+               # add it to the measure
                (link (car Dur))
-               # increment the current count
+               # increment count of current measure
                (inc 'Curr (cdr Dur)) ) ) ) ) )
 
 (de duration-as-128th-notes (D)
@@ -389,4 +391,3 @@
    (mapcar
       '((Note) (if (pair Note) (cdr @) Note))
       Scale ) )
-
