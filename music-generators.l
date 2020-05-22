@@ -27,29 +27,27 @@
 (de random-duration-range (X Y)
    (let Ds (1 2 4 8 16 32 64 128)
       (random-element
-         (sect 
+         (sect
             (nth Ds (index X Ds))
             (head (index Y Ds) Ds) ) ) ) )
 
 (de random-duration-from (Lst)
    (random-element Lst) )
 
-###
-# (random-measure-of-durations "4/4")
+# (random-measure-of-durations)
+# (random-measure-of-durations "17/16")
 (de random-measure-of-durations (Time)
    (default Time "4/4")
    (let [Lst  (mapcar '((L) (any (pack L))) (split (chop Time) "/"))  # e.g. "17/16" -> (17 16)
          Full (* (car Lst) (duration-as-128th-notes (cadr Lst)))      # length of measure as 128th notes
-         Curr 0  # current count of 128th notes as measure is built
-         ]
+         Curr 0 ]  # current count of 128th notes as measure is built
       (make
-         (loop 
+         (loop
             (T (= Curr Full))
-            # pick random duration from duration table
-            (let 
-               [Dur
+            (let
+               [Dur  # pick random duration from duration table
                   (random-element
-                     (filter 
+                     (filter
                         '((D) (<= (cdr D) (- Full Curr)))
                         *duration-as-128th-notes-table*)) ]
                (link (car Dur))
@@ -62,9 +60,11 @@
          Dur  (any (pack (filter '((N) (num? (any N))) C)))
          Dots (filter '((X) (= X ".")) C) ]
       (macro  # gotta be a simpler way to do this
-         (apply + 
-            (list 
+         (apply +
+            (list
+               # 128th-note value of base duration (e.g. "2" in "2..")
                (nthcar (index Dur Ds) (reverse Ds))
+               # 128th-note value of dots
                ^(make
                   (for Dot (length Dots)
                      (link
