@@ -57,10 +57,6 @@
                (inc 'Curr (cdr Dur)) ) ) ) ) )
 
 (de duration-as-128th-notes (D)
-   (let Ds (1 2 4 8 16 32 64 128)
-      (nthcar (index D Ds) (reverse Ds)) ) )
-
-(de dotted-duration-as-128th-notes (D)
    (let [C    (chop D)
          Ds (1 2 4 8 16 32 64 128)
          Dur  (any (pack (filter '((N) (num? (any N))) C)))
@@ -80,7 +76,7 @@
          (for Dur (1 2 4 8 16 32 64 128)
             (for Dot '("" "." ".." "..." "...." "....." "......" ".......")
                (let It (pack Dur Dot)
-                  (link (cons It (dotted-duration-as-128th-notes It))) ) ) ) ) ) )
+                  (link (cons It (duration-as-128th-notes It))) ) ) ) ) ) )
 ###
 
 (de random-note ()
