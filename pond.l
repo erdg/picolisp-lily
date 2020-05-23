@@ -15,9 +15,6 @@
       (lyVersion)
       (lyLayout)
       (lyHeader)
-      ### jazz font
-      # (lyInclude "lilyjazz.ily")
-      # (lyInclude "jazzchords.ly")
       (run Music 1) )
    (call *Lily File)
    (call 'evince (pack File ".pdf") ]
@@ -39,6 +36,11 @@
       (ld) ]
 
 [de lyVersion () (prinl "\\version \"" *Version "\"")]
+
+[de lyJazz ()
+   ### jazz font
+   (lyInclude "lilyjazz.ily")
+   (lyInclude "jazzchords.ly") ]
 
 [de lyLayout ()
    (prinl "\\layout")
