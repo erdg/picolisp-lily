@@ -169,6 +169,100 @@
       ("16.." 64)
       ("32." 64) ) )
 
+# (make-ly-times 4 7 8 random-element '("a" "b" "c"))
+# (make-ly-times 4 5 4 ++ (
+(de make-ly-times (@X @Y @D @Fn @Notes)
+# in the space of @X @D-notes, put @Y @D-notes, chosen from the ring @Notes
+# @X - numerator, e.g. "4" in "4/5"
+# @Y - denominator, e.g. "5" in "4/5
+# @D - duration of notes, e.g 16th-notes
+# @Fn - function to select note from @Notes, e.g. '++' or 'random-element'
+# @Notes - notes to choose from, take care to use a list or ring appropriately,
+#          i.e. '++' rings and pick 'random-element's from a list
+   (macro
+      (lyTimes (pack @X "/" @Y)
+         ^(make
+            (do @Y
+               (link
+                  (pack
+                     (@Fn @Notes)
+                     @D ) ) ) ) ) ) )
+
+# i want a function that makes crazy ly-times, like 'random-measure-of-durations'
+# for ly-times need to keep track of 128th-note duration of the times, and fill
+# with random stuff
+
+# this works, but is not contained by the duration 'N'. crazy nonsense scores. i would
+#like slightly less nonsense
+(de x-of-random-ly-times (N @Fn @Notes) # N = 2 -> a half-note filled with crazy ly-times
+# |
+# V
+# - generate random make-ly-times call, e.g (make-ly-times 13 17 64 ...) -> in
+#   space of 13, put 17 64th-notes.
+# - calculate 128th-note time for this call, e.g. (* @X (128th-note-value @D)), increment 'Curr'
+# - fill with crazy randomness via 'random-measure-of-durations', e.g
+#   '(random-measure-of-durations "13/64")' should work
+# - map durations to notes
+# - fill notes in ly-times-call
+# - repeat with another random make-ly-times call that fits within '(- Full Curr)'
+#
+# - probably needs to use note rings
+   (let [Full (duration-as-128th-notes N) Curr 0]
+      (make
+         (loop
+            (T (>= Curr Full))
+            (let [@X (rand 1 100)
+                  @Y (rand 1 100)
+                  D (random-element (nth (base-note-durations) (+ (index N (base-note-durations) 1))))
+                  Dur (* @X (duration-as-128th-notes D))
+                  @Rhythms (random-rhythms (pack @X "/" D) N "...")
+                  ]
+               # (make-ly-times ...)
+               (link
+                  (macro
+                     (lyTimes (pack @X "/" @Y)
+                        ^(make
+                           # map random-rhythms to notes
+                           (for R @Rhythms
+                              (link
+                                 (pack
+                                    (@Fn @Notes)
+                                    R ) ) ) ) ) ) )
+               # increment count of current measure
+               (inc 'Curr Dur) ) ) ) ) )
+
+(de base-note-durations () (list 1 2 4 8 16 32 64 128))
+
+# (random-rhythms "4/4" 2 "..") -> measure of 4/4 with rhythms of "4.." or less
+(de random-rhythms (Time MaxDur MaxDot)
+   (default Time "4/4")
+   (let [Lst  (mapcar '((L) (any (pack L))) (split (chop Time) "/"))  # e.g. "17/16" -> (17 16)
+         Full (* (car Lst) (duration-as-128th-notes (cadr Lst)))      # length of measure as 128th notes
+         Curr 0  # current count of 128th notes as measure is built
+         Avail
+            (and
+               (filter # durations larger than max
+                  '((L) (> (any (pack (car (split (chop (car L)) ".")))) Max))
+                  *duration-as-128th-notes-table* )  # <- (("2" . 64) ... ("4." . 48))
+               (filter # dots more than max
+                  '((L) (not (sub? MaxDot (car L))))
+                  @ ) )
+         ]
+      (make
+         (loop
+            (T (= Curr Full))
+            (let Dur
+               (random-element # pick random duration from duration table
+                  (filter  # that fits in remaining space of measure
+                     '((D) (<= (cdr D) (- Full Curr)))
+                     Avail ) )
+               # add it to the measure
+               (link (car Dur))
+               # increment count of current measure
+               (inc 'Curr (cdr Dur)) ) ) ) ) )
+
+
+###
 # scales n stuff
 (de chromatic-scale-ascending-sharps ()
    (list "c" "cis" "d" "dis" "e" "f" "fis" "g" "gis" "a" "ais" "b") )
