@@ -1,4 +1,4 @@
-const { h, app } = hyperapp;
+import { h, app } from "./hyperapp.js"
 
 const state = {
    note: "e",
