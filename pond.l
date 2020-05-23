@@ -55,6 +55,17 @@
    (prinl "}")
    (prinl "}") ]
 
+# lyMidi - create a midi file from score
+#
+# (lyScore
+#    (lyMidi)
+#    ... music here ... )
+#
+[de lyMidi ()
+   (prinl "\\midi")
+   (prinl "{")
+   (prinl "}") ]
+
 [de lyHeader (Title Composer)
    (prinl "\\header")
    (prinl "{")
