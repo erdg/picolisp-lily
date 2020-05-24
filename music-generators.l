@@ -252,8 +252,8 @@
 # for ly-times need to keep track of 128th-note duration of the times, and fill
 # with random stuff...
 
-# this works, but is not contained by the duration 'N'. crazy nonsense scores. i would
-# like slightly less nonsense
+# this "works", but is not contained by the duration 'N'. crazy nonsense
+# scores. i would like slightly less nonsense
 (de random-ly-times (N @Fn @Notes) # N = 2 -> a half-note filled with crazy ly-times
 # |
 # V
