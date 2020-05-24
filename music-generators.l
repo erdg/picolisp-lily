@@ -155,13 +155,13 @@
 # (make-ly-times 4 7 8 random-element '("a" "b" "c"))
 # (make-ly-times 4 5 4 ++ (ring-from-list (with-flats (des-lydian-scale))))
 (de make-ly-times (@X @Y @D @Fn @Notes)
-# in the space of @X @D-notes, put @Y @D-notes, chosen from the ring @Notes
-# @X - numerator, e.g. "4" in "4/5"
-# @Y - denominator, e.g. "5" in "4/5
-# @D - duration of notes, e.g 16th-notes
-# @Fn - function to select note from @Notes, e.g. '++' or 'random-element'
-# @Notes - notes to choose from, take care to use a list or ring appropriately,
-#          i.e. '++' rings and pick 'random-element's from a list
+   # --- "in the space of @X @D-notes put @Y @D-notes, chosen by @Fn from @Notes" ---
+   # @X - numerator, e.g. "4" in "4/5"
+   # @Y - denominator, e.g. "5" in "4/5
+   # @D - duration of notes, e.g 16th-notes
+   # @Fn - function to select note from @Notes, e.g. '++' or 'random-element'
+   # @Notes - notes to choose from, take care to use a list or ring appropriately,
+   #          i.e. '++' rings and pick 'random-element's from a list
    (macro
       (lyTimes (pack @X "/" @Y)
          ^(make
