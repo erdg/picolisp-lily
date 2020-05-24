@@ -293,33 +293,128 @@
 
 (de base-note-durations () (list 1 2 4 8 16 32 64 128))
 
-# (random-rhythms "4/4" 2 "..") -> measure of 4/4 with rhythms of "4.." or less
+# (random-rhythms "4/4" 2 "..") -> measure of 4/4 with rhythms of "2.." or less
 (de random-rhythms (Time MaxDur MaxDot)
    (default Time "4/4")
+   (default MaxDur 1)
+   (default MaxDot ".")
    (let [Lst  (mapcar '((L) (any (pack L))) (split (chop Time) "/"))  # e.g. "17/16" -> (17 16)
          Full (* (car Lst) (duration-as-128th-notes (cadr Lst)))      # length of measure as 128th notes
          Curr 0  # current count of 128th notes as measure is built
          Avail
-            (and
-               (filter # durations larger than max
-                  '((L) (> (any (pack (car (split (chop (car L)) ".")))) Max))
-                  *duration-as-128th-notes-table* )  # <- (("2" . 64) ... ("4." . 48))
-               (filter # dots more than max
+            (filter  # no durations larger than max
+               '((L) (>= (any (pack (split (chop (car L)) "."))) MaxDur))
+               (filter  # no dots more than max
                   '((L) (not (sub? MaxDot (car L))))
-                  @ ) )
+                  *duration-as-128th-notes-table* ) )  # <- (("2" . 64) ... ("4." . 48))
          ]
       (make
          (loop
             (T (= Curr Full))
             (let Dur
-               (random-element # pick random duration from duration table
-                  (filter  # that fits in remaining space of measure
+               (random-element   # pick random-element from available durations
+                  (filter        # that fits in remaining space of measure
                      '((D) (<= (cdr D) (- Full Curr)))
                      Avail ) )
-               # add it to the measure
-               (link (car Dur))
-               # increment count of current measure
-               (inc 'Curr (cdr Dur)) ) ) ) ) )
+               (link (car Dur))  # add it to the measure
+               (inc 'Curr (cdr Dur)) ) ) ) ) )  # increment count of current measure
+
+
+###
+# (random-rhythms "4/4" 2 "..") -> measure of 4/4 with rhythms of "2." or less
+# (random-rhythms "4/4" (4 16 64)) -> measure with durations 4/16/64
+(de random-rhythms% (Time MaxDur MaxDot)
+   (default Time "4/4")
+   (default MaxDur 1)
+   (default MaxDot ".")
+   (let [Lst  (mapcar '((L) (any (pack L))) (split (chop Time) "/"))  # e.g. "17/16" -> (17 16)
+         Full (* (car Lst) (duration-as-128th-notes (cadr Lst)))      # length of measure as 128th notes
+         Curr 0  # current count of 128th notes as measure is built
+         FilteredDots
+            (filter  # no dots more than max
+               '((L) (not (sub? MaxDot (car L))))
+               *duration-as-128th-notes-table* )
+         Avail
+            # if MaxDur is a list, take only those durations
+            (if (pair MaxDur)
+               (make
+                  (for N MaxDur
+                     (chain
+                        (filter  # no durations larger than max
+                           '((L)
+                              (=
+                                 (if (str? N)
+                                    (car L)
+                                    (any (pack (split (chop (car L)) "."))) )
+                                 N) )
+                           FilteredDots ) ) ) )  # <- (("2" . 64) ... ("4." . 48))
+               (filter  # no durations larger than max
+                  '((L) (>= (any (pack (split (chop (car L)) "."))) MaxDur))
+                   FilteredDots ) )
+         ]
+      (make
+         (loop
+            (T (= Curr Full))
+            (let
+               Dur
+               (or
+                  (random-element   # pick random-element from available durations
+                     (filter        # that fits in remaining space of measure
+                        '((D) (<= (cdr D) (- Full Curr)))
+                        Avail ) )
+                  (random-element   # pick random-element from available durations
+                     (filter        # that fits in remaining space of measure
+                        '((D) (<= (cdr D) (- Full Curr)))
+                        *duration-as-128th-notes-table* ) ) )
+               (link (car Dur))  # add it to the measure
+               (inc 'Curr (cdr Dur)) ) ) ) ) )  # increment count of current measure
+
+###
+# (random-rhythms-from "4/4" (4 "4." 8 16)) -> measure with durations 4/"4."/8/16
+#
+# NOTE - this can also be used to "apply weights" to the randomness, e.g.
+#
+#    (random-rhythms-from "13/16" (4 8 16 16 16 16))
+#
+# will pick more 16th-notes as it will result in 4x as many in the 'Avail'able list
+(de random-rhythms-from (Time Ds)
+   # Time - time signature/total duration of desired rhythms
+   # Ds   - allowed durations
+   (default Time "4/4")
+   (default Ds (1 2 4 8 16 32 64 128))
+   (let [Lst  (mapcar '((L) (any (pack L))) (split (chop Time) "/"))  # e.g. "17/16" -> (17 16)
+         Full (* (car Lst) (duration-as-128th-notes (cadr Lst)))      # length of measure as 128th notes
+         Curr 0  # current count of 128th notes as measure is built
+         Avail
+            (make
+               (for D Ds
+                  (chain
+                     (filter
+                        '((L) (= (car L) (pack D)))
+                        *duration-as-128th-notes-table* ) ) ) )  # <- (("2" . 64) ... ("4." . 48))
+         ]
+      (make
+         (loop
+            (T (= Curr Full))
+            (let
+               Dur
+               (or
+                  (random-element   # pick random-element from AVAILABLE durations
+                     (filter        # that FITS in remaining space of measure
+                        '((D) (<= (cdr D) (- Full Curr)))
+                        Avail ) )
+                  # NOTE - these clauses are so the function doesn't hang
+                  # -----------------------------------------------------
+                  (random-element   # pick random-element from ALL durations
+                     (filter        # that USES remaining space of measure
+                        '((D) (= (cdr D) (- Full Curr)))
+                        *duration-as-128th-notes-table* ) )
+                  (random-element   # pick random-element from ALL durations
+                     (filter        # that FITS IN remaining space of measure
+                        '((D) (<= (cdr D) (- Full Curr)))
+                        *duration-as-128th-notes-table* ) ) )
+               (link (car Dur))  # add it to the measure
+               (inc 'Curr (cdr Dur)) ) ) ) ) )  # increment count of current measure
 
 
 ###
