@@ -171,6 +171,25 @@
                      (@Fn @Notes)
                      @D ) ) ) ) ) ) )
 
+# (make-ly-tuplet 7 4 8 random-element '("a" "b" "c"))
+# (make-ly-tuplet 3 2 8 ++ (ring-from-list (with-flats (des-lydian-scale))))
+(de make-ly-tuplet (@X @Y @D @Fn @Notes)
+   # --- "@X over @Y @D-notes, chosen by @Fn from @Notes" ---
+   # @X - numerator
+   # @Y - denominator
+   # @D - duration of notes, e.g 16th-notes
+   # @Fn - function to select note from @Notes, e.g. '++' or 'random-element'
+   # @Notes - notes to choose from, take care to use a list or ring appropriately,
+   #          i.e. '++' rings and pick 'random-element's from a list
+   (macro
+      (lyTuplet (pack @X "/" @Y)
+         ^(make
+            (do @X
+               (link
+                  (pack
+                     (@Fn @Notes)
+                     @D ) ) ) ) ) ) )
+
 # i want a function that makes crazy ly-times, like 'random-measure-of-durations'
 # for ly-times need to keep track of 128th-note duration of the times, and fill
 # with random stuff...
