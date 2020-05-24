@@ -152,23 +152,6 @@
 (de random-dot ()
    (random-element '("." ".." "..." "...." "....." "......" ".......")) )
 
-(de dotted-duration-complement (Dur) # in 4/4
-   (case Dur
-      ("2." 4)
-      ("2.." 8)
-      ("2..." 16)
-      ("2...." 32)
-      ("4." 8)
-      ("4.." 16)
-      ("4..." 32)
-      ("4...." 64)
-      ("8." 16)
-      ("8.." 32)
-      ("8..." 64)
-      ("16." 32)
-      ("16.." 64)
-      ("32." 64) ) )
-
 # (make-ly-times 4 7 8 random-element '("a" "b" "c"))
 # (make-ly-times 4 5 4 ++ (
 (de make-ly-times (@X @Y @D @Fn @Notes)
