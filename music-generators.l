@@ -200,8 +200,8 @@
                         R ) ) ) ) ) ) ) )
 
 (de make-ly-times-random-rhythms% (@X @Y @A @B @Fn @Notes)
-   # --- "put @X @Y-notes in the space of @A @B-notes" --- 
-   #   e.g put 17 16th-notes in the space of 5 8th-notes 
+   # --- "put @X @Y-notes in the space of @A @B-notes" ---
+   #   e.g put 17 16th-notes in the space of 5 8th-notes
    (let @Rhythms (random-rhythms (pack @X "/" @Y) @Y)
       (macro
          (lyTimes (pack @A "/" @X)
