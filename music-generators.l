@@ -153,7 +153,7 @@
    (random-element '("." ".." "..." "...." "....." "......" ".......")) )
 
 # (make-ly-times 4 7 8 random-element '("a" "b" "c"))
-# (make-ly-times 4 5 4 ++ (
+# (make-ly-times 4 5 4 ++ (ring-from-list (with-flats (des-lydian-scale))))
 (de make-ly-times (@X @Y @D @Fn @Notes)
 # in the space of @X @D-notes, put @Y @D-notes, chosen from the ring @Notes
 # @X - numerator, e.g. "4" in "4/5"
@@ -173,11 +173,11 @@
 
 # i want a function that makes crazy ly-times, like 'random-measure-of-durations'
 # for ly-times need to keep track of 128th-note duration of the times, and fill
-# with random stuff
+# with random stuff...
 
 # this works, but is not contained by the duration 'N'. crazy nonsense scores. i would
-#like slightly less nonsense
-(de x-of-random-ly-times (N @Fn @Notes) # N = 2 -> a half-note filled with crazy ly-times
+# like slightly less nonsense
+(de random-ly-times (N @Fn @Notes) # N = 2 -> a half-note filled with crazy ly-times
 # |
 # V
 # - generate random make-ly-times call, e.g (make-ly-times 13 17 64 ...) -> in
@@ -196,7 +196,7 @@
             (T (>= Curr Full))
             (let [@X (rand 1 100)
                   @Y (rand 1 100)
-                  D (random-element (nth (base-note-durations) (+ (index N (base-note-durations) 1))))
+                  D (random-element (nth (base-note-durations) (+ (index N (base-note-durations)) 1)))
                   Dur (* @X (duration-as-128th-notes D))
                   @Rhythms (random-rhythms (pack @X "/" D) N "...")
                   ]
