@@ -272,6 +272,13 @@
    (lyEval Music)
    (prinl "}") ]
 
+
+[de lyTuplet% (Sig Base . Music)
+   (prinl "\\tuplet " Sig " " Base)
+   (prinl "{")
+   (lyEval Music)
+   (prinl "}") ]
+
 # times - like tuplets, but crazier
 #
 # (lyTimes "2/3" "a4" "b4" "c4") -> 1/4 note triplets
