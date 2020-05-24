@@ -173,6 +173,47 @@
                      (@Fn @Notes)
                      @D ) ) ) ) ) ) )
 
+# NOTE - this is my current favorite
+# (make-ly-times-alt 4 5 (mapcar '((R) (pack (random-element '("a" "b" "c")) R)) (random-rhythms "5/4")))
+# (make-ly-times-alt 2 3 (mapcar '((R) (pack (random-element '("a" "b" "c")) R)) (random-rhythms "3/2" 8 "...")))
+(de make-ly-times-alt (@X @Y @Music)
+   # @Music - e.g. (mapcar '((R) (pack (random-element '("a" "b" "c")) R)) (random-rhythms "4/4"))
+   (macro
+      (lyTimes (pack @X "/" @Y)
+         (prinl "\\once \\override TupletNumber.text = #(tuplet-number::non-default-tuplet-fraction-text "@Y" "@X")")
+         ^(make
+            (for M @Music
+               (link
+                  M ) ) ) ) ) )
+
+(de make-ly-times-random-rhythms (@X @Y @R @Fn @Notes)
+   (let @Rhythms (random-rhythms (pack @Y "/" @R) @R)
+      (macro
+         (lyTimes (pack @X "/" @Y)
+            (prinl "\\once \\override TupletNumber.text =
+               #(tuplet-number::non-default-fraction-with-notes "@Y" \""@R"\" "@X" \""@R"\")")
+            ^(make
+               (for R @Rhythms
+                  (link
+                     (pack
+                        (@Fn @Notes)
+                        R ) ) ) ) ) ) ) )
+
+(de make-ly-times-random-rhythms% (@X @Y @A @B @Fn @Notes)
+   # --- "put @X @Y-notes in the space of @A @B-notes" --- 
+   #   e.g put 17 16th-notes in the space of 5 8th-notes 
+   (let @Rhythms (random-rhythms (pack @X "/" @Y) @Y)
+      (macro
+         (lyTimes (pack @A "/" @X)
+            (prinl "\\once \\override TupletNumber.text =
+               #(tuplet-number::non-default-fraction-with-notes "@X" \""@Y"\" "@A" \""@B"\")")
+            ^(make
+               (for R @Rhythms
+                  (link
+                     (pack
+                        (@Fn @Notes)
+                        R ) ) ) ) ) ) ) )
+
 # (make-ly-tuplet 7 4 8 random-element '("a" "b" "c"))
 # (make-ly-tuplet 3 2 8 ++ (ring-from-list (with-flats (des-lydian-scale))))
 (de make-ly-tuplet (@X @Y @D @Fn @Notes)
