@@ -233,6 +233,21 @@
                      (@Fn @Notes)
                      @D ) ) ) ) ) ) )
 
+
+### it "works" but results are undesirable. use 'make-ly-times-alt' instead
+# (make-ly-tuplet-alt 4 5 (mapcar '((R) (pack (random-element '("a" "b" "c")) R)) (random-rhythms "5/4")))
+# (make-ly-tuplet-alt 2 3 (mapcar '((R) (pack (random-element '("a" "b" "c")) R)) (random-rhythms "3/2" 8 "...")))
+(de make-ly-tuplet-alt (@X @Y @R @Music)
+# @Music - e.g. (mapcar '((R) (pack (random-element '("a" "b" "c")) R)) (random-rhythms "4/4"))
+   (macro
+      (lyTuplet% (pack @X "/" @Y) @R
+         # (prinl "\\once \\override TupletNumber.text = #(tuplet-number::non-default-tuplet-fraction-text "@Y" "@X")")
+         ^(make
+            (for M @Music
+               (link
+                  M ) ) ) ) ) )
+
+###
 # i want a function that makes crazy ly-times, like 'random-measure-of-durations'
 # for ly-times need to keep track of 128th-note duration of the times, and fill
 # with random stuff...
