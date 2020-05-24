@@ -41,7 +41,8 @@
    (default Time "4/4")
    (let [Lst  (mapcar '((L) (any (pack L))) (split (chop Time) "/"))  # e.g. "17/16" -> (17 16)
          Full (* (car Lst) (duration-as-128th-notes (cadr Lst)))      # length of measure as 128th notes
-         Curr 0 ]  # current count of 128th notes as measure is built
+         Curr 0
+         ]  # current count of 128th notes as measure is built
       (make
          (loop
             (T (= Curr Full))
@@ -50,7 +51,8 @@
                   (random-element
                      (filter  # that fits in remaining space of measure
                         '((D) (<= (cdr D) (- Full Curr)))
-                        *duration-as-128th-notes-table*)) ]
+                     *duration-as-128th-notes-table*))
+                  ]
                # add it to the measure
                (link (car Dur))
                # increment count of current measure
