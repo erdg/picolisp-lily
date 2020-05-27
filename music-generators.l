@@ -4,6 +4,22 @@
 
 (de ring-from-list (Lst)
    (macro (circ ^ Lst)) )
+
+### will this get used?
+#
+# (map-generator
+#    '(random-octave-from-range 1 3)      # generator (quoted)
+#     (with-flats (des-lydian-scale)) )
+#
+# (let L '("f" "a" "bes" "c'")
+#    (map-generator
+#       '(++ L)
+#       (make-rhythms "2." 8 (4 . 16)) ) )
+#
+(de map-generator ("Gen" Lst)
+   (make
+      (for "L" Lst
+         (link (pack (eval "Gen") "L") ) ) ) )
 ###
 
 (de random-element (Lst)
