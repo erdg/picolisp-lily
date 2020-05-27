@@ -432,6 +432,91 @@
                (link (car Dur))  # add it to the measure
                (inc 'Curr (cdr Dur)) ) ) ) ) )  # increment count of current measure
 
+#####
+#
+#  (make-rhythms "4." 8 (2 . 4))    -> dotted 1/4-note, 8th-note, 2 quarter notes
+#  (make-rhythms (T "3/2" 8))       -> 8th-note triplets
+#  (make-rhythms (4 . (T "3/2" 8))  -> 4 sets 8th-note triplets
+#  (make-rhythms                    -> 4 measures of random rhythms
+#     (4 . (random-rhythms "4/4"))
+#  (make-rhythms                    -> entire pattern repeated twice
+#     (2 . ((T "3/2" 8) (T "5/4" 16) (T "3/2" 8)))
+#
+(de make-rhythms Lst
+   (make
+      (for L Lst
+         (cond
+            # N | "N.[...]"
+            ((atom L) (link L) )
+            # (N . ...) -- repeats
+            ((num? (car L))
+               (cond
+                  # (4 . 16) -> 16 16 16 16
+                  ((num? (cdr L))
+                     (do (car L) (link (cdr L))) )
+                  # (2 . (T "3/2" 8)) -> (T "3/2" 8 8 8) (T "3/2" 8 8 8)
+                  ((atom (cadr L))
+                     (macro
+                        (do (car L)
+                           (chain (make-rhythms ^(list (cdr L)))) ) ) )
+                  # (2 . ((T "3/2" 8) (T "5/4 16))) -> 2x (T "3/2" 8 8 8) (T "5/4" 16 16 16 16 16)
+                  (T (do (car L) (macro (chain (make-rhythms ^(cdr L)))))) ) )
+            # (T "X/Y" N) -- tuplets/times
+            ((=T (car L))
+               (link
+                  (make
+                     (link T)
+                     (link (cadr L))
+                     (chain (need (any (caar (split (chop (cadr L)) "/"))) (caddr L)))) ) )
+            # function call
+            (T (chain (eval L)) ) ) ) ) )
+
+#####
+#
+# (pack-rhythms
+#    '(random-element (with-sharps (d-major-7-chord)))
+#    (make-rhythms
+#       (2 .
+#          (T "3/2" 8)
+#          (2 . (T "5/4" 16) ) ) ) )
+#
+# combine rhythms from 'make-rhythms' with notes from a list or note generator
+# function
+#
+(de pack-rhythms (G Lst)
+   # G - music generator, see example above
+   # Lst - list of rhythms
+   (make
+      (for L Lst
+         (cond
+            ((atom L) (link (pack (eval G) L)))
+            (T
+               (link
+                  (make
+                     (link T)
+                     (link (cadr L))
+                     (for X (cddr L) (link (pack (eval G) X))) ) ) ) ) ) ) )
+
+#####
+#
+# (make-melody
+#    (pack-rhythms
+#       '(random-pitch-from-octave-range 0 2)
+#       (make-rhythms (2 . ((T "3/2" 8) (2 . (T "5/4" 16)) (T "3/2" 8)))) ) )
+#
+# combine notes with a list of rhythms and create a melody/arpeggio.
+# this function should auto-generate tuplets, likely via 'macro' that
+# creates a 'lyWrap'ed list with whatever is needed
+#
+(de make-melody (Lst)
+   (make
+      (link 'lyWrap)
+      (for L Lst
+         (if (atom L)
+            (link L)
+            # tuplets
+            (link (cons 'lyTuplet (cdr L)))) ) ) )
+
 
 ###
 # scales n stuff
