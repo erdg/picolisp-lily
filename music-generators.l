@@ -22,6 +22,21 @@
          (link (pack (eval "Gen") "L") ) ) ) )
 ###
 
+#####
+#
+#  (map-notes '("a" "b" "c") ...) -> apply 'random-element'
+#  (map-notes (circ "a" "b" "c") ...) -> apply '++'
+#
+#  these seem to be the two most common patterns currently
+#  used, might as well make a function
+#
+(de map-notes (Ns Lst)
+   (map-generator
+      (if (circ? Ns)
+         '(++ Ns)
+         '(random-element Ns) )
+      Lst ) )
+
 (de random-element (Lst)
    (car (nth Lst (rand 1 (length Lst)))) )
 
