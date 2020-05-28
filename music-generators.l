@@ -163,6 +163,11 @@
                   ((=0 N) "")
                   ((gt0 N) (pack (need N "'"))) ) ) ) ) ) )
 
+(de make-octaves Lst
+   (make
+      (for L Lst
+         (do (car L) (link (cdr L))) ) ) )
+
 # note + octave
 (de random-pitch ()
    (case (random-octave)
