@@ -145,9 +145,16 @@
 
 (de musicApp ()
    (html 0 "music app" NIL NIL
+      (<ProjectHeader>)
       (setupServerEvents)
       (collectMusicObjs)
       (interactJS) ) )
+
+(de <ProjectHeader> ()
+   (let Prj (pack (car (split (chop (blobFn)) "%")))  # current (default/test) project on app start
+      # (serverSentEvent "project" '*Project)
+      (<h1> '(id . "project")
+         "Project: " Prj) ) )
 
 # server sent event for each +MusicObj
 (de setupServerEvents ()
