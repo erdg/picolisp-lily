@@ -125,6 +125,13 @@
       Durations ) )
 ###
 
+(de chord-inversions (Notes)
+   (fish atom
+      (make
+         (link Notes)
+         (for N (- (length Notes) 1)
+            (link (append (tail (- N) Notes) (head N Notes))) ) ) ) )
+
 (de random-note ()
    (pack
       (random-element '(a b c d e f g))
