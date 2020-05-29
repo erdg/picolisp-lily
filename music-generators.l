@@ -536,6 +536,17 @@
 # creates a 'lyWrap'ed list with whatever is needed
 #
 (de make-melody (Lst)
+   (macro
+      (lyWrap
+         ^(make
+            (for L Lst
+               (if (atom L)
+                  (link L)
+                  # tuplets
+                  (link (cons 'lyTuplet (cdr L)))) ) ) ) ) )
+
+# same as above, but returns an unevaluted list. possibly useful for debugging.
+(de make-melody% (Lst)
    (make
       (link 'lyWrap)
       (for L Lst
