@@ -1,4 +1,4 @@
-(load "../../pond.l" "music-generators.l")
+(load "../../pond.l" "../../music-generators.l")
 
 # arpeggio in ees
 (de code-gen-3 ()
