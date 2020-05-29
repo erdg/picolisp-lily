@@ -555,7 +555,6 @@
             # tuplets
             (link (cons 'lyTuplet (cdr L)))) ) ) )
 
-
 ###
 # scales n stuff
 (de chromatic-scale-ascending-sharps ()
