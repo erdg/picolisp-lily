@@ -2,6 +2,7 @@
 
 (de random-measures-in-4/4 ()
    (lilypond "random-measures"
+      # (lyJazz)
       (lyWrap
          ~(mapcar
             '((D) (pack (random-pitch-from-octave-range 0 2) D))
