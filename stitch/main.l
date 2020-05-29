@@ -37,7 +37,10 @@
    (out (blob This 'ly)
       # need to write variation of 'lilypond' here
       (lyVersion)
-      ((blobFn This)) ) )
+      (lyLayout)
+      (lyInclude "lilyjazz.ily")
+      (lyInclude "jazzchords.ly")
+      ((blobFn This)) ) )  # call function in pl file
 
 (dm echo> ()
    (in (blob This 'ly) (echo)) )
