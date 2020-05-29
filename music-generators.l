@@ -751,23 +751,40 @@
 #       "f" ) )              # 12
 
 (de make-all-scales ()
-   (let Lyd (1 3 5 7 2 4 6) # lydian prototype
-      (for Scale
+   (for Scale
          [list
-            (cons "lydian" Lyd)
-            (cons "major" (1 3 5 12 2 4 6))
-            (cons "minor" (1 3 10 12 2 9 11))
-            (cons "wholetone" (1 3 5 7 9 11))
-            # FIXME - need to generate all scales variants for a certain pitch
-            # instead of all pitch variants for a certain scale
-            # (cons "phrygian"   (rot Lyd))
-            # (cons "dorian"     (rot Lyd))
-            # (cons "major"      (rot Lyd))
-            # (cons "locrian"    (rot Lyd))
-            # (cons "minor"      (rot Lyd))
-            # (cons "mixolydian" (rot Lyd))
-         ]
-         (make-all-scales-of-type-from-circle-of-fifths (car Scale) (cdr Scale)) ) ) )
+         (cons "lydian" (1 3 5 7 2 4 6))
+         (cons "major" (1 3 5 12 2 4 6))
+         (cons "mixolydian" (1 3 5 13 2 4 11))
+         (cons "dorian" (1 3 10 12 2 4 11))
+         (cons "minor" (1 3 10 12 2 9 11))         # same
+         (cons "natural-minor" (1 3 10 12 2 9 11)) # same
+         (cons "aeolian" (1 3 10 12 2 9 11))       # same
+         (cons "phrygian" (1 8 10 12 2 9 11))
+         (cons "locrian" (1 8 10 12 7 9 11))
+         (cons "wholetone" (1 3 5 7 9 11))
+
+         # chords
+         # "maj"
+         # "maj6"
+         # "6"
+         # "maj+"
+         # "maj-aug"
+         # "maj7"
+         # "maj7+5"
+         # "maj13+11"
+         # "maj9"
+         # "min"
+         # "min7"
+         # "min9"
+         # "min7-5"
+         # "min7b5"
+         # "dim"
+         # "dim7"
+         # "aug"
+
+      ]
+      (make-all-scales-of-type-from-circle-of-fifths (car Scale) (cdr Scale)) ) )
 
 # scale helpers
 (de with-sharps (Scale)
