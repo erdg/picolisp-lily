@@ -4,6 +4,7 @@
 (rel id (+Need +Key +Number))
 (rel nm (+Ref +String))
 
+# REFACTOR
 (rel l (+Blob))            # pl file
 (rel ly (+Blob))           # ly file
 (rel svg (+Blob))          # svg
@@ -47,9 +48,13 @@
    (unless (: preview.svg) (put!> This 'preview.svg T))
    (t (call 'lilypond "-dcrop" "-dpreview" "-dbackend=svg" "-o" (blobDir This) (blob This 'ly))) )
 
+#REFACTOR
 # strip all '<a>' tags from svg files. lilypond links notes in svg to lines
 # in the source file. not okay for sharing svg's on the internet, when the
 # source files are +Blob's in the picolisp DB
+#
+# FIXME - this method makes a mess of the console. figure out way to mute
+# output
 (dm sanitize> ()
    (unless (: clean.svg) (put!> This 'clean.svg T))
    (let CleanSvg
