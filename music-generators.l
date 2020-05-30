@@ -584,15 +584,15 @@
    # G - music generator, see example above
    # Lst - list of rhythms
    (make
-      (for L Lst
+      (for "L" Lst
          (cond
-            ((atom L) (link (pack (eval G) L)))
+            ((atom "L") (link (pack (eval G) "L")))
             (T
                (link
                   (make
                      (link T)
-                     (link (cadr L))
-                     (for X (cddr L) (link (pack (eval G) X))) ) ) ) ) ) ) )
+                     (link (cadr "L"))
+                     (for X (cddr "L") (link (pack (eval G) X))) ) ) ) ) ) ) )
 
 #####
 #
