@@ -58,3 +58,36 @@
 
 (de render-code-gen-11 ()
    (lilypond "code-gen-11" (code-gen-11)) )
+
+###
+
+(de code-gen-12 ()
+   (let L (with-flats (ees-dorian-scale))
+      (make-melody
+         (pack-rhythms
+            '(pack (random-element L) (random-octave-from-range 1 2))
+            (make-rhythms
+               (4 . (T "3/2" 8))
+               (4 . (T "5/4" 16))
+               (4 . (T "6/4" 16))
+               (4 . (T "7/4" 16)))) ) ) )
+
+(de render-code-gen-12 ()
+   (lilypond "code-gen-12" (code-gen-12)) )
+
+###
+
+# same as 12, but with no doubles (same note back to back)
+(de code-gen-13 ()
+   (let (L (with-flats (ees-dorian-scale)) LastNote NIL)
+      (make-melody
+         (pack-rhythms
+            '(random-element-no-repeats L)
+            (make-rhythms
+               (4 . (T "3/2" 8))
+               (4 . (T "5/4" 16))
+               (4 . (T "6/4" 16))
+               (4 . (T "7/4" 16)) ) ) ) ) )
+
+(de render-code-gen-13 ()
+   (lilypond "code-gen-13" (code-gen-13)) )
