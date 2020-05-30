@@ -264,6 +264,23 @@
                         (tail (+ (- Idx) N)
                            *all-pitches* ) ) ) ) ) ) ) ) )
 
+#  (random-pitch-within-n-steps 4 (with-flats (c-dorian-scale)))
+#
+# this also kinda works, but "within n steps" is not always obeyed.
+# works best with small values of N.
+(de random-pitch-within-n-steps (N Lst Start)
+   (job '((Last . NIL))
+      (ifn Last
+         (setq Last (or Start (random-element Lst)))
+         (let Idx (index Last Lst)
+            (setq Last
+               (random-element
+                  (uniq
+                     (filter '((X) (not (= X Last)))
+                        (append
+                           (tail N (head N Lst))
+                           (head N (nth Lst N)) ) ) ) ) ) ) ) ) )
+
 (de random-dot ()
    (random-element '("." ".." "..." "...." "....." "......" ".......")) )
 
