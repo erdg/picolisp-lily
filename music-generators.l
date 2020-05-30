@@ -213,6 +213,57 @@
       ("c" (pack @ (random-element '(",," "," "" "'" "''" "'''" "''''" "'''''"))))
       (T (pack @ (random-element '(",," "," "" "'" "''" "'''" "''''")))) ) )
 
+(de chromatic-scale ()
+   (list
+      "c"
+      (cons "cis" "des")
+      "d"
+      (cons "dis" "ees")
+      "e"
+      "f"
+      (cons "fis" "ges")
+      "g"
+      (cons "gis" "aes")
+      "a"
+      (cons "ais" "bes")
+      "b" ) )
+
+# all pitches (on piano)
+(setq *all-pitches*
+   (make
+      (link "a,,,")
+      (link (cons "ais,,," "bes,,,"))
+      (link "b,,,")
+      (for Oct '(",," "," "" "'" "''" "'''" "''''")
+         (mapcar
+            '((Note)
+               (if (pair Note)
+                  (link (cons (pack (car @) Oct) (pack (cdr @) Oct)))
+                  (link (pack Note Oct)) ) )
+            (chromatic-scale) ) )
+      (link "c'''''") ) )
+
+(de index-of-pitch (Pitch)
+   (for (I . P) *all-pitches*
+      (T
+         (if (atom P)
+            (= Pitch P)
+            (or (= Pitch (car P)) (= Pitch (cdr P))) )
+         I ) ) )
+
+# this kinda works, but the results are rather uninspiring.
+(de random-pitch-within-n-semitones (N Start)
+   (job '((Last . NIL))
+      (ifn Last
+         (setq Last (or Start (random-pitch)))
+         (let Idx (index Last *all-pitches*)
+            (setq Last
+               (random-element
+                  (fish atom
+                     (head (* 2 N)
+                        (tail (+ (- Idx) N)
+                           *all-pitches* ) ) ) ) ) ) ) ) )
+
 (de random-dot ()
    (random-element '("." ".." "..." "...." "....." "......" ".......")) )
 
