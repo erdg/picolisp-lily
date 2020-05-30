@@ -771,6 +771,22 @@
       (cons "ais" "bes")   # 11
       "f" ) )              # 12
 
+(de list-of-fifths ()
+   (list
+      "c"                  # 1
+      "g"                  # 2
+      "d"                  # 3
+      "a"                  # 4
+      "e"                  # 5
+      (cons "b"   "ces")   # 6
+      (cons "fis" "ges")   # 7
+      (cons "cis" "des")   # 8
+      (cons "gis" "aes")   # 9
+      (cons "dis" "ees")   # 10
+      (cons "ais" "bes")   # 11
+      "f" ) )              # 12
+
+
 ### circle of fifths patterns
 # major scale -> (1 3 5 12 2 4 6)
 # dorian scale -> (1 3 10 12  2 4 11)
