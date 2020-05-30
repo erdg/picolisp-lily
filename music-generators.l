@@ -184,6 +184,16 @@
       (for L Lst
          (do (car L) (link (cdr L))) ) ) )
 
+#  (octave-tick-to-number "''") -> 2
+#  (octave-tick-to-number ",") -> -1
+(de octave-tick-to-number (Tick)
+   (ifn Tick
+      0
+      (let Len (length Tick)
+         (if (pre? "'" Tick)
+            Len
+            (- Len) ) ) ) )
+
 # note + octave
 (de random-pitch ()
    (case (random-octave)
