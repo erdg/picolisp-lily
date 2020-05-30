@@ -32,7 +32,7 @@
          (let Notes
                (mapcar
                   '((Note) (pack Note (random-octave-from-range 1 2)))
-                  (eval 
+                  (eval
                      (list
                         (case S
                               ((or "c" "f") 'with-sharps)
