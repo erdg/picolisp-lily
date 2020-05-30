@@ -40,6 +40,15 @@
 (de random-element (Lst)
    (car (nth Lst (rand 1 (length Lst)))) )
 
+# no back to back repeats
+(de random-element-no-repeats (Lst)
+   (job '(("Last" . NIL))
+      (recur ()
+         (let It (random-element Lst)
+            (if (= It "Last")
+               (recurse)
+               (setq "Last" It) ) ) ) ) )
+
 (de random-duration ()
    (random-element (1 2 4 8 16 32 64 128)) )
 
