@@ -893,6 +893,14 @@
       ]
       (make-all-scales-of-type-from-circle-of-fifths (car Scale) (cdr Scale)) ) )
 
+#  (make-multi-octave-scale (with-flats (c-dorian-scale)) '("'" "''"))
+#  -> ("c'" "d'" "ees'" ... "bes'" "c''" "d''" "ees''" ... "c''")
+(de make-multi-octave-scale (Notes Octaves)
+   (make
+      (for Y Octaves
+         (for X Notes
+            (link (pack X Y)) ) ) ) )
+
 # scale helpers
 (de with-sharps (Scale)
    (mapcar
