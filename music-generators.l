@@ -832,14 +832,14 @@
          (ifn (pair @Note)
             # e.g. (de c-major-scale ...)
             (macro
-               (de ^(list (any (pack @Note "-" Name))) NIL
+               (de ^(list (any (pack @Note Name))) NIL
                   (make-scale-from-pattern-ring @Pattern @N (@Base)) ) )
                # else make scale for sharp/flat, e.g. (de fis-major-scale ...)/(de ges-major-scale)
             (macro
-               (de ^(list (any (pack (car @Note) "-" Name))) NIL
+               (de ^(list (any (pack (car @Note) Name))) NIL
                   (make-scale-from-pattern-ring @Pattern @N (@Base)) ) )
             (macro
-               (de ^(list (any (pack (cdr @Note) "-" Name))) NIL
+               (de ^(list (any (pack (cdr @Note) Name))) NIL
                   (make-scale-from-pattern-ring @Pattern @N (@Base)) ) ) ) ) ) )
 
 # (de circle-of-fifths ()
