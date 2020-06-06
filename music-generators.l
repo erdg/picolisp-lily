@@ -857,84 +857,259 @@
 #       (cons "ais" "bes")   # 11
 #       "f" ) )              # 12
 
-(de make-all-scales ()
-   (for Scale
-         [list
-         (cons "lydian" (1 3 5 7 2 4 6))
-         (cons "major" (1 3 5 12 2 4 6))
-         (cons "mixolydian" (1 3 5 13 2 4 11))
-         (cons "dorian" (1 3 10 12 2 4 11))
-         (cons "minor" (1 3 10 12 2 9 11))         # same
-         (cons "natural-minor" (1 3 10 12 2 9 11)) # same
-         (cons "aeolian" (1 3 10 12 2 9 11))       # same
-         (cons "phrygian" (1 8 10 12 2 9 11))
-         (cons "locrian" (1 8 10 12 7 9 11))
-         (cons "wholetone" (1 3 5 7 9 11))
 
-         # chords
-         # "maj"
-         # "maj6"
-         # "6"
-         # "maj+"
-         # "maj-aug"
-         # "maj7"
-         # "maj7+5"
-         # "maj13+11"
-         # "maj9"
-         # "min"
-         # "min7"
-         # "min9"
-         # "min7-5"
-         # "min7b5"
-         # "dim"
-         # "dim7"
-         # "aug"
-
-      ]
-      (make-all-scales-of-type-from-circle-of-fifths (car Scale) (cdr Scale)) ) )
-
+# NOTE - take care to use the 'with-[sharps|flats]' helper functions with these patterns, e.g.
+#
+#   (with-flats (des-lydian-scale))
+#
+#   (with-sharps (c|maj13+11))
+#
+# NOTE - chords/scales with no accidentals should use 'with-sharps', e.g
+#
+#   (with-sharps (c-major-scale))
+#
 (de make-all-patterns ()
    (for Pattern
       [list
-         # considering '/' as abbrevation for scale, e.g. 'des/maj'  (d-flat major scale)
-         # considering '|' as abbrevation for chord, e.g. 'des|min' (d-flat minor chord)
-         # scales -- [note]/[scale]
-         (cons "lydian-scale" (1 3 5 7 2 4 6))
-         (cons "major-scale" (1 3 5 12 2 4 6))
-         (cons "mixolydian-scale" (1 3 5 13 2 4 11))
-         (cons "dorian-scale" (1 3 10 12 2 4 11))
-         (cons "minor-scale" (1 3 10 12 2 9 11))         # same
-         (cons "natural-minor-scale" (1 3 10 12 2 9 11)) # same
-         (cons "aeolian-scale" (1 3 10 12 2 9 11))       # same
-         (cons "phrygian-scale" (1 8 10 12 2 9 11))
-         (cons "locrian-scale" (1 8 10 12 7 9 11))
-         (cons "wholetone-scale" (1 3 5 7 9 11))
+         ##### Scales -- [note]/[scale]
+         #
+         # REFS - https://en.wikipedia.org/wiki/Jazz_scale
+         #      - https://en.wikipedia.org/wiki/Lydian_Chromatic_Concept_of_Tonal_Organization
+         #
+         # NOTE - '/' as abbrevation for scale, e.g. 'des/major'  (d-flat major scale)
+         #
+         (cons "-lydian-scale"   (1 3 5 7 2 4 6))
+         (cons "/lydian"         (1 3 5 7 2 4 6))
+         (cons "/lyd"            (1 3 5 7 2 4 6))
+         (cons "/maj7"           (1 3 5 7 2 4 6))
+         (cons "/ma7"            (1 3 5 7 2 4 6))
+         (cons "/M7"             (1 3 5 7 2 4 6))
 
-         # lydian-dominant / harmonic minor (and all modes)
-         # rest of the lydian scales (and all modes)
+         (cons "-major-pentatonic-scale" (1 3 5 2 4))
 
-         # chords -- [note]|[chord]
-         (cons "maj" (1 5 2))
-         (cons "maj6" (1 5 2 4)) # same
-         (cons "6" (1 5 2 4))    # same
-         (cons "maj+" (1 5 9))
-         (cons "aug" (1 5 9))
-         (cons "maj-aug" (1 5 9))
-         (cons "maj7" (1 5 2 6))
-         (cons "maj7+5" (1 5 9 6))
-         (cons "maj13+11" (1 5 2 6 3 7 4))
-         (cons "maj9" (1 5 2 6 3))
-         (cons "min" (1 10 2))
-         (cons "min6" (1 10 2 4))
-         (cons "min7" (1 10 2 11))
-         (cons "min-M7" (1 10 2 6))
-         (cons "min+7" (1 10 2 6))
-         (cons "min-maj7" (1 10 2 6))
-         (cons "min9" (1 10 2 11 3))
-         # "min7-5"
-         # "min7b5"
-         # "dim"
-         # "dim7"
+         (cons "-major-scale" (1 3 5 12 2 4 6))
+         (cons "/major"       (1 3 5 12 2 4 6))
+         (cons "/maj"         (1 3 5 12 2 4 6))
+         (cons "/ma"          (1 3 5 12 2 4 6))
+         (cons "/M"           (1 3 5 12 2 4 6))
+
+         (cons "-bebop-major-scale" (1 3 5 12 2 9 4 6))
+
+         (cons "-mixolydian-scale"  (1 3 5 12 2 4 11))
+         (cons "-dominant-scale"    (1 3 5 12 2 4 11))
+         (cons "/mixolydian"        (1 3 5 12 2 4 11))
+         (cons "/dominant"          (1 3 5 12 2 4 11))
+         (cons "/mix"               (1 3 5 12 2 4 11))
+         (cons "/dom"               (1 3 5 12 2 4 11))
+         (cons "/7"                 (1 3 5 12 2 4 11))
+
+         (cons "-bebop-dominant-scale" (1 3 5 12 2 4 11 6))
+         (cons "/bebop-dominant"       (1 3 5 12 2 4 11 6))
+         (cons "/bebop-7"              (1 3 5 12 2 4 11 6))
+
+         (cons "-dorian-scale"   (1 3 10 12 2 4 11))
+         (cons "/dorian"         (1 3 10 12 2 4 11))
+         (cons "/dor"            (1 3 10 12 2 4 11))
+         (cons "/min7"           (1 3 10 12 2 4 11))
+         (cons "/mi7"            (1 3 10 12 2 4 11))
+         (cons "/m7"             (1 3 10 12 2 4 11))
+
+         (cons "-minor-pentatonic-scale"  (1 10 12   2 11))
+         (cons "-blues-scale"             (1 10 12 7 2 11))
+
+         (cons "-natural-minor-scale"  (1 3 10 12 2 9 11))
+         (cons "-minor-scale"          (1 3 10 12 2 9 11))
+         (cons "-aeolian-scale"        (1 3 10 12 2 9 11))
+         (cons "/min7-b13"             (1 3 10 12 2 9 11))
+         (cons "/mi7-b13"              (1 3 10 12 2 9 11))
+         (cons "/m7-b13"               (1 3 10 12 2 9 11))
+         (cons "/min7-13"              (1 3 10 12 2 9 11))
+         (cons "/mi7-13"               (1 3 10 12 2 9 11))
+         (cons "/m7-13"                (1 3 10 12 2 9 11))
+
+         (cons "-phrygian-scale" (1 8 10 12 2 9 11))
+         (cons "/phrygian"       (1 8 10 12 2 9 11))
+         (cons "/phr"            (1 8 10 12 2 9 11))
+
+         (cons "-locrian-scale"  (1 8 10 12 7 9 11))
+         (cons "/locrian"        (1 8 10 12 7 9 11))
+         (cons "/loc"            (1 8 10 12 7 9 11))
+
+         (cons "-harmonic-minor-scale" (1 3 10 12 2 9 6))
+
+         ###
+         # Melodic Minor (and modes)
+         # REF - https://en.wikipedia.org/wiki/Jazz_scale#Modes_of_the_melodic_minor_scale
+
+         # I
+         (cons "-melodic-minor-scale" (1 3 10 12 2 4 6))
+
+         # II
+         (cons "-melodic-minor-II-scale"     (1 8 10 12 2 4 11))
+         (cons "-phrygian-natural-6-scale"   (1 8 10 12 2 4 11))
+         (cons "-phrygidorian-scale"         (1 8 10 12 2 4 11))
+
+         # III
+         (cons "-lydian-augmented-scale"  (1 3 5 7 9 4 6))
+         (cons "/lydian+5"                (1 3 5 7 9 4 6))
+         (cons "/lyd+5"                   (1 3 5 7 9 4 6))
+
+         # IV
+         (cons "-lydian-flat-7-scale"     (1 3 5 7 2 4 11))
+         (cons "-lydian-dominant-scale"   (1 3 5 7 2 4 11))
+         (cons "/lyd7"                    (1 3 5 7 2 4 11))
+         (cons "/13+11"                   (1 3 5 7 2 4 11))
+
+         # V
+         (cons "-mixolydian-flat-6-scale" (1 3 5 12 2 9 11))
+         (cons "-melodic-major-scale"     (1 3 5 12 2 9 11))
+         (cons "/7-b13"                   (1 3 5 12 2 9 11))
+         (cons "/7-13"                    (1 3 5 12 2 9 11))
+         (cons "/7b13"                    (1 3 5 12 2 9 11))
+         (cons "/9-b13"                   (1 3 5 12 2 9 11))
+         (cons "/9-13"                    (1 3 5 12 2 9 11))
+         (cons "/9b13"                    (1 3 5 12 2 9 11))
+
+         # VI
+         (cons "-locrian-natural-2-scale" (1 3 10 12 7 9 11))
+         (cons "half-diminished-scale"    (1 3 10 12 7 9 11))
+         (cons "/min7-5"                  (1 3 10 12 7 9 11))
+         (cons "/mi7-5"                   (1 3 10 12 7 9 11))
+         (cons "/m7-5"                    (1 3 10 12 7 9 11))
+         (cons "/min7-b5"                 (1 3 10 12 7 9 11))
+         (cons "/mi7-b5"                  (1 3 10 12 7 9 11))
+         (cons "/m7-b5"                   (1 3 10 12 7 9 11))
+         (cons "/min7b5"                  (1 3 10 12 7 9 11))
+         (cons "/mi7b5"                   (1 3 10 12 7 9 11))
+         (cons "/m7b5"                    (1 3 10 12 7 9 11))
+         (cons "/min9-b5"                 (1 3 10 12 7 9 11))
+         (cons "/mi9-b5"                  (1 3 10 12 7 9 11))
+         (cons "/m9-b5"                   (1 3 10 12 7 9 11))
+         (cons "/min9-5"                  (1 3 10 12 7 9 11))
+         (cons "/mi9-5"                   (1 3 10 12 7 9 11))
+         (cons "/m9-5"                    (1 3 10 12 7 9 11))
+         (cons "/min9b5"                  (1 3 10 12 7 9 11))
+         (cons "/mi9b5"                   (1 3 10 12 7 9 11))
+         (cons "/m9b5"                    (1 3 10 12 7 9 11))
+
+         # VII
+         (cons "-super-locrian-scale"     (1 8 10 5 7 9 11))
+         (cons "-altered-dominant-scale"  (1 8 10 5 7 9 11))
+         (cons "-altered-scale"           (1 8 10 5 7 9 11))
+         (cons "/altered"                 (1 8 10 5 7 9 11))
+         (cons "/alt"                     (1 8 10 5 7 9 11))
+         (cons "/7-altered"               (1 8 10 5 7 9 11))
+         (cons "/7-alt"                   (1 8 10 5 7 9 11))
+         ###
+
+         (cons "-lydian-diminished-scale" (1 3 10 7 2 4 6))
+
+         (cons "-wholetone-scale"            (1 3 5 7 9 11))
+         (cons "-auxiliary-augmented-scale"  (1 3 5 7 9 11))
+
+         (cons "-auxiliary-diminished-scale"    (1 3 10 12 7 9 4 6))
+         (cons "-whole-half-diminished-scale"   (1 3 10 12 7 9 4 6))
+         (cons "-whole-half-octatonic-scale"    (1 3 10 12 7 9 4 6))
+
+         (cons "-auxiliary-diminished-blues-scale" (1 8 10 5 7 2 4 11))
+         (cons "-half-whole-diminished-scale"      (1 8 10 5 7 2 4 11))
+         (cons "-half-whole-octatonic-scale"       (1 8 10 5 7 2 4 11))
+
+
+         ##### chords -- [note]|[chord]
+         #
+         # NOTE - '|' as abbrevation for chord, e.g. 'd|min' (d minor chord)
+
+         ### Lydian Mode I (major chords)
+         (cons "|maj"      (1 5 2))
+         (cons "|maj6"     (1 5 2 4))
+         (cons "|6"        (1 5 2 4))
+         (cons "|maj7"     (1 5 2 6))
+         (cons "|maj9"     (1 5 2 6 3))
+         (cons "|maj13+11" (1 5 2 6 3 7 4))
+         (cons "|maj13s11" (1 5 2 6 3 7 4))
+         (cons "|maj7-5"   (1 5 7 6))
+         (cons "|maj7b5"   (1 5 7 6))
+         (cons "|M"        (1 5 2))
+         (cons "|M6"       (1 5 2 4))
+         (cons "|M7"       (1 5 2 6))
+         (cons "|M9"       (1 5 2 6 3))
+         (cons "|M13+11"   (1 5 2 6 3 7 4))
+         (cons "|M13s11"   (1 5 2 6 3 7 4))
+         (cons "|M7-5"     (1 5 7 6))
+         (cons "|M7b5"     (1 5 7 6))
+         ###
+
+         ### Lydian Mode II (7th chords)
+         (cons "|13" (1 5 2 11 3 4))
+         (cons "|11" (1 2 11 3 12 4))
+         (cons "|9"  (1 5 2 11 3))
+         (cons "|7"  (1 5 2 11))
+         ###
+
+         ### Lydian Mode VI (minor chords)
+         (cons "|min"   (1 10 2))
+         (cons "|min6"  (1 10 2 4))
+         (cons "|min7"  (1 10 2 11))
+         (cons "|min9"  (1 10 2 11 3))
+         (cons "|min11" (1 10 2 11 3 12))
+         (cons "|min13" (1 10 2 11 3 12 4))
+         (cons "|m"     (1 10 2))
+         (cons "|m6"    (1 10 2 4))
+         (cons "|m7"    (1 10 2 11))
+         (cons "|m9"    (1 10 2 11 3))
+         (cons "|m11"   (1 10 2 11 3 12))
+         (cons "|m13"   (1 10 2 11 3 12 4))
+         ###
+
+         ### Lydian Mode +IV (minor 7th b5 chords)
+         (cons "|min7-5" (1 10 7 11))
+         (cons "|min7b5" (1 10 7 11))
+         (cons "|min7-5-9" (1 10 7 11 8))
+         (cons "|min7b5b9" (1 10 7 11 8))
+         (cons "|min11-5-9" (1 10 7 11 8 12))
+         (cons "|min11b5b9" (1 10 7 11 8 12))
+         ###
+
+         ### Lydian Mode VII (11th b9 chords)
+         (cons "|11-9" (1 12 11 8))
+         (cons "|11b9" (1 12 11 8))
+         ###
+
+         ### Lydian Augmented Mode +V (7th +5 chords)
+         (cons "|min-M7"   (1 10 2 6))
+         (cons "|min+7"    (1 10 2 6))
+         (cons "|min-maj7" (1 10 2 6))
+         (cons "|mM7"      (1 10 2 6))
+         ###
+
+         ### Lydian Augmented Mode I (major +5 chords)
+         (cons "|major-augmented" (1 5 9))
+         (cons "|maj+"     (1 5 9))
+         (cons "|ma+"      (1 5 9))
+         (cons "|M+"       (1 5 9))
+         (cons "|maj+5"    (1 5 9))
+         (cons "|ma+5"     (1 5 9))
+         (cons "|M+5"      (1 5 9))
+         (cons "|aug"      (1 5 9))
+         (cons "|maj-aug"  (1 5 9))
+         (cons "|aug-maj"  (1 5 9))
+         (cons "|maj7+5"   (1 5 9 6))
+         (cons "|ma7+5"    (1 5 9 6))
+         (cons "|M7+5"     (1 5 9 6))
+         ###
+
+         ### Lydian Augmented Mode II (7th +11 chords)
+         ###
+
+         ### Lydian Augmented Mode VI (minor +7 chords)
+         ###
+
+         ### Suspended chords (e.g. 'c|sus7')
+
+         ### Add chords (e.g. 'c|maj-add4')
+
+         ### Diminished chords
 
       ]
       (make-all-chromatic-variants-of-pattern (car Pattern) (cdr Pattern)) ) )
