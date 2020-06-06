@@ -14,8 +14,7 @@
    (out (pack File ".ly")  # write file
       (lyVersion)
       (lyLayout)
-      (lyHeader)
-      (run Music 1) )
+      (run Music) )
    (call *Lily File)
    (call 'evince (pack File ".pdf") ]
 
