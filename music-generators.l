@@ -825,23 +825,6 @@
          (link
             (nthcar N (nth Base Offset)) ) ) ) )
 
-(de make-all-scales-of-type-from-circle-of-fifths (Name @Pattern)
-   (for @N 12
-      (let (@Base 'circle-of-fifths
-            @Note (nthcar @N (@Base)) )
-         (ifn (pair @Note)
-            # e.g. (de c-major-scale ...)
-            (macro
-               (de ^(list (any (pack @Note "-" Name "-scale"))) NIL
-                  (make-scale-from-pattern-ring @Pattern @N (@Base)) ) )
-               # else make scale for sharp/flat, e.g. (de fis-major-scale ...)/(de ges-major-scale)
-            (macro
-               (de ^(list (any (pack (car @Note) "-" Name "-scale"))) NIL
-                  (make-scale-from-pattern-ring @Pattern @N (@Base)) ) )
-            (macro
-               (de ^(list (any (pack (cdr @Note) "-" Name "-scale"))) NIL
-                  (make-scale-from-pattern-ring @Pattern @N (@Base)) ) ) ) ) ) )
-
 (de make-all-chromatic-variants-of-pattern (Name @Pattern)
    (for @N 12
       (let (@Base 'circle-of-fifths
