@@ -842,6 +842,23 @@
                (de ^(list (any (pack (cdr @Note) "-" Name "-scale"))) NIL
                   (make-scale-from-pattern-ring @Pattern @N (@Base)) ) ) ) ) ) )
 
+(de make-all-chromatic-variants-of-pattern (Name @Pattern)
+   (for @N 12
+      (let (@Base 'circle-of-fifths
+            @Note (nthcar @N (@Base)) )
+         (ifn (pair @Note)
+            # e.g. (de c-major-scale ...)
+            (macro
+               (de ^(list (any (pack @Note "-" Name))) NIL
+                  (make-scale-from-pattern-ring @Pattern @N (@Base)) ) )
+               # else make scale for sharp/flat, e.g. (de fis-major-scale ...)/(de ges-major-scale)
+            (macro
+               (de ^(list (any (pack (car @Note) "-" Name))) NIL
+                  (make-scale-from-pattern-ring @Pattern @N (@Base)) ) )
+            (macro
+               (de ^(list (any (pack (cdr @Note) "-" Name))) NIL
+                  (make-scale-from-pattern-ring @Pattern @N (@Base)) ) ) ) ) ) )
+
 # (de circle-of-fifths ()
 #    (circ
 #       "c"                  # 1
@@ -892,6 +909,53 @@
 
       ]
       (make-all-scales-of-type-from-circle-of-fifths (car Scale) (cdr Scale)) ) )
+
+(de make-all-patterns ()
+   (for Pattern
+      [list
+         # considering '/' as abbrevation for scale, e.g. 'des/maj'  (d-flat major scale)
+         # considering '|' as abbrevation for chord, e.g. 'des|min' (d-flat minor chord)
+         # scales -- [note]/[scale]
+         (cons "lydian-scale" (1 3 5 7 2 4 6))
+         (cons "major-scale" (1 3 5 12 2 4 6))
+         (cons "mixolydian-scale" (1 3 5 13 2 4 11))
+         (cons "dorian-scale" (1 3 10 12 2 4 11))
+         (cons "minor-scale" (1 3 10 12 2 9 11))         # same
+         (cons "natural-minor-scale" (1 3 10 12 2 9 11)) # same
+         (cons "aeolian-scale" (1 3 10 12 2 9 11))       # same
+         (cons "phrygian-scale" (1 8 10 12 2 9 11))
+         (cons "locrian-scale" (1 8 10 12 7 9 11))
+         (cons "wholetone-scale" (1 3 5 7 9 11))
+
+         # lydian-dominant / harmonic minor (and all modes)
+         # rest of the lydian scales (and all modes)
+
+         # chords -- [note]|[chord]
+         (cons "maj" (1 5 2))
+         (cons "maj6" (1 5 2 4)) # same
+         (cons "6" (1 5 2 4))    # same
+         (cons "maj+" (1 5 9))
+         (cons "aug" (1 5 9))
+         (cons "maj-aug" (1 5 9))
+         (cons "maj7" (1 5 2 6))
+         (cons "maj7+5" (1 5 9 6))
+         (cons "maj13+11" (1 5 2 6 3 7 4))
+         (cons "maj9" (1 5 2 6 3))
+         (cons "min" (1 10 2))
+         (cons "min6" (1 10 2 4))
+         (cons "min7" (1 10 2 11))
+         (cons "min-M7" (1 10 2 6))
+         (cons "min+7" (1 10 2 6))
+         (cons "min-maj7" (1 10 2 6))
+         (cons "min9" (1 10 2 11 3))
+         # "min7-5"
+         # "min7b5"
+         # "dim"
+         # "dim7"
+
+      ]
+      (make-all-chromatic-variants-of-pattern (car Pattern) (cdr Pattern)) ) )
+
 
 #  (make-multi-octave-scale (with-flats (c-dorian-scale)) '("'" "''"))
 #  -> ("c'" "d'" "ees'" ... "bes'" "c''" "d''" "ees''" ... "c''")
