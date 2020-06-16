@@ -1,24 +1,6 @@
-### utils
-(de nthcar (N Lst)
-   (car (nth Lst N)) )
+(load "utils.l")
 
-(de ring-from-list (Lst)
-   (macro (circ ^ Lst)) )
-
-(de delete-all (Xs Lst Flg)
-   (while (++ Xs)
-      (setq Lst (delete @ Lst Flg)) ) )
-
-(de delete-all% (Xs Lst)
-   (filter
-      (list (list 'E)
-         (cons 'nor
-            (make
-               (for X Xs
-                  (link (list '= (cons 'quote X) 'E)))) ) )
-      Lst ) )
-
-### will this get used?
+###
 #
 # (map-generator
 #    '(random-octave-from-range 1 3)      # generator (quoted)
