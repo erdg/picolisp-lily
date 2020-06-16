@@ -1110,13 +1110,13 @@
       (make-all-chromatic-variants-of-pattern (car Pattern) (cdr Pattern)) ) )
 
 
-#  (make-multi-octave-scale (with-flats (c-dorian-scale)) '("'" "''"))
+#  (make-multi-octave-scale (with-flats (c-dorian-scale)) "'" "''")
 #  -> ("c'" "d'" "ees'" ... "bes'" "c''" "d''" "ees''" ... "c''")
-(de make-multi-octave-scale (Notes Octaves)
+(de make-multi-octave-scale (Notes . Octaves)
    (make
-      (for Y Octaves
-         (for X Notes
-            (link (pack X Y)) ) ) ) )
+      (for O Octaves
+         (for N Notes
+            (link (pack N O)) ) ) ) )
 
 # scale helpers
 (de with-sharps (Scale)
