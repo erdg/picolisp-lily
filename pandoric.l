@@ -72,7 +72,6 @@
          (if (pair "V")
             (link (car @))
             (link "V") ) ) ) )
-
 ###
 
 ### p! - a read macro used within a "@-args" 'de' form, e.g.
@@ -93,12 +92,12 @@
 #
 # just make sure the variables are also within the '`' read-macro
 #
-# the definition
+### p! - the definition
 (de p! Lst
    (let ((@Args @Pargs . @Body) Lst)
       (macro
          '(job (^(lit (macro '(^(p!-env->job (cons 'This @Pargs))))))
-            (ifn This (setq This ^(list (lit (macro '((^(p!-args->fn @Args)) ^ @Body))))))
+            (ifn This (setq This (^(lit (macro '((^(p!-args->fn @Args)) ^ @Body))))))
             (macro
                ((d!
                   ("get" (Sym) (val Sym))
@@ -110,18 +109,71 @@
 # anonymous p!
 (de @p! Lst
    (let ((@Args @Pargs . @Body) Lst)
-      (list
-         '@
-         (macro
-            '(job (^(lit (macro '(^(p!-env->job (cons 'This @Pargs))))))
-               (ifn This (setq This ^(list (lit (macro '((^(p!-args->fn @Args)) ^ @Body))))))
-               (macro
-                  ((d!
-                     ("get" (Sym) (val Sym))
-                     ("set" (Sym Val) (set Sym Val))
-                     # hack
-                     (T ()  (This ^(list '^ '(rest)))) )
-                   ^(list '^ '(rest))) ) ) ) ) ) )
+      (macro
+         (list '@
+            (p! @Args @Pargs ^ @Body) ) ) ) )
+
+# access pandoric variables from anywhere
+(de with-p! Lst
+   (let ((@Syms "Box" . @Body) Lst)
+      (macro
+         (let ^(list
+                  (make
+                     (chain (list 'Self "Box"))  # binds 'Self' so 'setp' can set pandoric vars
+                     (for "S" @Syms
+                        (if (= "S" 'This)
+                           (chain (list "S" (cons 'quote ("Box" "get" "S"))))
+                           (chain (list "S" ("Box" "get" "S"))) ) ) ) )
+            ^ @Body ) ) ) )
+
+### setp - used to modify p!-vars within 'with-p!'
+#
+#   (with-p! (A B) p!-form
+#      (setp A 4)
+#      (setp B "string") )
+#
+# NOTE - fancy macro definition so we don't have to 'quote' var. gotta use 'macro'
+# as much as possible to make code super cool and mind-bending like Common Lisp
+(de setp "Lst"
+   (macro (Self "set" ^(list (cons 'quote (car "Lst"))) ^(cdr "Lst"))) )
+
+(de hotpatch-p! Lst
+   (let ((@Box @New) Lst)
+      (macro
+         (with-p! () @Box
+            (setp This @New) ) ) ) )
+
+(de recode-p! Lst
+   (let ((@Vars @Box @New) Lst)
+      (macro
+         (with-p! @Vars @Box
+            (setp This @New) ) ) ) )
+
+# test
+(test 33
+   (let P! (@p! (N) ((X . 2)) (inc 'X N))
+      (P! 2)                  # -> 4
+      (with-p! (X) P!
+         (setp X (+ X 26)) )  # -> 30
+      (P! 3)                  # -> 33
+      (P! "get" 'X) ) )
+
+(test 30
+   (let (X 2 P! (@p! (N) (X) (inc 'X N)))
+      (P! 2)  # -> 4
+      (with-p! (X) P!
+         (setp X (+ X 26)) ) # -> 30
+      (P! "get" 'X) ) )
+
+(test 30
+   (let X 2
+      (let P! (@p! (N) (X) (inc 'X N))
+         (P! 2)  # -> 4
+         (with-p! (X) P!
+            (setp X (+ X 26)) ) # -> 30
+         (P! "get" 'X) ) ) )
+###
+
 
 ###
 (de p/d! Lst
@@ -160,10 +212,6 @@
 (test 1 (p/d!-env-test "incY"))
 (test 2 (p/d!-env-test "incX"))
 (test (2 1) (p/d!-env-test))
-
-###
-
-
 ###
 
 ###
@@ -193,28 +241,6 @@
 # as much as possible to make code super cool and mind-bending like Common Lisp
 (de setp "Lst"
    (macro (Self "set" ^(list (cons 'quote (car "Lst"))) ^(cdr "Lst"))) )
-
-(test 30
-   (let P! (@p! (N) ((X . 2)) (inc 'X N))
-      (P! 2)  # -> 4
-      (with-p! (X) P!
-         (setp X (+ X 26)) ) # -> 30
-      (P! "get" 'X) ) )
-
-(test 30
-   (let (X 2 P! (@p! (N) (X) (inc 'X N)))
-      (P! 2)  # -> 4
-      (with-p! (X) P!
-         (setp X (+ X 26)) ) # -> 30
-      (P! "get" 'X) ) )
-
-(test 30
-   (let X 2
-      (let P! (@p! (N) (X) (inc 'X N))
-         (P! 2)  # -> 4
-         (with-p! (X) P!
-            (setp X (+ X 26)) ) # -> 30
-         (P! "get" 'X) ) ) )
 
 (de hotpatch-p! Lst
    (let ((@Box @New) Lst)
@@ -252,15 +278,22 @@
 #          ("dec" () (setp X (dec 'X))) )
 #     "dec" ) )
 # -> 12
+
 # : (p!-test "get" 'X)
 # -> 12
+(test 12 (p!-test "get" 'X))
 
-# : (with-p! (This) p!-test (setp This '((N) (inc 'X (* 2 N)))))
+(with-p! (This) p!-test (setp This '((N) (inc 'X (* 2 N)))))
 # -> ((N) (inc 'X (* 2 N)))
+
+# : (p!-test 10)
+# -> 32
+(p!-test 10)
+(test 32 (p!-test "get" 'X))
+
 # : (p!-test "get" 'This)
 # -> ((N) (inc 'X (* 2 N)))
-# : (p!-test 10)
-# -> 27
+(test '((N) (inc 'X (* 2 N))) (p!-test "get" 'This))
 
 
 # it would be cool if this code could generate something that functions
