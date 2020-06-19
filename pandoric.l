@@ -151,7 +151,7 @@
 (de p/d!-env-test @
    `(let X 0
       (let Y 0
-         (p/d! () ((X . 0) (Y . 0))
+         (p/d! () (X Y)
             ("incX" () (inc 'X))
             ("incY" () (inc 'Y))
             (T () (list X Y)) ) ) ) )
