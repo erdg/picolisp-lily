@@ -20,8 +20,22 @@
 (test 'that-thang (d!-test "that"))
 (test 'default (d!-test))
 
-# this is essentially a plambda... kinda, not really
-(de d!state @
+(test 9
+   (let X 3
+      ((d! ("doubleX" () (* X 2)) ("squareX" () (* X X)))
+         "squareX") ) )
+
+(test 6
+   (let X 3
+      ((d! ("doubleX" () (* X 2)) ("squareX" () (* X X)))
+         "doubleX") ) )
+
+(test 15
+   (let [X 3 D! (d! ("doubleX" () (* X 2)) ("squareX" () (* X X)))]
+      (+ (D! "doubleX") (D! "squareX")) ) )
+
+# this is essentially a 'p!' form
+(de d!-with-state @
    (job '((State . NIL) (Cnt . 0))
       (macro
          ((d!
@@ -29,15 +43,13 @@
             ("set" (Sym Val) (set Sym Val)) )
          ^(rest) ) ) ) )
 
-### helper fns for 'p!'
+(d!-with-state "set" 'Cnt 3)
+(test 3 (d!-with-state "get" 'Cnt))
+(d!-with-state "set" 'State "ON")
+(test "ON" (d!-with-state "get" 'State))
 
-# (A B (C . 0)) -> ((A) (B) (C . 0))
-(de p!-vars->job-vars (Lst)
-   (make
-      (for "L" Lst
-         (if (pair "L")
-            (link @)
-            (link (cons "L" NIL)) ) ) ) )
+
+### helper fns for 'p!'
 
 # (A B (C . 0)) -> ((A) (B) (C . 0))
 # p! args bound to surrounding lexical environment.
@@ -47,8 +59,8 @@
       (for "L" Lst
          (if (pair "L")
             (link @)
-            (link 
-               (or 
+            (link
+               (or
                   (assoc "L" (env))
                   (cons "L" NIL) ) ) ) ) ) )
 
@@ -83,7 +95,7 @@
 # the definition
 (de p! Lst
    (let ((@Args @Pargs . @Body) Lst)
-      (macro 
+      (macro
          '(job (^(lit (macro '(^(p!-env->job (cons 'This @Pargs))))))
             (ifn This (setq This ^(list (lit (macro '((^(p!-vars->lambda-vars @Args)) ^ @Body))))))
             (macro
@@ -99,7 +111,7 @@
    (let ((@Args @Pargs . @Body) Lst)
       (list
          '@
-         (macro 
+         (macro
             '(job (^(lit (macro '(^(p!-env->job (cons 'This @Pargs))))))
                (ifn This (setq This ^(list (lit (macro '((^(p!-vars->lambda-vars @Args)) ^ @Body))))))
                (macro
@@ -113,7 +125,7 @@
 ###
 (de p/d! Lst
    (let ((@Args @Pargs . @Body) Lst)
-      (macro 
+      (macro
          '(job (^(lit (macro '(^(p!-env->job (cons 'This @Pargs))))))
             (ifn This (setq This ^(list (lit (macro '((^(p!-vars->lambda-vars @Args)) ^ @Body))))))
             (macro
@@ -160,7 +172,7 @@
    (let ((@Syms "Box" . @Body) Lst)
       (macro
          (let ^(list
-                  (make 
+                  (make
                      (chain (list 'Self "Box"))
                      (for "S" @Syms
                         (if (= "S" 'This)
@@ -196,7 +208,7 @@
       (P! "get" 'X) ) )
 
 (test 30
-   (let X 2 
+   (let X 2
       (let P! (@p! (N) (X) (inc 'X N))
          (P! 2)  # -> 4
          (with-p! (X) P!
@@ -228,7 +240,7 @@
 
 (test 12
    (with-p! (X) p!-test  # p! over anonymous d!
-      ('`(d! 
+      ('`(d!
             ("inc" () (setp X (inc 'X)))
             ("dec" () (setp X (dec 'X))) )
        "dec" ) ) )
@@ -253,7 +265,7 @@
 # it would be cool if this code could generate something that functions
 # like the following
 #
-# (p/d! ((X . 0)) 
+# (p/d! ((X . 0))
 #    ("inc"   () (setp X (inc 'X)))
 #    ("dec"   () (setp X (dec 'X)))
 #    ("reset" () (setp X 0)) )
