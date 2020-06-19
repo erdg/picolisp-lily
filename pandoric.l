@@ -213,47 +213,6 @@
 (test 2 (p/d!-env-test "incX"))
 (test (2 1) (p/d!-env-test))
 ###
-
-###
-# with-p! - access pandoric variables from anywhere
-# binds 'Self' so 'setp' can set pandoric vars
-(de with-p! Lst
-   (let ((@Syms "Box" . @Body) Lst)
-      (macro
-         (let ^(list
-                  (make
-                     (chain (list 'Self "Box"))
-                     (for "S" @Syms
-                        (if (= "S" 'This)
-                           (chain (list "S" (cons 'quote ("Box" "get" "S"))))
-                           (chain (list "S" ("Box" "get" "S"))) ) ) ) )
-            ^ @Body ) ) ) )
-
-
-# setp - used to modify pandoric vars inside 'with-pandoric'
-#
-#    (with-pandoric (A B) some-p!-form
-#       (setp A 4)
-#       (setp B "string") )
-#
-# NOTE - not a general as CL's 'setf', but this is more picolispy
-# NOTE - fancy macro definition so we don't have to 'quote' var. gotta use 'macro'
-# as much as possible to make code super cool and mind-bending like Common Lisp
-(de setp "Lst"
-   (macro (Self "set" ^(list (cons 'quote (car "Lst"))) ^(cdr "Lst"))) )
-
-(de hotpatch-p! Lst
-   (let ((@Box @New) Lst)
-      (macro
-         (with-p! () @Box
-            (setp This @New) ) ) ) )
-
-(de recode-p! Lst
-   (let ((@Vars @Box @New) Lst)
-      (macro
-         (with-p! @Vars @Box
-            (setp This @New) ) ) ) )
-
 ### TESTING
 (de p!-test @ `(p! (N) ((X . 0)) (inc 'X N)))
 
