@@ -51,9 +51,9 @@
 
 ### helper fns for 'p!'
 
-# (A B (C . 0)) -> ((A) (B) (C . 0))
-# p! args bound to surrounding lexical environment.
-# p!
+# p! args initialized from surrounding lexical environment,
+# possibly expanded or overwritten by '@Pargs' (see 'p!').
+# (p!-env-job '(A B (C . 0))) -> ((A) (B) (C . 0))
 (de p!-env->job (Lst)
    (make
       (for "L" Lst
@@ -64,8 +64,9 @@
                   (assoc "L" (env))
                   (cons "L" NIL) ) ) ) ) ) )
 
-# (A B (C . 0)) -> (A B C)
-(de p!-vars->lambda-vars (Vars)
+# p! args to 'quote' fn args
+# (p!-args->fn (A B (C . 0))) -> (A B C)
+(de p!-args->fn (Vars)
    (make
       (for "V" Vars
          (if (pair "V")
@@ -97,14 +98,14 @@
    (let ((@Args @Pargs . @Body) Lst)
       (macro
          '(job (^(lit (macro '(^(p!-env->job (cons 'This @Pargs))))))
-            (ifn This (setq This ^(list (lit (macro '((^(p!-vars->lambda-vars @Args)) ^ @Body))))))
+            (ifn This (setq This ^(list (lit (macro '((^(p!-args->fn @Args)) ^ @Body))))))
             (macro
                ((d!
                   ("get" (Sym) (val Sym))
                   ("set" (Sym Val) (set Sym Val))
                   # hack
                   (T ()  (This ^(list '^ '(rest)))) )
-                ^(list '^ '(rest)) ) ) ) ) ) )
+                ^(list '^ '(rest))) ) ) ) ) )
 
 # anonymous p!
 (de @p! Lst
@@ -113,7 +114,7 @@
          '@
          (macro
             '(job (^(lit (macro '(^(p!-env->job (cons 'This @Pargs))))))
-               (ifn This (setq This ^(list (lit (macro '((^(p!-vars->lambda-vars @Args)) ^ @Body))))))
+               (ifn This (setq This ^(list (lit (macro '((^(p!-args->fn @Args)) ^ @Body))))))
                (macro
                   ((d!
                      ("get" (Sym) (val Sym))
@@ -127,7 +128,7 @@
    (let ((@Args @Pargs . @Body) Lst)
       (macro
          '(job (^(lit (macro '(^(p!-env->job (cons 'This @Pargs))))))
-            (ifn This (setq This ^(list (lit (macro '((^(p!-vars->lambda-vars @Args)) ^ @Body))))))
+            (ifn This (setq This ^(list (lit (macro '((^(p!-args->fn @Args)) ^ @Body))))))
             (macro
                ((d!
                   ("get" (Sym) (val Sym))
