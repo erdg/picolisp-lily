@@ -58,15 +58,14 @@
 (de p! Lst
    (let ((@Args @Pargs . @Body) Lst)
       (macro
-         '(job (^(lit (macro '(^(p!-env->job (cons 'This @Pargs))))))
-            (ifn This (setq This (^(lit (macro '((^(p!-args->fn @Args)) ^ @Body))))))
+         '(job '(^(p!-env->job (cons 'This @Pargs)))
+            (ifn This (setq This '((^(p!-args->fn @Args)) ^ @Body)))
             (macro
                ((d!
                   ("get" (Sym) (val Sym))
                   ("set" (Sym Val) (set Sym Val))
-                  # hack
-                  (T ()  (This ^(list '^ '(rest)))) )
-                ^(list '^ '(rest))) ) ) ) ) )
+                  (T ()  (apply This (rest))) )
+                ^(list '^ '(rest))) ) ) ) ) )  # don't ask... no idea why this works
 
 # anonymous p!
 (de @p! Lst
@@ -75,40 +74,35 @@
          (list '@
             (p! @Args @Pargs ^ @Body) ) ) ) )
 
-# access pandoric variables from anywhere
+# with-p! - access pandoric variables from anywhere
+#
+#  (with-p! (X Y) p!-form
+#     (setp X 4)
+#     (setp Y (do-something)) )
+#
 (de with-p! Lst
    (let ((@Syms "Box" . @Body) Lst)
       (macro
-         (let ^(list
-                  (make
-                     (chain (list 'Self "Box"))  # binds 'Self' so 'setp' can set pandoric vars
-                     (for "S" @Syms
-                        (if (= "S" 'This)
-                           (chain (list "S" (cons 'quote ("Box" "get" "S"))))
-                           (chain (list "S" ("Box" "get" "S"))) ) ) ) )
+         (let (^(make
+                   (chain (list 'Self "Box"))  # binds 'Self' so 'setp' can set pandoric vars
+                   (for "S" @Syms
+                      (if (= "S" 'This)
+                         (chain (list "S" (cons 'quote ("Box" "get" "S"))))
+                         (chain (list "S" ("Box" "get" "S"))) ) ) ) )
             ^ @Body ) ) ) )
 
-### setp - used to modify p!-vars within 'with-p!'
-#
-#   (with-p! (A B) p!-form
-#      (setp A 4)
-#      (setp B "string") )
-#
-# NOTE - fancy macro definition so we don't have to 'quote' var. gotta use 'macro'
-# as much as possible to make code super cool and mind-bending like Common Lisp
+### setp - modify p!-vars within 'with-p!'
 (de setp "Lst"
    (macro (Self "set" ^(list (cons 'quote (car "Lst"))) ^(cdr "Lst"))) )
-
-(de hotpatch-p! Lst
-   (let ((@Box @New) Lst)
-      (macro
-         (with-p! () @Box
-            (setp This @New) ) ) ) )
+#
+# NOTE - fancy macro definition so we don't have to 'quote' var.
+# It's important to use 'macro' as much as possible to make code super cool
+# and mind-bending like Common Lisp ;P
 
 (de recode-p! Lst
-   (let ((@Vars @Box @New) Lst)
+   (let ((@Box @New) Lst)
       (macro
-         (with-p! @Vars @Box
+         (with-p! (This) @Box
             (setp This @New) ) ) ) )
 
 ### pandoric dispatchers!
