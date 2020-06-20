@@ -87,27 +87,104 @@
 (de with-p! Lst
    (let ((@Syms "Box" . @Body) Lst)
       (macro
-         (let (^(make
-                   (chain (list 'Self "Box"))  # binds 'Self' so 'setp' can set pandoric vars
-                   (for "S" @Syms
-                      (if (= "S" 'This)
-                         (chain (list "S" (cons 'quote ("Box" "get" "S"))))
-                         (chain (list "S" ("Box" "get" "S"))) ) ) ) )
+         (let (^(with-p!-env @Syms))
             ^ @Body ) ) ) )
 
-### setp - modify p!-vars within 'with-p!'
+(de with-p!-env (Syms)
+   (make
+      (chain (list 'Self "Box"))  # binds 'Self' so 'setp' can set pandoric vars
+      (for "S" Syms
+         (if (= "S" 'This)
+            (chain (list "S" (cons 'quote ("Box" "get" "S"))))
+            (chain (list "S" ("Box" "get" "S"))) ) ) ) )
+###
+
+### with-p!s - combine p! environments
+#
+#  (with-p!s
+#     [((A B) p!-1)    # too dense, but easiest for 'with-p!s-env'
+#      ((X Y) p!-2)    # ideally ((A B) p!-1 (X Y) p!-2)
+#     ]
+#     (list A B X Y) )
+#
+(de with-p!s Lst
+   (let ((@Pargs . @Body) Lst)
+      (macro
+         (let (^(with-p!s-env% @Pargs))
+            ^ @Body ) ) ) )
+
+(de with-p!s-env (Lst)
+   (make
+      (for (N . W) Lst
+         (let P! (cadr W)
+            # P1 p!-form-1, PN p!-form-n
+            (chain (list (any (pack "P" N)) P!))
+            (for "S" (car W)
+               (if (= "S" 'This)
+                (chain (list (any (pack 'This N)) (cons 'quote ((cadr W) "get" "S"))))
+                (chain (list "S" ((cadr W) "get" "S"))) ) ) ) ) ) )
+
+# close, doesn't do X1 ... XN properly yet
+# (p!1 (X Y) p!2 (Y Z)) -> (let (P1 p!1 X _ Y1 _ P2 p!2 Y2 _ Z _) ...)
+(de with-p!s-env% (P!s)
+   (make
+      (use P! # current P
+         # (let Dups (uniq (fish atom (filter '((L) (>= (length L) 2)) (by name group (delete 'This (fish atom P!s) T)))))
+         #    (println Dups)
+            (for (I . P) P!s
+               (if (odd? I)
+                  # process p! ->  P1 p!-form-1 PN p!-form-n
+                  (prog
+                     (setq P! P)
+                     (chain (list (any (pack "P" (inc 'N))) P)) )
+                  # process p! vars
+                  (for "S" P
+                     (if (= "S" 'This)
+                        (chain (list (any (pack 'This N)) (cons 'quote (P! "get" "S"))))
+                        (chain (list "S" (P! "get" "S"))) ) ) ) ) ) ) )
+
+# # (p!1 (X Y) p!2 (Y Z)) -> (let (P1 p!1 X _ Y1 _ P2 p!2 Y2 _ Z _) ...)
+# (de with-p!s-env%% (P!s)
+#    (make
+#       (use P! # current P
+#          (let Dups (uniq (fish atom (filter '((L) (>= (length L) 2)) (by name group (delete 'This (fish atom P!s) T)))))
+#             # (println Dups)
+#             (for (I . P) P!s
+#                (if (odd? I)
+#                   # process p! ->  P1 p!-form-1 PN p!-form-n
+#                   (prog
+#                      (setq P! P)
+#                      (chain (list (any (pack "P" (inc 'N))) P)) )
+#                   # process p! vars
+#                   (for "S" P
+#                      (if (= "S" 'This)
+#                         (chain (list (any (pack 'This N)) (cons 'quote (P! "get" "S"))))
+#                         (if (member "S" Dups)
+#                            (chain (list (any (pack "S" N))))
+#                            (chain (list "S" (P! "get" "S"))) ) ) ) ) ) ) ) ) )
+
+(de odd? (N) (n0 (% N 2)))
+###
+
+###
+
+###
+# setp - modify p!-vars within 'with-p!'
 (de setp "Lst"
    (macro (Self "set" ^(list (cons 'quote (car "Lst"))) ^(cdr "Lst"))) )
 #
 # NOTE - fancy macro definition so we don't have to 'quote' var.
 # It's important to use 'macro' as much as possible to make code super cool
 # and mind-bending like Common Lisp ;P
+###
 
+###
 (de recode-p! Lst
    (let ((@Box @New) Lst)
       (macro
          (with-p! (This) @Box
             (setp This @New) ) ) ) )
+###
 
 ### pandoric dispatchers!
 #
