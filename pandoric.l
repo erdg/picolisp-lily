@@ -13,29 +13,6 @@
 
 ### helper fns for 'p!'
 
-# p! args initialized from surrounding lexical environment,
-# possibly expanded or overwritten by '@Pargs' (see 'p!').
-# (p!-env-job '(A B (C . 0))) -> ((A) (B) (C . 0))
-(de p!-env->job (Lst)
-   (make
-      (for "L" Lst
-         (if (pair "L")
-            (link @)
-            (link
-               (or
-                  (assoc "L" (env))
-                  (cons "L" NIL) ) ) ) ) ) )
-
-# p! args to 'quote' fn args
-# (p!-args->fn (A B (C . 0))) -> (A B C)
-(de p!-args->fn (Vars)
-   (make
-      (for "V" Vars
-         (if (pair "V")
-            (link (car @))
-            (link "V") ) ) ) )
-###
-
 ### p! - a read macro used within a "@-args" 'de' form, e.g.
 #
 #   (de p!-test @
@@ -54,7 +31,6 @@
 #
 # just make sure the variables are also within the '`' read-macro
 #
-### p! - the definition
 (de p! Lst
    (let ((@Args @Pargs . @Body) Lst)
       (macro
@@ -67,13 +43,41 @@
                   (T ()  (apply This (rest))) )
                 ^(list '^ '(rest))) ) ) ) ) )  # don't ask... no idea why this works
 
+# p! args initialized from surrounding lexical environment,
+# possibly expanded or overwritten by '@Pargs' (see 'p!').
+# (p!-env-job '(A B (C . 0))) -> ((A) (B) (C . 0))
+(de p!-env->job (Lst)
+   (make
+      (for "L" Lst
+         (if (pair "L")
+            (link @)
+            (link
+               (or
+                  (assoc "L" (env))
+                  (cons "L" NIL) ) ) ) ) ) )
+
+# p! args to 'quote' fn args
+# (p!-args->fn '(A B (C . 0))) -> (A B C)
+(de p!-args->fn (Vars)
+   (make
+      (for "V" Vars
+         (if (pair "V")
+            (link (car @))
+            (link "V") ) ) ) )
+###
+
+
+
+###
 # anonymous p!
 (de @p! Lst
    (let ((@Args @Pargs . @Body) Lst)
       (macro
          (list '@
             (p! @Args @Pargs ^ @Body) ) ) ) )
+###
 
+###
 # with-p! - access pandoric variables from anywhere
 #
 #  (with-p! (X Y) p!-form
@@ -129,6 +133,7 @@
                            ^ @Body )
                            # hack
                          ^(list '^ '(rest)) ) ) ) ) )
+            ###
             (apply This (rest)) ) ) ) )
             # (macro
             #    ((d!
@@ -137,5 +142,8 @@
             #       ^ @Body )
             #       # hack
             #     ^(list '^ '(rest))) ) ) ) ) )
+            ###
+###
 
 (load "pandoric-tests.l")
+(pandoric-tests)
