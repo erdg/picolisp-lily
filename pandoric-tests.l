@@ -1,3 +1,5 @@
+[de pandoric-tests ()
+
 ### d! tests
 (def 'd!-test
    (d!
@@ -240,3 +242,76 @@
 #      (setp X (+ X 9)) )
 # -> 13
 ###
+
+### nested 'with-p!'s - prototype for 'with-p!s'
+(test (15 8)
+   (let (X 2 Y 3)
+      (let [P1 (@p! (N) (X) (inc 'X N))
+            P2 (@p! (N) (Y) (inc 'Y N))]
+         (with-p! (X) P1
+            (with-p! (Y) P2
+               (P1 (+ (P2 5) 5))
+               (list
+                  (P1 "get" 'X)
+                  (P2 "get" 'Y)) ) ) ) ) )
+
+# (test (53 1)
+#    (with-p!s (((X) p!-test) ((Y) pd!-env-test))
+#       (list X Y) ) )
+
+(test (53 1)
+   (with-p!s [p!-test (X)
+              pd!-env-test (Y) ]
+      (list X Y) ) )
+
+# test 'This[N]' anaphors
+(test '((N) (inc 'X (* 3 N)))
+   (with-p!s [p!-test (This X)
+              pd!-env-test (This Y) ]
+      This1 ) )
+
+(test
+   (list
+      '((N)
+         (+ (inc 'X N) (inc 'Y (* 2 N))))
+      '((N)
+         (+ (inc 'Y (* 3 N)) (inc 'Z (* 4 N)))) )
+   (let X 1
+      (let Y 2
+         (let Z 3
+            (let [some-p! (@p! (N) (X Y) (+ (inc 'X N) (inc 'Y (* 2 N))))
+                  some-other-p! (@p! (N) (Y Z) (+ (inc 'Y (* 3 N)) (inc 'Z (* 4 N))))]
+               (with-p!s [some-p!       (This)
+                          some-other-p! (This)]
+                  (list This1 This2) ) ) ) ) ) )
+
+# test 'P[1]' anaphors
+(test 62
+   (prog
+      (with-p!s [p!-test (This X)]
+         (P1 3) )
+      (p!-test "get" 'X) ) )
+
+(test (11 111 1111)
+   (let (X 1 Y 101 Z 1101)
+      (let [p!-1 (@p! (N) (X) (inc 'X N))
+            p!-2 (@p! (N) (Y) (inc 'Y N))
+            p!-3 (@p! (N) (Z) (inc 'Z N))]
+         (with-p!s  [p!-1 (This X)
+                     p!-2 (This Y)
+                     p!-3 (This Z)]
+            (mapc '((P) (P 10)) '(P1 P2 P3))
+            (mapcar '((P V) (P "get" V)) '(P1 P2 P3) '(X Y Z))) ) ) )
+
+# test '[Var][N]' anaphors
+(test (2 12)
+   (let (X 1 Y 2)
+      (let p!-1 (@p! (N) (X Y) (+ (inc 'X N) (inc 'Y (* 2 N))))
+         (let (Y 12 Z 13)
+            (let p!-2 (@p! (N) (Y Z) (+ (inc 'Y (* 3 N)) (inc 'Z (* 4 N))))
+               (with-p!s [p!-1 (X Y) p!-2 (Y Z)]
+                  (list Y1 Y2) ) ) ) ) ) )
+
+(t (prinl "passed all tests"))
+
+]

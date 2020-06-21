@@ -1,4 +1,5 @@
-# d! - a dispatching 'quote fn
+### d! - a dispatching 'quote fn
+#
 (de d! "Ds"
    (macro
       '("Args"
@@ -10,8 +11,7 @@
                         (list
                            (macro
                               '(apply '(^(cdr "D")) (cdr "Args")) ) ) ) ) ) ) ) ) ) )
-
-### helper fns for 'p!'
+###
 
 ### p! - a read macro used within a "@-args" 'de' form, e.g.
 #
@@ -66,8 +66,6 @@
             (link "V") ) ) ) )
 ###
 
-
-
 ###
 # anonymous p!
 (de @p! Lst
@@ -92,86 +90,175 @@
 
 (de with-p!-env (Syms)
    (make
-      (chain (list 'Self "Box"))  # binds 'Self' so 'setp' can set pandoric vars
+      (link 'setp         # setp dynamically bound
+         (lit set-with-p!) )
+      (link 'Self "Box")  # binds 'Self' so 'setp' can set pandoric vars
       (for "S" Syms
          (if (= "S" 'This)
-            (chain (list "S" (cons 'quote ("Box" "get" "S"))))
-            (chain (list "S" ("Box" "get" "S"))) ) ) ) )
+            (link "S" (cons 'quote ("Box" "get" "S")))
+            (link "S" ("Box" "get" "S")) ) ) ) )
 ###
 
 ### with-p!s - combine p! environments
 #
-#  (with-p!s
-#     [((A B) p!-1)    # too dense, but easiest for 'with-p!s-env'
-#      ((X Y) p!-2)    # ideally ((A B) p!-1 (X Y) p!-2)
-#     ]
-#     (list A B X Y) )
-#
 (de with-p!s Lst
    (let ((@Pargs . @Body) Lst)
       (macro
-         (let (^(with-p!s-env% @Pargs))
+         (let (^(with-p!s-env @Pargs))
             ^ @Body ) ) ) )
 
-(de with-p!s-env (Lst)
-   (make
-      (for (N . W) Lst
-         (let P! (cadr W)
-            # P1 p!-form-1, PN p!-form-n
-            (chain (list (any (pack "P" N)) P!))
-            (for "S" (car W)
-               (if (= "S" 'This)
-                (chain (list (any (pack 'This N)) (cons 'quote ((cadr W) "get" "S"))))
-                (chain (list "S" ((cadr W) "get" "S"))) ) ) ) ) ) )
-
-# close, doesn't do X1 ... XN properly yet
-# (p!1 (X Y) p!2 (Y Z)) -> (let (P1 p!1 X _ Y1 _ P2 p!2 Y2 _ Z _) ...)
+# first draft - dense, but easiest to process
+#
+#  (with-p!s [((A B) p!-1) ((X Y) p!-2)]
+#     (list A B X Y) )
+#
 (de with-p!s-env% (P!s)
    (make
+      (link 'setp (lit set-with-p!s))  # define 'setp' in 'with-p!s'
+      (for (N . P) P!s
+         (let P! (cadr P)
+            # P1 p!-form-1, PN p!-form-n
+            (link (any (pack "P" N)) P!)
+            (for "S" (car P)
+               (if (= "S" 'This)
+                (link (any (pack 'This N)) (cons 'quote (P! "get" "S")))
+                (link "S" (P! "get" "S"))) ) ) ) ) )
+
+# second draft - close, but doesn't do [Var][N] anaphors
+#
+#  : (with-p!s [p!-1 (This X) p!-2 (This Y)]
+#       ... )
+#
+#  -> (let [P1 p!-1  This1 _  X _  P2 p!-2  This2 _  Y _]
+#        ... )
+#
+# NOTE - in 'Pargs' the p!-env comes first, followed by imported vars.
+#        this is opposite of 'with-p!s-env%' and Doug Hoyte's original
+#        "vars first" syntax for 'with-pandoric'.
+#
+(de with-p!s-env%% (P!s)
+   (make
+      (link 'setp (lit set-with-p!s))  # define 'setp' in 'with-p!s'
       (use P! # current P
-         # (let Dups (uniq (fish atom (filter '((L) (>= (length L) 2)) (by name group (delete 'This (fish atom P!s) T)))))
-         #    (println Dups)
+         (for (I . P) P!s
+            (if (odd? I)
+               # process p! ->  P1 p!-form-1 PN p!-form-n
+               (prog
+                  (setq P! P)
+                  (link (any (pack "P" (inc 'N))) P) )
+               # process p! vars
+               (for "S" P
+                  (if (= "S" 'This)
+                     (link (any (pack 'This N)) (cons 'quote (P! "get" "S")))
+                     (link "S" (P! "get" "S"))) ) ) ) ) ) )
+
+# final draft
+#
+#  : (with-p!s [p!-1 (This X Y)
+#               p!-2 (This Y Z)]
+#       ... )
+#
+#  -> (let [P1 p!-1  This1 _  X _  Y1 _  P2 p!-2  This2 _  Y2 _  Z _ ]
+#        ... )
+#
+(de with-p!s-env%%% (P!s)
+   (make
+      (link 'setp (lit set-with-p!s))  # define 'setp' in 'with-p!s'
+      (use P!        # current p!-env
+         (let [N 0   # current p!-env number for 'P[N]','This[N]' and '[Var][N]' anaphors
+               Dups  # vars referenced from multiple p!-envs
+                  (delete 'This  # this processed separately (not 100% on this yet)
+                     (uniq
+                        (fish atom
+                           (filter '((L) (>= (length L) 2))
+                              (by name group (fish atom P!s))))))
+               P!Table '() ]  # used by 'setp' to look up p! for a (possibly anaphoric) symbol
             (for (I . P) P!s
                (if (odd? I)
-                  # process p! ->  P1 p!-form-1 PN p!-form-n
+                  # some-p!-form -> P[N]
                   (prog
                      (setq P! P)
-                     (chain (list (any (pack "P" (inc 'N))) P)) )
+                     (link (any (pack "P" (inc 'N))) P) )
                   # process p! vars
                   (for "S" P
                      (if (= "S" 'This)
-                        (chain (list (any (pack 'This N)) (cons 'quote (P! "get" "S"))))
-                        (chain (list "S" (P! "get" "S"))) ) ) ) ) ) ) )
+                        # This -> This[N]
+                        (link (any (pack 'This N)) (cons 'quote (P! "get" "S")))
+                        (if (member "S" Dups)
+                           # Var -> Var[N]
+                           (link (any (pack "S" N)) (P! "get" "S"))
+                           # Var
+                           (link "S" (P! "get" "S"))) ) ) ) ) ) ) ) )
 
-# # (p!1 (X Y) p!2 (Y Z)) -> (let (P1 p!1 X _ Y1 _ P2 p!2 Y2 _ Z _) ...)
-# (de with-p!s-env%% (P!s)
-#    (make
-#       (use P! # current P
-#          (let Dups (uniq (fish atom (filter '((L) (>= (length L) 2)) (by name group (delete 'This (fish atom P!s) T)))))
-#             # (println Dups)
-#             (for (I . P) P!s
-#                (if (odd? I)
-#                   # process p! ->  P1 p!-form-1 PN p!-form-n
-#                   (prog
-#                      (setq P! P)
-#                      (chain (list (any (pack "P" (inc 'N))) P)) )
-#                   # process p! vars
-#                   (for "S" P
-#                      (if (= "S" 'This)
-#                         (chain (list (any (pack 'This N)) (cons 'quote (P! "get" "S"))))
-#                         (if (member "S" Dups)
-#                            (chain (list (any (pack "S" N))))
-#                            (chain (list "S" (P! "get" "S"))) ) ) ) ) ) ) ) ) )
+# final final draft ;P
+#
+#  : (with-p!s [p!-1 (This X Y)
+#               p!-2 (This Y Z)]
+#       ... )
+#
+#  -> (let [P1 p!-1  This1 _  X _  Y$1 _  P2 p!-2  This2 _  Y$2 _  Z _ ]
+#        ... )
+#
+(de with-p!s-env (P!s)
+   (make
+      (link 'setp (lit set-with-p!s))  # define 'setp' in 'with-p!s'
+      (use P!        # current p!-env
+         (let [N 0   # current p!-env number for 'P![N]','This[N]' and '[Var]-[N]' anaphors
+               Dups  # vars referenced from multiple p!-envs
+                  (delete 'This  # 'This' processed separately (not 100% on this yet)
+                     (uniq
+                        (fish atom
+                           (filter '((L) (>= (length L) 2))
+                              (by name group (fish atom P!s))))))
+               P!Tab '() ]  # 'P!Table' used by 'setp' to look up parent 'p!' for a (possibly anaphoric) symbol
+            (for (I . P) P!s
+               (use P!T  # P!Tab entry
+                  (if (odd? I)
+                     # do p!-form -> P![N]
+                     (prog
+                        (setq P! P)
+                        (link (any (pack "P!" (inc 'N))) P) )  # -> e.g. '(P!1 first-p!-arg)
+                     # else do p! vars
+                     (for "S" P
+                        (if (= "S" 'This)
+                           # This -> This[N]
+                           (prog
+                              (link (any (pack 'This N)) (cons 'quote (P! "get" "S")))
+                              (queue 'P!T (cons (any (pack "P!" N)) (any (pack 'This N)))) )  # e.g. (P!1 . This1) -> P!Tab
+                           (if (member "S" Dups)
+                              # Var -> Var$[N]
+                              (prog
+                                 (link (any (pack "S" "$" N)) (P! "get" "S"))
+                                 (queue 'P!T (cons (any (pack "P!" N)) (any (pack "S" "$" N)))) )  # (P!1 . Y$1) -> P!Tab
+                              # Var
+                              (prog
+                                 (link "S" (P! "get" "S"))
+                                 (queue 'P!T (cons (any (pack "P!" N)) "S")) ) ) ) ) )  # (P!1 . X) -> P!Tab
+                  (setq P!Tab (append P!T P!Tab)) ) )  # -> '((P!1 . X) (P! . Y-1) (P!2 . Y-2) (P!2 . Z))
+            (link 'P!Table (cons 'quote (group P!Tab))) ) ) ) )  # -> '((P!1 X Y-1) (P!2 Y-2 Z))
 
 (de odd? (N) (n0 (% N 2)))
 ###
 
-###
+### setp - modify p!-vars within 'with-p!'
+#
+# bound to 'setp' within 'with-p!' forms
+(de set-with-p! Lst
+   (macro (Self "set" ^(list (cons 'quote (car Lst))) ^(cdr Lst))) )
+#
+# bound to 'setp' within 'with-p!s' forms
+(de set-with-p!s Lst
+   (let ((@Sym . @Rest) Lst)
+      (macro
+         (^(list
+              (car
+                 (find
+                    '((L) (member @Sym L))
+                    P!Table) ) )
+          "set"
+          ^(list (cons 'quote (any (caar (split (chop (pack @Sym)) "$")))))
+          ^ @Rest) ) ) )
 
-###
-# setp - modify p!-vars within 'with-p!'
-(de setp "Lst"
-   (macro (Self "set" ^(list (cons 'quote (car "Lst"))) ^(cdr "Lst"))) )
 #
 # NOTE - fancy macro definition so we don't have to 'quote' var.
 # It's important to use 'macro' as much as possible to make code super cool
