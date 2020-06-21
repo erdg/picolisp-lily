@@ -38,7 +38,7 @@
 (test 3 (d!-with-state "get" 'Cnt))
 (d!-with-state "set" 'State "ON")
 (test "ON" (d!-with-state "get" 'State))
-###
+#
 
 
 ### @p! tests
@@ -66,7 +66,7 @@
          (P! "get" 'X) ) ) )
 ###
 
-### pd! tests
+# pd! tests
 (de pd!-test @
    `(pd! () ((X . 0) (Y . 0))
       ("incX" () (inc 'X))
@@ -193,7 +193,7 @@
 
 ###
 (de p!-over-d!-test @
-   (job '((Self . `(list '@ (p! () ((X . 0))))))  # this was the first '@p!'
+   (job '((Self . `(list '@ (p! () ((X . 0))))))  # this was the first '@p!' (anonymous p!)
       (with-p! (X) Self
          (if (member (car (rest)) '("get" "set"))
             (cond
@@ -266,7 +266,7 @@
 
 # test 'This[N]' anaphors
 (test '((N) (inc 'X (* 3 N)))
-   (with-p!s [p!-test (This X)
+   (with-p!s [p!-test      (This X)
               pd!-env-test (This Y) ]
       This1 ) )
 
@@ -289,7 +289,7 @@
 (test 62
    (prog
       (with-p!s [p!-test (This X)]
-         (P1 3) )
+         (P!1 3) )
       (p!-test "get" 'X) ) )
 
 (test (11 111 1111)
@@ -297,21 +297,40 @@
       (let [p!-1 (@p! (N) (X) (inc 'X N))
             p!-2 (@p! (N) (Y) (inc 'Y N))
             p!-3 (@p! (N) (Z) (inc 'Z N))]
-         (with-p!s  [p!-1 (This X)
-                     p!-2 (This Y)
-                     p!-3 (This Z)]
-            (mapc '((P) (P 10)) '(P1 P2 P3))
-            (mapcar '((P V) (P "get" V)) '(P1 P2 P3) '(X Y Z))) ) ) )
+         (with-p!s  [p!-1 (This X)  # -> P!1
+                     p!-2 (This Y)  # -> P!2
+                     p!-3 (This Z)] # -> P!3
+            (mapc '((P) (P 10)) '(P!1 P!2 P!3))
+            (mapcar '((P V) (P "get" V)) '(P!1 P!2 P!3) '(X Y Z))) ) ) )
 
-# test '[Var][N]' anaphors
+# test '[Var]$[N]' anaphors
 (test (2 12)
    (let (X 1 Y 2)
       (let p!-1 (@p! (N) (X Y) (+ (inc 'X N) (inc 'Y (* 2 N))))
          (let (Y 12 Z 13)
             (let p!-2 (@p! (N) (Y Z) (+ (inc 'Y (* 3 N)) (inc 'Z (* 4 N))))
-               (with-p!s [p!-1 (X Y) p!-2 (Y Z)]
-                  (list Y1 Y2) ) ) ) ) ) )
+               (with-p!s [p!-1 (X Y)
+                          p!-2 (Y Z)]
+                  (list Y$1 Y$2) ) ) ) ) ) )
 
+# test 'setp' within 'with-p!s'
+(test (22 1212)
+   (let (X 1 Y 2)
+      (let p!-1 (@p! (N) (X Y) (+ (inc 'X N) (inc 'Y (* 2 N))))
+         (let (Y 12 Z 13)
+            (let p!-2 (@p! (N) (Y Z) (+ (inc 'Y (* 3 N)) (inc 'Z (* 4 N))))
+               (with-p!s [p!-1 (X Y)
+                          p!-2 (Y Z)]
+                  (setp Y$1 22)
+                  (setp Y$2 1212) )
+               (list (p!-1 "get" 'Y) (p!-2 "get" 'Y)) ) ) ) ) )
+
+# make sure the global env stays clean
+(test T
+   (fully '((X) (= NIL X))
+      (list State Cnt X Y Z Y-1 Y-2 This This1 This2 This3 D! P! P!1 P!2 P!3 p!-1 p!-2 p!-3 Self) ) )
+
+# and it's good to go
 (t (prinl "passed all tests"))
 
 ]
