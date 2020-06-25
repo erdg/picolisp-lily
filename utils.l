@@ -169,5 +169,26 @@
       (macro!
          (let Y !(setq X 2) _ (* X 2) (* Y Y))) ) )
 
-(de flatten (Lst)
-   (fish atom Lst) )
+(test "This is 17"
+   (macro$ $(X 17) $(Y 'This) (let Z "is" (glue " " (list Y Z X)))) )
+
+(test '(NIL NIL) (list X Y))
+
+# (de sbq% (Lst)
+#    (cons 'quote
+#       (list (at-syms Lst)
+#          (list 'fill
+#             (cons 'quote Lst ) ) ) ) )
+
+# inspired by Doug Hoyte's 'sharp-backquote' read-macro from "Let Over Lambda"
+(de sbq @Lst
+   (macro
+      '((^(at-syms @Lst)) (fill '(^ (car @Lst))) ) ) )
+
+(de at-syms (Lst)
+   (uniq
+      (by
+         '((X) (stem (chop X) "@"))
+         sort
+         (filter '((X) (pre? "@" (pack X)))
+            (flat Lst) ) ) ) )
