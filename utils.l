@@ -92,11 +92,11 @@
 
 ### macro! - 'macro' with a few more features
 #
-#  - expressions following the symbol '_' are evaluated and placed (not
-#     spliced) in the "expansion"
+# - expressions following the symbol '_' are evaluated and placed (not
+#   spliced) in the "expansion"
 #
-#  - expressions following the symbol '!' are evaluated for side-effects
-#     and do NOT appear in the "expansion"
+# - expressions following the symbol '!' are evaluated for side-effects
+#   and do NOT appear in the "expansion"
 #
 (de macro! @Lst
    (macro
@@ -119,15 +119,46 @@
             (cons (car Lst) (_walk (cdr Lst)))
             (cons (_walk (car Lst)) (_walk (cdr Lst))) )
          (cond
+            # eval and place result in expansion
             ((= (car Lst) '_)
                (cons
                   '^ (list 'list (cadr Lst))
                   (_walk (cddr Lst)) ) )
+            # execute side-effects
             ((= (car Lst) '!)
                (cons
                   '^ (list 'prog1 NIL (cadr Lst))
                   (_walk (cddr Lst)) ) )
+            # bind $Vars
+            ((= (car Lst) '$)
+               (cons
+                  '^ (list 'prog1 NIL (list 'setq (caadr Lst) (cadadr Lst)))
+                  (_walk (cddr Lst)) ) )
             (T (cons (car Lst) (_walk (cdr Lst)))) ) ) ) )
+
+### macro$ 'use' $-vars in body of macro
+#
+# $(Var (do-something)) -> 'Var' bound to 'do-something' and 
+# available in "expansion"
+# 
+(de macro$ @Lst
+   (macro
+      (use (^($syms @Lst))
+         (macro
+            ^(_walk @Lst) ) ) ) )
+
+(de debug-macro$ @Lst
+   (macro
+      '(use (^($syms (flat @Lst)))
+         (macro
+            ^(_walk @Lst) ) ) ) )
+
+(de $syms% (Lst)
+   (if Lst
+      (let F (flat Lst)
+         (if (= (car F) '$)
+            (cons (cadr F) ($syms (cddr F)))
+            ($syms (cdr F)) ) ) ) )
 
 (test '(let Y 2 (* Y Y))
    (let @X 1
