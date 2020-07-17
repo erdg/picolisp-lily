@@ -220,28 +220,9 @@
                      ^ Body ) )
                (macro '(prog ^ Body) ) ) ) ) ) )
 
-### pbj - pandoric obj
-(de pbj% Args
-   (macro!
-      '(macro!
-         (let [^(mapcan (\\ (@1 _'_ @1)) Args)]
-            (*p! () (^ Args)) ) ) ) )
-
-# : (de panrectangle (X Y DX DY) `(pbj% X Y DX DY))
-# -> panrectangle
-# : (def 'pr1 (panrectangle 1 1 20 30))
-# -> pr1
-
-(de pbj Lst
+# typ[e] of pandoric object! ... i try to be too clever with names
+(de typ!  Lst
    (let [("Nm" . Args) Lst]
-      (macro!
-         (de _ "Nm" (^ Args)
-            (macro!
-               (let [^(mapcan (\\ (@1 _'_ @1)) Args)]
-                  (*p! () (^ Args)) ) ) ) ) ) )
-
-(de pbj%% Lst
-   (let [("Nm" Args) Lst]
       (macro!
          (de _ "Nm" (^ Args)
             (macro!

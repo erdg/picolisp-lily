@@ -382,22 +382,9 @@
 
 (def 'pr2 (p-rectangle% 0 0 47 82))
 
-
-(de panrectangle (X Y DX DY) `(pbj% X Y DX DY))
+(typ! panrectangle X Y DX DY)
 (def 'pr3 (panrectangle 1 1 20 30))
-
-(test 600 (area pr3))
-
-
-(pbj panrectangle X Y DX DY)
-(def 'pr4 (panrectangle 1 1 20 30))
-
 (test 600 (area pr4))
-
-(pbj%% panrectangle% (X Y DX DY))
-(def 'pr5 (panrectangle 1 1 20 30))
-
-(test 600 (area pr5))
 
 (pd!-env-test "reset")
 (test (0 0) (pd!-env-test))

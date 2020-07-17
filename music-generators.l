@@ -526,24 +526,23 @@
       (make
          (loop
             (T (= Curr Full))
-            (let
-               Dur
-               (or
-                  (random-element   # pick random-element from AVAILABLE durations
-                     (filter        # that FITS in remaining space of measure
-                        '((D) (<= (cdr D) (- Full Curr)))
-                        Avail ) )
-                  # NOTE - these clauses are so the function doesn't hang
-                  # -----------------------------------------------------
-                  (random-element   # pick random-element from ALL durations
-                     (filter        # that USES remaining space of measure
-                        '((D) (= (cdr D) (- Full Curr)))
-                        *duration-as-128th-notes-table* ) )
-                  (random-element   # pick random-element from ALL durations
-                     (filter        # that FITS IN remaining space of measure
-                        '((D) (<= (cdr D) (- Full Curr)))
-                        *duration-as-128th-notes-table* ) ) )
-               (link (car Dur))  # add it to the measure
+            (let Dur
+                  (or
+                     (random-element   # pick random-element from AVAILABLE durations
+                        (filter        # that FITS in remaining space of measure
+                           '((D) (<= (cdr D) (- Full Curr)))
+                           Avail ) )
+                     # NOTE - these clauses are so the function doesn't hang
+                     # -----------------------------------------------------
+                     (random-element   # pick random-element from ALL durations
+                        (filter        # that USES remaining space of measure
+                           '((D) (= (cdr D) (- Full Curr)))
+                           *duration-as-128th-notes-table* ) )
+                     (random-element   # pick random-element from ALL durations
+                        (filter        # that FITS IN remaining space of measure
+                           '((D) (<= (cdr D) (- Full Curr)))
+                           *duration-as-128th-notes-table* ) ) )
+               (link (car Dur))                 # add it to the measure
                (inc 'Curr (cdr Dur)) ) ) ) ) )  # increment count of current measure
 
 #####
