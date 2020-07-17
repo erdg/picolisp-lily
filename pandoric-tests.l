@@ -344,19 +344,22 @@
             DY _ DY]
          (*p! () (X Y DX DY))) ) )
 
-(dp coords () (X Y)
+# NOTE - this was the first 'typ!'. '(typ! p-rectangle X Y DX DY)' expands
+# into the above definition.
+
+(pm coords () (X Y)
    (list X Y) )
 
-(dp move (A B) (X Y)
+(pm move (A B) (X Y)
    (prog
       (setp X (+ X A))
       (setp Y (+ Y B))
       (coords Self) ) )
 
-(dp area () (DX DY)
+(pm area () (DX DY)
    (* DX DY) )
 
-(dp perimeter () (DX DY)
+(pm perimeter () (DX DY)
    (* 2 (+ DX DY)) )
 
 (def 'pr1 (p-rectangle 0 0 20 30))

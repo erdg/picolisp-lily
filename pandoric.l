@@ -208,9 +208,9 @@
             (pd! _"Pargs" ^ Body) ) ) ) )
 ###
 
-### dp - define pandoric method
+### pm - define pandoric method
 #
-(de dp Lst
+(de pm Lst
    (let [("Nm" "Args" "Pargs" . Body) Lst]
       (macro!
          (de _"Nm" (Self ^ "Args")
