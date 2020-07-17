@@ -36,19 +36,16 @@
                (link "L")
                (chain "L") ) ) ) ) )
 
-### macro! - 'macro' with a exciting new features!
+### macro! - 'macro' with exciting new features!
 #
 # - expressions following the symbol '_' are evaluated and placed (not
 #   spliced) in the "expansion"
 #
+# - that's all for now! see experimental ideas below!!
+#
 (de macro! @Lst
    (macro
       (macro
-         ^(_walk @Lst) ) ) )
-
-(de debug-macro! @Lst
-   (macro
-      '(macro
          ^(_walk @Lst) ) ) )
 
 (de _walk (X)
@@ -68,7 +65,7 @@
 ### macro!% - more bells and whistles
 #
 # - expressions following the symbol '!' are evaluated for side-effects
-#   and do NOT appear in the "expansion"
+#   and do NOT appear in the "expansion". Good for the lols when debugging
 #
 (de macro!% @Lst
    (macro
@@ -85,12 +82,6 @@
       (use (^($syms @Lst))
          (macro
             ^(_walk% @Lst) ) ) ) )
-
-(de debug-macro$ @Lst
-   (macro
-      '(use (^($syms (flat @Lst)))
-         (macro
-            ^(_walk @Lst) ) ) ) )
 
 (de $syms (Lst)
    (if Lst
@@ -154,17 +145,20 @@
 ### end 'macro' madness
 
 
-# (de sbq% (Lst)
-#    (list (at-syms Lst)
-#       (list 'fill
-#          (cons 'quote Lst) ) ) )
-
 # inspired by Doug Hoyte's 'sharp-backquote' read-macro from "Let Over Lambda"
 (de sbq (@Lst)
    (fill
       '((^(at-syms @Lst))
          (fill
             '(^  @Lst) ) ) ) )
+
+# same as above, but no need to quote list
+(de \\ Lst
+   (let [(@Lst) Lst]
+      (fill
+         '((^(at-syms @Lst))
+            (fill
+               '@Lst) ) ) ) )
 
 # @1 ... @N
 (de at-syms (Lst)
@@ -214,7 +208,6 @@
                   Acc
                   (cons (car Lst) Acc) ) ) ) ) ) )
 
-# from "On Lisp"
 (de groups-of (N Src)
    (if (=0 N) (err "zero length"))
    # hack to account for off by 1

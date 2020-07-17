@@ -62,6 +62,6 @@
          "`"(let Y ","N
                (* Y ",@"L) ) ) ) )
 
-(t (prinl "passed all tests"))
+(t (prinl "utils.l -- passed all tests"))
 
 )
