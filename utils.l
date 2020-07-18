@@ -470,6 +470,20 @@
             '((X) @Test)
             '((X) @Result) ) ) ) )
 
+# meh
+(de sublet Lst
+   (let [(Binds% . Body) Lst]
+      (use Binds
+         (setq Binds (mapcar '((X) (cons (pack (car X)) X)) (groups-of 2 Binds%)))
+            (macro
+               (let [^(mapcan list
+                        (mapcar car Binds)
+                        (mapcar caddr Binds) ) ]
+                  ^(leaves
+                     Body
+                     (member X (mapcar cadr Binds))
+                     (car (member (pack X) (mapcar car Binds))) ) ) ) ) ) )
+
 ### end "Let Over Lambda"
 
 # if true, return Obj instead of T
