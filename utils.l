@@ -456,8 +456,8 @@
    (if Tree
       (if (pair Tree)
          (cons
-            (tree-leaves%% (car Tree) Test Result)
-            (tree-leaves%% (cdr Tree) Test Result) )
+            (leaves% (car Tree) Test Result)
+            (leaves% (cdr Tree) Test Result) )
          (if (Test Tree)
             (Result Tree)
             Tree ) ) ) )
