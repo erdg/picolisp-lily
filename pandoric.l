@@ -220,19 +220,23 @@
                      ^ Body ) )
                (macro '(prog ^ Body) ) ) ) ) ) )
 
-# typ[e] of pandoric object! ... i try to be too clever with names
-(de typ!  Lst
+# typ[e] of pandoric object!
+(de typ! Lst
    (let [("Nm" . Args) Lst]
       (macro!
          (de _ "Nm" (^ Args)
             (macro!
-               (let [^(mapcan (\\ (@1 _'_ @1)) Args)]
+               (let [^(mapcan '`(\\ (@1 _'_ @1)) Args)]
                   (*p! () (^ Args)) ) ) ) ) ) )
 
-# : (pbj panrectangle X Y DX DY)
+# : (typ! panrectangle X Y DX DY)
 # -> panrectangle
 # : (def 'pr1 (panrectangle 1 1 20 30))
 # -> pr1
+# : (pm area () (DX DY) (* DX DY))
+# -> area
+# : (area pr1)
+# -> 600
 ###
 
 # misc abstractions

@@ -362,7 +362,19 @@
 (pm perimeter () (DX DY)
    (* 2 (+ DX DY)) )
 
+###
+
 (def 'pr1 (p-rectangle 0 0 20 30))
+
+(move pr1 7 8)
+
+(move pr1 3 -9)
+
+(test (10 -1) (coords pr1))
+
+(test 100 (perimeter pr1))
+
+###
 
 (de p-rectangle% (X Y DX DY)
    (macro!
@@ -382,9 +394,17 @@
 
 (def 'pr2 (p-rectangle% 0 0 47 82))
 
+(test 3854 (pr2 "area"))
+(test 3854 (area pr2))
+
+###
+
 (typ! panrectangle X Y DX DY)
 (def 'pr3 (panrectangle 1 1 20 30))
 (test 600 (area pr3))
+(test (2 2) (move pr3 1 1))
+
+###
 
 (pd!-env-test "reset")
 (test (0 0) (pd!-env-test))
