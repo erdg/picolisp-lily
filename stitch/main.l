@@ -25,6 +25,8 @@
    # load it
    (load (blob This 'l)) )
 
+(de new-music () (new! '(+MusicObj)))
+
 # edit picolisp file
 (dm vi> ()
    (macro
