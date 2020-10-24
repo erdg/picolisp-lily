@@ -30,14 +30,14 @@
    (job '((State . NIL) (Cnt . 0))
       (macro
          ((d!
-            ("get" (Sym) (val Sym))
-            ("set" (Sym Val) (set Sym Val)) )
+            ("getp" (Sym) (val Sym))
+            ("setp" (Sym Val) (set Sym Val)) )
          ^(rest) ) ) ) )
 
-(d!-with-state "set" 'Cnt 3)
-(test 3 (d!-with-state "get" 'Cnt))
-(d!-with-state "set" 'State "ON")
-(test "ON" (d!-with-state "get" 'State))
+(d!-with-state "setp" 'Cnt 3)
+(test 3 (d!-with-state "getp" 'Cnt))
+(d!-with-state "setp" 'State "ON")
+(test "ON" (d!-with-state "getp" 'State))
 ###
 
 
@@ -47,7 +47,7 @@
       (P! 2)  # -> 4
       (with-p! (X) P!
          (setp X (+ X 26)) ) # -> 30
-      (P! "get" 'X) ) )
+      (P! "getp" 'X) ) )
 
 (test 30
    (let X 2
@@ -55,7 +55,7 @@
          (P! 2)  # -> 4
          (with-p! (X) P!
             (setp X (+ X 26)) ) # -> 30
-         (P! "get" 'X) ) ) )
+         (P! "getp" 'X) ) ) )
 ###
 
 # pd! tests
@@ -77,7 +77,7 @@
    (prog
       (with-p! (This X) pd!-test
          (do 4 (setp X (This "incX"))) )
-      (pd!-test "get" 'X) ) )
+      (pd!-test "getp" 'X) ) )
 
 # redundant
 (de pd!-env-test @
@@ -115,9 +115,9 @@
       ("dec" () (setp X (dec 'X))) )
     "dec" ) )
 
-# : (p!-test "get" 'X)
+# : (p!-test "getp" 'X)
 # -> 12
-(test 12 (p!-test "get" 'X))
+(test 12 (p!-test "getp" 'X))
 
 (with-p! (This) p!-test (setp This '((N) (inc 'X (* 2 N)))))
 # -> ((N) (inc 'X (* 2 N)))
@@ -125,17 +125,17 @@
 # : (p!-test 10)
 # -> 32
 (p!-test 10)
-(test 32 (p!-test "get" 'X))
+(test 32 (p!-test "getp" 'X))
 
-# : (p!-test "get" 'This)
+# : (p!-test "getp" 'This)
 # -> ((N) (inc 'X (* 2 N)))
-(test '((N) (inc 'X (* 2 N))) (p!-test "get" 'This))
+(test '((N) (inc 'X (* 2 N))) (p!-test "getp" 'This))
 
 (recode-p! p!-test
    '((N) (inc 'X (* 3 N))) )
 
 (p!-test 7)  # -> 53
-(test 53 (p!-test "get" 'X))
+(test 53 (p!-test "getp" 'X))
 ###
 
 ###
@@ -147,7 +147,7 @@
 (p!-env-test 2)
 # : (p!-env-test 2)
 # -> 4
-(test 4 (p!-env-test "get" 'X))
+(test 4 (p!-env-test "getp" 'X))
 
 
 (test 13
@@ -157,8 +157,8 @@
 #      (setp X (+ X 9)) )
 # -> 13
 
-(test 13 (p!-env-test "get" 'X))
-# : (p!-env-test "get" 'X)
+(test 13 (p!-env-test "getp" 'X))
+# : (p!-env-test "getp" 'X)
 # -> 13
 ###
 
@@ -167,10 +167,10 @@
 (de p!-over-d!-test @
    (job '((Self . `(let X 0 (list '@ (p! () (X))))))  # this was the first '*p!' (anonymous p!)
       (with-p! (X) Self
-         (if (member (car (rest)) '("get" "set"))
+         (if (member (car (rest)) '("getp" "setp"))
             (cond
-               ((= (car @) "get") X)
-               ((= (car @) "set") (setp X (last (rest)))) )
+               ((= (car @) "getp") X)
+               ((= (car @) "setp") (setp X (last (rest)))) )
             (macro
                ('`(d!
                      ("inc"   () (setp X (inc 'X)))
@@ -190,8 +190,8 @@
 # : (p!-over-d!-test "dec")
 # -> 5
 
-(test 17 (p!-over-d!-test "set" 'X 17))
-# : (p!-over-d!-test "set" 'X 17)
+(test 17 (p!-over-d!-test "setp" 'X 17))
+# : (p!-over-d!-test "setp" 'X 17)
 # -> 17
 
 (test 16 (p!-over-d!-test "dec"))
@@ -205,7 +205,7 @@
 
 (*p!-test 2)
 
-(test 4 (*p!-test "get" 'X))
+(test 4 (*p!-test "getp" 'X))
 
 (test 13
    (with-p! (X) *p!-test
@@ -224,8 +224,8 @@
             (with-p! (Y) P2
                (P1 (+ (P2 5) 5))
                (list
-                  (P1 "get" 'X)
-                  (P2 "get" 'Y)) ) ) ) ) )
+                  (P1 "getp" 'X)
+                  (P2 "getp" 'Y)) ) ) ) ) )
 
 (de pdtest2 @
    `(let [X 1 Y 2 Z 3]
@@ -275,7 +275,7 @@
    (prog
       (with-p!s [(This X) p!-test]
          (P!1 3) )
-      (p!-test "get" 'X) ) )
+      (p!-test "getp" 'X) ) )
 
 (test (11 111 1111)
    (let (X 1 Y 101 Z 1101)
@@ -286,7 +286,7 @@
                      (This Y) p!-2  # -> P!2
                      (This Z) p!-3] # -> P!3
             (mapc '((P) (P 10)) '(P!1 P!2 P!3))
-            (mapcar '((P V) (P "get" V)) '(P!1 P!2 P!3) '(X Y Z))) ) ) )
+            (mapcar '((P V) (P "getp" V)) '(P!1 P!2 P!3) '(X Y Z))) ) ) )
 
 # test '[Var]$[N]' anaphors
 (test (2 12)
@@ -309,7 +309,7 @@
             (do 2 (setp X$1 (P!1 11)))
             (setp X$2 (P!2 11))
             (setp X$3 (P!3 11)) )
-         (list (p!-1 "get" 'X) (p!-2 "get" 'X) (p!-3 "get" 'X)) ) ) )
+         (list (p!-1 "getp" 'X) (p!-2 "getp" 'X) (p!-3 "getp" 'X)) ) ) )
 (test (22 22 33)
    (let (X 0 Y 0)
       (let [p!-1 (*p! (N) (X) (inc 'X N))
@@ -321,7 +321,7 @@
             (do 2 (setp X$1 (P!1 11)))
             (setp Y (P!2 11))
             (setp X$3 (P!3 11)) )
-         (list (p!-1 "get" 'X) (p!-2 "get" 'Y) (p!-3 "get" 'X)) ) ) )
+         (list (p!-1 "getp" 'X) (p!-2 "getp" 'Y) (p!-3 "getp" 'X)) ) ) )
 
 # test 'setp' within 'with-p!s'
 (test (22 1212)
@@ -333,7 +333,7 @@
                           (Y Z) p!-2]
                   (setp Y$1 22)
                   (setp Y$2 1212) )
-               (list (p!-1 "get" 'Y) (p!-2 "get" 'Y)) ) ) ) ) )
+               (list (p!-1 "getp" 'Y) (p!-2 "getp" 'Y)) ) ) ) ) )
 
 # pandoric rectangle object
 (de p-rectangle (X Y DX DY)
