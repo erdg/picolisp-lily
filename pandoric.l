@@ -45,8 +45,8 @@
       (macro!
          '(job '[^(p!-env->job "Pargs") _(cons 'This "Args" Body)]
             (macro
-               ('`(d! ("get" (Sym) (val Sym))
-                      ("set" (Sym Val) (set Sym Val))
+               ('`(d! ("getp" (Sym) (val Sym))
+                      ("setp" (Sym Val) (set Sym Val))
                       (T ()  (This _'^ (rest))) )
                   _'^ (rest) ) ) ) ) ) )
 
@@ -86,8 +86,8 @@
       (link 'setp (lit set-with-p!))
       (for "S" "Syms"
          (ifn (= "S" 'This)
-            (link "S" ("P!" "get" "S"))
-            (link 'This (cons 'quote ("P!" "get" 'This))) ) ) ) )
+            (link "S" ("P!" "getp" "S"))
+            (link 'This (cons 'quote ("P!" "getp" 'This))) ) ) ) )
 ###
 
 ### with-p!s - combine p! environments
@@ -130,16 +130,16 @@
                            (if (= "Sym" 'This)
                               # This -> This[N]
                               (prog
-                                 (link (any (pack 'This N)) (cons 'quote (P! "get" "Sym")))
+                                 (link (any (pack 'This N)) (cons 'quote (P! "getp" "Sym")))
                                  (queue 'P!T (cons (any (pack "P!" N)) (any (pack 'This N)))) )  # e.g. (P!1 . This1) -> P!Tab
                               (if (member "Sym" Dups)
                                  # Var -> Var$[N]
                                  (prog
-                                    (link (any (pack "Sym" "$" N)) (P! "get" "Sym"))
+                                    (link (any (pack "Sym" "$" N)) (P! "getp" "Sym"))
                                     (queue 'P!T (cons (any (pack "P!" N)) (any (pack "Sym" "$" N)))) )  # (P!1 . Y$1) -> P!Tab
                                  # Var
                                  (prog
-                                    (link "Sym" (P! "get" "Sym"))
+                                    (link "Sym" (P! "getp" "Sym"))
                                     (queue 'P!T (cons (any (pack "P!" N)) "Sym")) ) ) ) ) )  # (P!1 . X) -> P!Tab
                      (setq P!Tab (append P!T P!Tab)) ) ) )  # -> '((P!1 . X) (P!1 . Y-1) (P!2 . Y-2) (P!2 . Z))
             (link 'P!Table (cons 'quote (group P!Tab))) ) ) ) )  # -> '((P!1 X Y-1) (P!2 Y-2 Z))
@@ -151,7 +151,7 @@
 (de set-with-p! Lst
    (let [(@Sym . Rest) Lst]
       (macro
-         (Self "set" '@Sym ^ Rest) ) ) )
+         (Self "setp" '@Sym ^ Rest) ) ) )
 
 # bound to 'setp' in 'with-p!s' forms
 (de set-with-p!s Lst
@@ -161,7 +161,7 @@
                (find
                   '((P) (member @Sym P))
                   P!Table ) )
-          "set"
+          "setp"
           _(Var$N->Var @Sym)
           ^ Rest) ) ) )
 
@@ -192,8 +192,8 @@
                     (macro!
                        '(@
                           (macro
-                             ((d! ("get" (Sym) (val Sym))
-                                  ("set" (Sym Val) (set Sym Val))
+                             ((d! ("getp" (Sym) (val Sym))
+                                  ("setp" (Sym Val) (set Sym Val))
                                   ^ Body )
                               _'^ (rest) ) ) ) ) ) ]
             (apply This (rest)) ) ) ) )
