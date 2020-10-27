@@ -4,19 +4,15 @@
 (rel id (+Need +Key +Number))
 (rel nm (+Ref +String))
 
-# REFACTOR
-(rel l (+Blob))            # pl file
-(rel ly (+Blob))           # ly file
-(rel svg (+Blob))          # svg
-(rel clean.svg (+Blob))    # 'sanitize>'d svg
+(rel l (+Blob))
+(rel ly (+Blob))
+(rel svg (+Blob))
 (rel cropped.svg (+Blob))
-(rel clean.cropped.svg (+Blob))
-(rel preview.svg (+Blob))
-(rel clean.preview.svg (+Blob))
 
 # '+MusicObj' creator method
 #
 #   creates picolisp file with unique fn, e.g. 'test%1' (see 'blobFn')
+#
 (dm T ()
    (put!> This 'id (genKey 'id '+MusicObj))
    (put!> This 'l T)
@@ -48,20 +44,14 @@
    (in (blob This 'ly) (echo)) )
 
 # render lilypond file to svg
-(dm re> ()
+(dm render> ()
    (unless (: svg) (put!> This 'svg T))
-   (unless (: preview.svg) (put!> This 'preview.svg T))
-   (t (call 'lilypond "-dcrop" "-dpreview" "-dbackend=svg" "-o" (blobDir This) (blob This 'ly))) )
+   (unless (: cropped.svg) (put!> This 'cropped.svg T))
+   (t (call 'lilypond "-dcrop" "-dbackend=svg" "-o" (blobDir This) (blob This 'ly))) )
 
-#REFACTOR
-# strip all '<a>' tags from svg files. lilypond links notes in svg to lines
-# in the source file. not okay for sharing svg's on the internet, when the
-# source files are +Blob's in the picolisp DB
-#
 # FIXME - this method makes a mess of the console. figure out way to mute
 # output
-(dm sanitize> ()
-   (unless (: clean.svg) (put!> This 'clean.svg T))
+(dm clean> ()
    (let CleanSvg
       (in (blob This 'svg)
          (pack
@@ -70,48 +60,80 @@
                   # remove <a> tags from svg
                   (unless (or (pre? "<a" @) (pre? "</a>" @))
                      (link @) ) ) ) ) )
-      (out (blob This 'clean.svg) (prin CleanSvg)) )
-   (unless (: clean.preview.svg) (put!> This 'clean.preview.svg T))
-   (let CleanPreviewSvg
-      (in (blob This 'preview.svg)
-         (prin
-            (pack
-               (make
-                  (while (line T)
-                     # remove <a> tags from svg
-                     (unless (or (pre? "<a" @) (pre? "</a>" @))
-                        (link @) ) ) ) ) ) )
-      (out (blob This 'clean.preview.svg) (prin CleanPreviewSvg)) )
-   (unless (: clean.cropped.svg) (put!> This 'clean.cropped.svg T))
+      (out (blob This 'svg) (prin CleanSvg)) )
    (let CleanCroppedSvg
-         (in (blob This 'cropped.svg)
-            (prin
-               (pack
-                  (make
-                     (while (line T)
-                        # remove <a> tags from svg
-                        (unless (or (pre? "<a" @) (pre? "</a>" @))
-                           (link @) ) ) ) ) ) )
-         (out (blob This 'clean.cropped.svg) (prin CleanCroppedSvg)) ) )
+      (in (blob This 'cropped.svg)
+         (pack
+            (make
+               (while (line T)
+                  # remove <a> tags from svg
+                  (unless (or (pre? "<a" @) (pre? "</a>" @))
+                     (link @) ) ) ) ) )
+      (out (blob This 'cropped.svg) (prin CleanCroppedSvg)) ) )
 
 # send updated SVG to the browser
 (dm send> ()
    (let @Sse (any (pack "*Obj" (: id)))
       (macro
          (serverSend @Sse
-            (<MusicSVG> This) ) ) ) )
+            (<MusicObj> This) ) )
+      T ) )
 
-(de <MusicSVG> (Obj)
+(de <MusicObj> (Obj)
    # see https://stackoverflow.com/questions/1077041/refresh-image-with-a-new-one-at-the-same-url/9943419#9943419
    # '(date)' and '(time)' to fool browser cache and update image
-   (<img> (pack "http://localhost:8080/" (blob Obj 'clean.cropped.svg) "#" (date) (time))) )
+   (macro
+      (<div> '(style . "display: flex; flex-direction: column; min-width: 380px;")
+         # for some reason the 'img' won't show on update if it's not first...
+         # haven't figured out why, but a little flexbox hacking gives the 
+         # desired result for now
+         (<div> '(collapsible (style . "display: flex; flex-direction: column; position: relative;"))
+            (<div> '(style . "align-self: start")
+               (<img> ^(list (pack "http://localhost:8080/" (blob Obj 'cropped.svg) "#" (date) (time)))) )
+            (<h2> '(style . "order: -1")
+               ^(list (; Obj nm))) )
+         # (<btn> '((type . "button") (class . "collapsible") (style . "order: -1"))
+         #    ^(list (; Obj nm)))
+         (<div> "collapsible-content"
+            (<table> NIL
+               NIL  # No title
+               '((align "Tracks")(align "Tempo")(align "Time")(align "Created"))
+               (<row> NIL
+                  "take1.wav" "86" "0:16" "2020-10-26" )
+               (<row> NIL
+                  "messed-up-take.wav" "64" "0:22" "2020-10-26") ) )
+         ) ) )
+
+(de <RecordButton> ()
+   (<btn> '((type . "button") "record")
+      NIL ) )
+
+(de collapsibleJS ()
+   (<javascript>
+     "var coll = document.getElementsByClassName('collapsible');
+      var i;
+
+for (i = 0; i < coll.length; i++) {
+        coll[i].addEventListener('click', function() {
+               this.classList.toggle('active');
+                   var content = this.nextElementSibling;
+                       if (content.style.maxHeight){
+                                content.style.maxHeight = null;
+                                    } else {
+                                             content.style.maxHeight = content.scrollHeight + 'px';
+                                                 }
+                                                   });
+   }" ) )
 
 (dm work> ()
    (vi> This)
    (ly> This)
-   (re> This)
-   # (cl> This)
-   (sanitize> This)
+   (render> This)
+   (clean> This)
+   (send> This) )
+
+(dm rename> (Name)
+   (put!> This 'nm Name)
    (send> This) )
 
 # start a new project or change to an existing project
@@ -140,24 +162,28 @@
 
 (load "@lib/http.l" "@lib/xhtml.l")
 
+(de <btn> (Attr . Prg)
+   (tag 'button Attr 2 Prg)
+   (prinl) )
+
 (de work ()
    (app)
    (timeout)
    (redirect (baseHRef) *SesId "!musicApp") )
 
 (de musicApp ()
-   (html 0 "music app" NIL NIL
-      (<ping> 7)
+   (html 0 "music app" "app.css" NIL
       (<ProjectHeader>)
       (setupServerEvents)
       (collectMusicObjs)
-      (interactJS) ) )
+      (collapsibleJS)
+      ) )
 
 (de <ProjectHeader> ()
    (let Prj (pack (car (split (chop (blobFn)) "%")))  # current (default/test) project on app start
       # (serverSentEvent "project" '*Project)
       (<h1> '(id . "project")
-         "Project: " Prj) ) )
+         "Project - " Prj) ) )
 
 # server sent event for each +MusicObj
 (de setupServerEvents ()
@@ -176,32 +202,12 @@
       (<MusicDiv> Obj) ) )
 
 (de <MusicDiv> (Obj)
-   (let Name (; Obj nm)
-      (<div>
-         (list 'drag  # connect to 'interact.js'
-            (cons 'id (sseId> Obj))  # connect to sse
-            '(style . "width: min-content;") )
-         (<h4> NIL Name)
-         (<MusicSVG> Obj) ) ) )
+   (<div>
+      (list
+         (cons 'id (sseId> Obj))  # connect to sse
+         '(style . "width: min-content; padding-top: 16px; padding-bottom: 32px") )
+      (<MusicObj> Obj) ) )
 
-(push '*JS "interact.min.js")
-
-(de interactJS ()
-   (<javascript>
-      "interact('.drag').draggable({
-         listeners: {
-            move: dragMoveListener
-         },
-         autoScroll: true
-      })
-      function dragMoveListener (event) {
-         var target = event.target
-         var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
-         var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
-         target.style.transform = 'translate(' + x + 'px, ' + y + 'px)'
-         target.setAttribute('data-x', x)
-         target.setAttribute('data-y', y)
-      }" ) )
 
 ### utils
 

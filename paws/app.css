@@ -1,0 +1,63 @@
+body {
+   line-height:1.6;
+   font-size:16px;
+   padding:0 10px;
+   font-family: 'Roboto', sans-serif;
+   /* font-family: sans-serif; */
+   background: #eee;
+   font-weight: 300;
+}
+
+h1,h2,h3 {
+   line-height:1.2;
+   font-weight: 300;
+}
+
+table {
+   font-weight: 100;
+   border-collapse: collapse;
+}
+
+th, td {
+   padding: 4px 8px;
+   text-align: left;
+   border-bottom: 1px solid #ccc;
+}
+
+
+th {
+   font-weight: 300;
+}
+
+
+a { color: #0077aa }
+
+/* record button */
+.record {
+   background: #f44336;
+   border-color: darkred;
+   border-radius: 50%;
+   border-width: 1px;
+   padding: 9px;
+}
+
+.collapsible:after {
+   content: '\02C5';
+   float: right;
+   margin-left: 6px;
+   position: absolute;
+   font-size: 32px;
+   right: 0px;
+   top: 16px;
+}
+
+
+.collapsible-content {
+   max-height: 0px;
+   overflow: hidden;
+   transition: max-height 0.2s ease-out;
+}
+
+.active:after {
+   content: '\02C4';
+}
