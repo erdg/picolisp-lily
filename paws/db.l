@@ -96,4 +96,9 @@
             (<h2> NIL ^(list (: nm))) ) )
       T ) )
 
+(class +Track +Entity)
+(rel id (+Need +Key +Number))
+(rel nm (+Ref +String))
+(rel tempo (+Number))
 
+(rel wav (+Blob))

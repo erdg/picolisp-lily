@@ -36,6 +36,27 @@
          (link
             (list Obj (if (; Obj nm) @)) ) ) ) )
 
+(de tracks ()
+   (filter
+      '((S) (= "wav" (pack (last (split (chop S) ".")))))
+      (chdir *Blob (dir)) ) )
+
+(de track-info (Track)
+   (and
+      (chdir *Blob
+         (in (list 'soxi Track)
+            (make
+               (until (eof)
+                  (link (line T)) ) ) ) )
+      (clip @)
+      (head 6 @)
+      (remove 5 @)   # 'duration' is special
+      (mapcar '((S) (split (chop S) ":")) @)
+      (mapcar last @)
+      (mapcar clip @)
+      (mapcar pack @)
+      ) )
+
 
 # init stuff
 (setq
