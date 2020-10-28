@@ -1,4 +1,4 @@
-(load 
+(load
    "../pond.l"
    "db.l"
    "@lib/http.l"
@@ -15,7 +15,7 @@
 #
 # rename> - rename obj
 # work> - edit obj and update app
-# 
+#
 # and more - see "db.l"
 
 # each project is a directory, with a db file and +Blob's

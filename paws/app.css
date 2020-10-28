@@ -1,5 +1,5 @@
 body {
-   margin: 40px auto;
+   margin: 8px auto;
    max-width: 650px;
    line-height: 1.6;
    font-size: 18px;
@@ -8,7 +8,7 @@ body {
    /* font-family: sans-serif; */
    background: #eee;
    font-weight: 300;
-   color: #333;
+   color: #444;
 }
 
 h1,h2,h3 {
@@ -32,6 +32,24 @@ th {
    font-weight: 300;
 }
 
+.logo {
+   /* float: right */
+}
+
+.logo h5 {
+   margin: 0;
+}
+
+.logo p {
+   margin: 0;
+   font-size: 12px;
+}
+
+.logo strong {
+   color: #327f9d;
+   font-weight: 900;
+   margin-bottom: 0px;
+}
 
 a { 
    /* color: #0077aa; */

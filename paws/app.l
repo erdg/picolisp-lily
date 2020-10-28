@@ -27,8 +27,11 @@
 (de <ProjectHeader> ()
    (let Prj (pack (car (split (chop (blobFn)) "%")))  # current (default/test) project on app start
       # (serverSentEvent "project" '*Project)
+      (<div> 'logo
+         (<h5> NIL (<strong> "||") " paws")
+         (<p> NIL "the picolisp audio workstation") )
       (<h1> '(id . "project")
-         "Project - " Prj) ) )
+         "Projects / " Prj) ) )
 
 # server sent event for each +MusicObj
 (de setupServerEvents ()
