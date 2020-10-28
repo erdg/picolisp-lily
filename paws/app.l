@@ -13,7 +13,13 @@
 (de paws ()
    (html 0 "music app" "app.css" NIL
       (<ProjectHeader>)
-      (collectMusicObjs)
+      (<tab>
+         ("music"
+            (collectMusicObjs) )
+         ("tracks"
+            (<h2> NIL "tracks") )
+         ("mixes"
+            (<h2> NIL "mixes") ) )
       (setupServerEvents)
       (collapsibleJS)
       ) )

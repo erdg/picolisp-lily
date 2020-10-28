@@ -1,13 +1,14 @@
 body {
    margin: 40px auto;
    max-width: 650px;
-   line-height:1.6;
-   font-size:16px;
-   padding:0 10px;
+   line-height: 1.6;
+   font-size: 18px;
+   padding: 0 10px;
    font-family: 'Roboto', sans-serif;
    /* font-family: sans-serif; */
    background: #eee;
    font-weight: 300;
+   color: #333;
 }
 
 h1,h2,h3 {
@@ -32,7 +33,11 @@ th {
 }
 
 
-a { color: #0077aa }
+a { 
+   /* color: #0077aa; */
+   color: #327f9d;
+   text-decoration: none;
+}
 
 /* record button */
 .record {
@@ -63,3 +68,33 @@ a { color: #0077aa }
 .active:after {
    content: '\02C4';
 }
+
+
+/* Tabulators */
+.tab {
+   margin-bottom: 1ex;
+   /* border-collapse: unset; */
+   display: flex;
+   background-color: #ddd6;
+}
+
+.tab td {
+   padding: 3px 1rem;
+   border-bottom: none;
+}
+
+.tab .top {
+   background-color: #ddd;
+   color: #666;
+   font-weight: 300;
+   border-top: 1px solid #666;
+   border-left: 1px solid #666;
+   border-right: 1px solid #666;
+   border-bottom: 1px solid #666;
+}
+
+.tab .sub {
+   font-weight: 300;
+   /* border-bottom: 1px solid; */
+}
+
