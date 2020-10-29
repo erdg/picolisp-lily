@@ -66,15 +66,15 @@ a {
    padding: 9px;
 }
 
-.collapsible:after {
-   content: '\02C5';
-   float: right;
-   margin-left: 6px;
-   position: absolute;
-   font-size: 32px;
-   right: 0px;
-   top: 16px;
-}
+/* .collapsible:after { */
+/*    content: '\02C5'; */
+/*    float: right; */
+/*    margin-left: 6px; */
+/*    position: absolute; */
+/*    font-size: 32px; */
+/*    right: 0px; */
+/*    top: 16px; */
+/* } */
 
 
 .collapsible-content {

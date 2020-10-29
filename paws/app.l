@@ -21,7 +21,7 @@
          ("mixes"
             (<h2> NIL "mixes") ) )
       (setupServerEvents)
-      (collapsibleJS)
+      # (collapsibleJS)
       ) )
 
 (de <ProjectHeader> ()
@@ -60,14 +60,14 @@
             (<div> '(^(list (cons 'id (pack (sseId> Obj) "name")) '(style . "order: -1")))
                (<h2> NIL
                   ^(list (; Obj nm)) ) ) )
-         (<div> "collapsible-content"
-            (<table> NIL
-               NIL  # No title
-               '((align "Tracks")(align "Tempo")(align "Time")(align "Created"))
-               (<row> NIL
-                  "take1.wav" "86" "0:16" "2020-10-26" )
-               (<row> NIL
-                  "messed-up-take.wav" "64" "0:22" "2020-10-26") ) )
+         # (<div> "collapsible-content"
+         #    (<table> NIL
+         #       NIL  # No title
+         #       '((align "Tracks")(align "Tempo")(align "Time")(align "Created"))
+         #       (<row> NIL
+         #          "take1.wav" "86" "0:16" "2020-10-26" )
+         #       (<row> NIL
+         #          "messed-up-take.wav" "64" "0:22" "2020-10-26") ) )
          ) ) )
 
 (de <RecordButton> ()
