@@ -51,6 +51,8 @@
       (clip @)
       (head 6 @)
       (remove 5 @)   # 'duration' is special
+      (remove 3 @)
+      (remove 3 @)
       (mapcar '((S) (split (chop S) ":")) @)
       (mapcar last @)
       (mapcar clip @)

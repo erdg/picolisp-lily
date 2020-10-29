@@ -17,7 +17,7 @@
          ("music"
             (collectMusicObjs) )
          ("tracks"
-            (<h2> NIL "tracks") )
+            (collectTracks) )
          ("mixes"
             (<h2> NIL "mixes") ) )
       (setupServerEvents)
@@ -69,6 +69,14 @@
          #       (<row> NIL
          #          "messed-up-take.wav" "64" "0:22" "2020-10-26") ) )
          ) ) )
+
+(de collectTracks ()
+   (<table> NIL NIL  # No title
+      '((align "track") (align "channels") (align "size"))
+      (for Track (mapcar track-info (tracks))
+         (macro
+            (<row> NIL
+               ^ Track ) ) ) ) )
 
 (de <RecordButton> ()
    (<btn> '((type . "button") "record")
