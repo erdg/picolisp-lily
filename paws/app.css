@@ -33,7 +33,10 @@ th {
 }
 
 .logo {
-   /* float: right */
+   background-color: #9996;
+   padding: 4px 8px;
+   position: relative;
+   border-radius: 2px;
 }
 
 .logo h5 {
@@ -46,14 +49,13 @@ th {
 }
 
 .logo strong {
-   color: #327f9d;
+   color: #7878d8;
    font-weight: 900;
    margin-bottom: 0px;
 }
 
-a { 
-   /* color: #0077aa; */
-   color: #327f9d;
+a {
+   color: #7878d8;
    text-decoration: none;
 }
 
