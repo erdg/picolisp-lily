@@ -61,23 +61,59 @@ a {
 
 /* record button */
 .record {
-   background: #f44336;
-   border-color: darkred;
-   border-radius: 50%;
-   border-width: 1px;
-   padding: 9px;
+   background: #d87878;
+   position: absolute;
+   top: 8px;
+   right: 8px;
+   text-align: right;
+   font-weight: 300;
+   border-radius: 2px;
 }
 
-/* .collapsible:after { */
-/*    content: '\02C5'; */
-/*    float: right; */
-/*    margin-left: 6px; */
-/*    position: absolute; */
-/*    font-size: 32px; */
-/*    right: 0px; */
-/*    top: 16px; */
-/* } */
+.record:hover {
+   background: #c26c6c;
+}
 
+.record .sub {
+   padding: 3px 8px;
+}
+
+.record .top {
+   margin-top: 2px;
+}
+
+.record .top a {
+   margin-right: 8px;
+}
+
+.record .cmd:hover {
+   background: #ddd;
+}
+
+.record .top ul {
+   margin-top: 4px;
+   text-align: center;
+}
+
+.record a {
+   color: #eee;
+}
+
+.record ul {
+   margin: 0px;
+   padding: 0px;
+   list-style: none;
+}
+
+.record .cmd {
+   background: white;
+   color: #444;
+   padding: 8px;
+}
+
+.record .cmd a {
+   color: #444;
+}
 
 .collapsible-content {
    max-height: 0px;
@@ -85,17 +121,37 @@ a {
    transition: max-height 0.2s ease-out;
 }
 
-.active:after {
-   content: '\02C4';
+.trackmenu {
+   position: absolute;
+   top: -8px;
+   right: 32px;
+}
+
+.trackmenu ul {
+   margin: 8px;
+   padding-left: 0px;
+}
+
+.trackmenu li {
+   background: #fff;
+   border-radius: 2px;
+   list-style: none;
+   padding: 0px 8px;
+   font-weight: 300;
+}
+
+.trackmenu li:hover {
+   background: #ddd;
 }
 
 
 /* Tabulators */
 .tab {
    margin-bottom: 1ex;
-   /* border-collapse: unset; */
+   border-collapse: unset;
    display: flex;
    background-color: #ddd6;
+   border-radius: 2px;
 }
 
 .tab td {
@@ -105,16 +161,31 @@ a {
 
 .tab .top {
    background-color: #ddd;
-   color: #666;
+   color: #444;
    font-weight: 300;
-   border-top: 1px solid #666;
-   border-left: 1px solid #666;
-   border-right: 1px solid #666;
-   border-bottom: 1px solid #666;
+   border-radius: 2px;
 }
 
 .tab .sub {
    font-weight: 300;
-   /* border-bottom: 1px solid; */
 }
 
+.tab .sub:hover {
+   background: #e4e4f7;
+}
+
+.dotmenu {
+   display: flex;
+   flex-direction: column;
+   padding: 0px 16px;
+   cursor: pointer;
+}
+
+.dot {
+   height: 3px;
+   width: 3px;
+   margin: 2px;
+   background: #444;
+   border-radius: 50%;
+   display; inline-block;
+}

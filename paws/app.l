@@ -11,76 +11,118 @@
    (redirect (baseHRef) *SesId "!paws") )
 
 (de paws ()
-   (html 0 "music app" "app.css" NIL
+   (html 0 "paws - the picolisp audio workstation" "app.css" NIL
       (<ProjectHeader>)
-      (<tab>
-         ("music"
-            (collectMusicObjs) )
-         ("tracks"
-            (collectTracks) )
-         ("mixes"
-            (<h2> NIL "mixes") ) )
+      (<ProjectContent>)
       (setupServerEvents)
-      # (collapsibleJS)
+      (collapsibleJS)
       ) )
 
 (de <ProjectHeader> ()
+   (<div> 'logo
+      (<h5> NIL (<strong> "||") " paws")
+      (<p> NIL "the picolisp audio workstation")
+      (<RecordButton>) )
+      (<CurrentProject> ) )
+
+(de <CurrentProject> ()
    (let Prj (pack (car (split (chop (blobFn)) "%")))  # current (default/test) project on app start
-      # (serverSentEvent "project" '*Project)
-      (<div> 'logo
-         (<h5> NIL (<strong> "||") " paws")
-         (<p> NIL "the picolisp audio workstation") )
-      (<h1> '(id . "project")
+      (<h1> NIL
          "Projects / " Prj) ) )
 
-# server sent event for each +MusicObj
+(de <ProjectContent> ()
+      (<tab>
+         ("charts"
+            (collectCharts) )
+         ("tracks"
+            (collectTracks) )
+         ("mixes"
+            (<h2> NIL "mixes") ) ) )
+
+# server sent event for each +Chart
 (de setupServerEvents ()
-   (for Obj (collect 'id '+MusicObj)
+   (serverSentEvent "tracks" '*Tracks)
+   (for Obj (collect 'id '+Chart)
       # add more events here
       (serverSentEvent
          (pack (sseId> Obj)  "name")
          (any (pack (sseVar> Obj) "name")) )
       (serverSentEvent
-         (pack (sseId> Obj)  "music")
-         (any (pack (sseVar> Obj) "music")) ) ) )
+         (pack (sseId> Obj)  "chart")
+         (any (pack (sseVar> Obj) "chart")) ) ) )
 
-(de collectMusicObjs ()
-   (for Obj (collect 'id '+MusicObj)
-      (<MusicObj> Obj) ) )
+(de collectCharts ()
+   (for Obj (collect 'id '+Chart)
+      (<Chart> Obj) ) )
 
 # REFACTOR THIS MESS
-(de <MusicObj> (Obj)
+(de <Chart> (Obj)
    # see https://stackoverflow.com/questions/1077041/refresh-image-with-a-new-one-at-the-same-url/9943419#9943419
    # '(date)' and '(time)' to fool browser cache and update image
    (macro
-      (<div> '(style . "display: flex; flex-direction: column; min-width: 380px;")
-         (<div> '(collapsible (style . "display: flex; flex-direction: column; position: relative;"))
-            (<div> '(^(list (cons 'id (pack (sseId> Obj) "music")) '(style . "align-self: start")))
+      (<div> '(style . "display: flex; flex-direction: column; margin-bottom: 16px")
+         (<div> '(#^(list (if (; Obj tracks) 'collapsible))
+                  (style . "display: flex; flex-direction: column; position: relative;") )
+            (<div> '(^(list (cons 'id (pack (sseId> Obj) "chart")) '(style . "align-self: start")))
                (<img> ^(list (pack "http://localhost:8080/" (blob Obj 'cropped.svg) "#" (date) (time)))) )
             (<div> '(^(list (cons 'id (pack (sseId> Obj) "name")) '(style . "order: -1")))
                (<h2> NIL
                   ^(list (; Obj nm)) ) ) )
-         # (<div> "collapsible-content"
-         #    (<table> NIL
-         #       NIL  # No title
-         #       '((align "Tracks")(align "Tempo")(align "Time")(align "Created"))
-         #       (<row> NIL
-         #          "take1.wav" "86" "0:16" "2020-10-26" )
-         #       (<row> NIL
-         #          "messed-up-take.wav" "64" "0:22" "2020-10-26") ) )
+         (if (; Obj tracks)
+            (<div> NIL #"collapsible-content"
+               (<TracksTable> @) ) )
          ) ) )
 
 (de collectTracks ()
+   (<div> '((id . "tracks") (style . "margin-top: 32px;"))
+      (<TracksTable>) ) )
+
+(de <TracksTable> (Tracks)
    (<table> NIL NIL  # No title
-      '((align "track") (align "channels") (align "size"))
-      (for Track (mapcar track-info (tracks))
+      '((align "track") (align "channels") (align "time") (align "size"))
+      (for Track (list-tracks Tracks)
          (macro
             (<row> NIL
-               ^ Track ) ) ) ) )
+               ^ Track (<TrackMenu>) ) ) ) ) )
+
+(de <TrackMenu> ()
+   (<div> '(style . "position: relative;")
+      (<div> "collapsible dotmenu"
+         (<span> 'dot)
+         (<span> 'dot)
+         (<span> 'dot) )
+      (<div> "collapsible-content trackmenu"
+         (<ul> NIL
+            (<li> NIL "preloopify")
+            (<li> NIL "loopify") ) ) ) )
 
 (de <RecordButton> ()
-   (<btn> '((type . "button") "record")
-      NIL ) )
+   (<div> 'record
+      (<bar>
+         ("record"
+            ("new mono track" "!api-record")
+            ("new stereo track" NIL) ) ) ) )
+
+(de <RecordButton%> ()
+   (<btn> '((type . "button") "record%")
+      "record" ) )
+
+(de openLinkJS () 
+   (<javascript>
+      "function openLink(evt, animName) {
+         var i, x, tablinks;
+         x = document.getElementsByClassName('city');
+         for (i = 0; i < x.length; i++) {
+            x[i].style.display = 'none';
+         }
+         tablinks = document.getElementsByClassName('tablink');
+         for (i = 0; i < x.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(' w3-red', '');
+         }
+         document.getElementById(animName).style.display = 'block';
+         evt.currentTarget.className += ' w3-red';
+      }") )
+
 
 (de collapsibleJS ()
    (<javascript>

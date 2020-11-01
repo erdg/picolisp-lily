@@ -1,25 +1,26 @@
-(class +MusicObj +Entity)
+(class +Chart +Entity)
 (rel id (+Need +Key +Number))
 (rel nm (+Ref +String))
+(rel tracks (+List +Joint) chart (+Track))
 
 (rel l (+Blob))
 (rel ly (+Blob))
 (rel svg (+Blob))
 (rel cropped.svg (+Blob))
 
-# '+MusicObj' creator method
+# '+Chart' creator method
 #
 #   creates picolisp file with unique fn, e.g. 'test%1' (see 'blobFn')
 #
 (dm T ()
-   (put!> This 'id (genKey 'id '+MusicObj))
+   (put!> This 'id (genKey 'id '+Chart))
    (put!> This 'l T)
    # put prototype in file
    (out (blob This 'l) (prin "(de " (blobFn This) " ())"))
    # load it
    (load (blob This 'l)) )
 
-(de new-music () (new! '(+MusicObj)))
+(de new-chart () (new! '(+Chart)))
 
 # edit picolisp file
 (dm vi> ()
@@ -71,7 +72,7 @@
 
 # send updated SVG to the browser
 (dm send> ()
-   (let @Sse (any (pack "*Obj" (: id) "music"))
+   (let @Sse (any (pack "*Obj" (: id) "chart"))
       (macro
          (serverSend @Sse
             (<img> ^(list (pack "http://localhost:8080/" (blob This 'cropped.svg) "#" (date) (time)))) ) )
@@ -79,7 +80,7 @@
 
 # sse helpers, e.g. *SsEvt -> (("obj3" *Obj3) ... )
 (dm sseVar> () (any (pack "*Obj" (: id))))
-(dm sseId>  () (pack "obj" (: id)))  # connects to <div> from 'collectMusicObjs'
+(dm sseId>  () (pack "obj" (: id)))  # connects to <div> from 'collectCharts'
 
 (dm work> ()
    (vi> This)
@@ -99,6 +100,26 @@
 (class +Track +Entity)
 (rel id (+Need +Key +Number))
 (rel nm (+Ref +String))
-(rel tempo (+Number))
+(rel chart (+Joint) tracks (+Chart))
 
 (rel wav (+Blob))
+
+(de new-track ()
+   (new! '(+Track)) )
+
+(dm T ()
+   (put!> This 'id (genKey 'id '+Track)) )
+
+(dm record> (Name)
+   (put!> This 'nm Name)
+   (unless (: wav) (put!> This 'wav T))
+   (record (blob This 'wav))
+   (noContent)
+   (serverSend *Tracks
+      (<TracksTable> (collect 'id '+Track)) ) )
+
+(dm rename> (Name)
+   (put!> This 'nm Name)
+   (serverSend *Tracks 
+      (<TracksTable>) )
+   T )
