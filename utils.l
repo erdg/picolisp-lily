@@ -121,30 +121,6 @@
             (T (cons (car Lst) (_walk% (cdr Lst)))) ) ) ) )
 ###
 
-### common lisp style macros, oh baby! ;P
-(de cl-macro @Lst
-   (macro
-      (macro
-         ^(list
-            (deflate (macro (walk-cl-macro ^ @Lst))) ) ) ) )
-
-(de walk-cl-macro X
-   (recur (X Acc)
-      (ifn X
-         (flip Acc)
-         (if (pair (car X))
-            (if (atom (cdr @))
-               (recurse (cdr X) (cons (car X) Acc))
-               (recurse (cdr X) (cons (recurse (car X) NIL) Acc)) )
-            (case (car X)
-               ("`"  (recurse (cdr  X) (cons (lit 'quote) Acc)) )
-               (","  (recurse (cddr X) (cons (list 'list (cadr X)) '^ Acc)) )
-               (",@" (recurse (cddr X) (cons (cadr X) '^ Acc)) )
-               (T    (recurse (cdr  X) (cons (car X) Acc))) ) ) ) ) )
-#
-### end 'macro' madness
-
-
 # inspired by Doug Hoyte's 'sharp-backquote' read-macro from "Let Over Lambda"
 (de sbq (@Lst)
    (fill
