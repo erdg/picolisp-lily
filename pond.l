@@ -73,6 +73,12 @@
    (prinl "{")
    (prinl "}") ]
 
+(de with-midi Music
+   (macro
+      (lyScore
+         (lyMidi)
+         ^ Music ) ) )
+
 [de lyHeader (Title Composer)
    (prinl "\\header")
    (prinl "{")
