@@ -91,3 +91,118 @@
 
 (de render-code-gen-13 ()
    (lilypond "code-gen-13" (code-gen-13)) )
+
+
+(de cg14 ()
+   (arp (random-element (with-flats (d/lyd)))
+      (4 . (T "3/2" 8))
+      (4 . (T "5/4" 16))
+      (4 . (T "6/4" 16))
+      (4 . (T "7/4" 16)) ) )
+
+(de render-cg14 () (lilypond "cg14" (cg14)))
+
+
+(de cg15 ()
+   (let Notes '("des" "ees" "f" .)
+      (arp (++ Notes)
+         (4 . (T "3/2" 8))
+         (4 . (T "5/4" 16))
+         (4 . (T "6/4" 16))
+         (4 . (T "7/4" 16)) ) ) )
+
+(de render-cg15 () (lilypond "cg15" (cg15)))
+
+
+(de cg16 ()
+   (let Notes (ring (make-multi-octave-scale (with-flats (des|maj7)) "'" "''"))
+      (arp (++ Notes)
+         (4 . (T "3/2" 8))
+         (4 . (T "5/4" 16))
+         (4 . (T "6/4" 16))
+         (4 . (T "7/4" 16)) ) ) )
+
+(de render-cg16 () (lilypond "cg16" (cg16)))
+
+
+(de cg17 ()
+   (let Notes (ring (make-multi-octave-scale (with-flats (des|maj7)) "'" "''"))
+      (arp (++ Notes)
+         (4 . (T "3/2" 8))
+         (7 . (random-rhythms-from "7/8" '(4 4 8 8 8 16 16 16 "8." "4.")))
+         (4 . (T "5/4" 16))
+         (4 . (T "6/4" 16))
+         (4 . (T "7/4" 16)) ) ) )
+
+(de render-cg17 () (lilypond "cg17" (cg17)))
+
+
+(de cg18 ()
+   (let Notes (ring (map-octave "'" '("f"  "ees" "f" "aes" "bes")))
+      (arp (++ Notes)
+         (lyTime "7/8")
+         (7 . (random-rhythms-from "7/8" '(4 4 8 8 8 16 16 16 "8." "4."))) ) ) )
+
+(de render-cg18 () (lilypond "cg18" (cg18)))
+
+
+(de cg19 ()
+   (macro
+      (lyWrap
+         (lyTime "7/8")
+         ^(let Notes (ring (map-octave "'" '("f"  "ees" "f" "aes" "bes")))
+            (arp-no-wrap (++ Notes)
+               (7 . (random-rhythms-from "7/8" '(4 4 8 8 8 16 16 16 "8." "4."))) ) ) ) ) )
+
+(de render-cg19 () (lilypond "cg19" (cg19)))
+
+
+(de cg20 ()
+   (lyWrap
+      (lyTime "7/8")
+      ~(let Notes (ring (map-octave "'" '("f"  "ees" "f" "aes" "bes")))
+         (arp-no-wrap (++ Notes)
+            (7 . (random-rhythms-from "7/8" '(4 4 8 8 8 16 16 16 "8." "4."))) ) ) ) )
+
+(de render-cg20 () (lilypond "cg20" (cg20)))
+
+
+(de cg21 ()
+   (lyWrap
+      ~(let Notes (map-octave "'" '("f"  "ees" "f" "aes" "bes"))
+         (arp-in "7/8"
+            (random-element-no-repeats Notes)
+            (7 . (random-rhythms-from "7/8" '(4 4 8 8 8 16 16 16 "8." "4."))) ) )  ) )
+
+(de render-cg21 () (lilypond "cg21" (cg21)))
+
+
+(de cg22 ()
+   (with-midi
+      (lyPiano
+         (let Notes (ring (map-octave "'" '("aes" "des'" "c'" "aes'")))
+            (arp-in "13/16" (++ Notes) (4 . (random-rhythms-from "13/16" (2 4 4 8 8 16)))) )
+         (let Notes (ring '("aes" "des" "ees" "aes,"))
+            (arp-in "13/16" (++ Notes) (4 . (random-rhythms-from "13/16" (2 4 4 8 8 16)))) ) ) ) )
+
+(de render-cg22 () (lilypond "cg22" (cg22)))
+
+
+(de cg23 ()
+   (lyPiano
+      (let Notes (ring (map-octave "'" '("aes" "des'" "c'" "aes'")))
+         (arp-in "4/4" (++ Notes)
+            (4 . (random-rhythms-from "4/4" (2 4 4 8 8 16)))
+            (4 . (random-rhythms-from "4/4" (4 8 8 16 16)))
+            (4 . (random-rhythms-from "4/4" (8 8 16 "8." "16.")))
+            (4 . (random-rhythms-from "4/4" (8  16 16)))))
+      (let Notes (ring '("aes" "des" "ees" "aes,"))
+         (arp-in "4/4" (++ Notes)
+            (4 . (random-rhythms-from "4/4" (2 4 4 8 8 16)))
+            (4 . (random-rhythms-from "4/4" (4 8 8 16 16)))
+            (4 . (random-rhythms-from "4/4" (8 8 16 "8." "16.")))
+            (4 . (random-rhythms-from "4/4" (8  16 16))) ) ) ) )
+
+(de render-cg23 () 
+   (_lilypond "cg23" (with-midi (cg23)))
+   (lilypond "cg23" (cg23)) )
