@@ -1,4 +1,4 @@
-(load "utils.l")
+(load (pack (car (file)) "utils.l"))
 
 ###
 #
@@ -641,6 +641,37 @@
             # tuplets
             (link (cons 'lyTuplet (cdr L)))) ) ) )
 
+(de make-melody-no-wrap (Lst)
+   (make
+      (for L Lst
+         (if (atom L)
+            (link L)
+            # tuplets
+            (link (cons 'lyTuplet (cdr L)))) ) ) )
+
+(de arp Lst
+   (let [(@Notes . Rhythms) Lst]
+      (macro
+         (make-melody
+            (pack-rhythms '@Notes
+               (make-rhythms ^ Rhythms) ) ) ) ) )
+
+(de arp-no-wrap Lst
+   (let [(@Notes . Rhythms) Lst]
+      (macro
+         (make-melody-no-wrap
+            (pack-rhythms '@Notes
+               (make-rhythms ^ Rhythms) ) ) ) ) )
+
+(de arp-in Lst
+   (let [(@Meter @Notes . Rhythms) Lst]
+      (macro
+         (list
+            '(lyTime @Meter)
+            ^(macro
+               (arp-no-wrap @Notes
+                  ^ Rhythms ) ) ) ) ) )
+
 ###
 # scales n stuff
 (de chromatic-scale-ascending-sharps ()
@@ -1116,6 +1147,9 @@
       (for O Octaves
          (for N Notes
             (link (pack N O)) ) ) ) )
+
+(de map-octave (Oct Notes)
+   (mapcar '((N) (pack N Oct)) Notes) )
 
 # scale helpers
 (de with-sharps (Scale)
