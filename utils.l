@@ -359,7 +359,7 @@
          ((atrec _ R _ B) ^ Ls) ) ) )
 
 # hack
-(de func? (Fn) (or (lamb? Fn) (if (num? Fn) (n1 Fn))) )
+(de func? (Fn) (or (lamb? Fn) (if (num? Fn) (> Fn 100000))) )
 
 # lambda form?
 (de lamb? (Fn) (pair (fun? Fn)))
@@ -415,12 +415,12 @@
 # @  - result of latest 'and' clause
 (de fand "Fns"
    (fill
-      '((It)
+      '((it)
          (and
             ^(make
                (for "F" "Fns"
                   (if (atom "F")
-                     (link ('`(sbq '(@1 It)) "F"))
+                     (link ('`(sbq '(@1 it)) "F"))
                      (link "F") ) ) ) ) ) ) )
 
 ### end "On Lisp"
@@ -468,5 +468,5 @@
       (next) ) )
 
 
-(load "test-utils.l")
-(test-utils)
+# (load "test-utils.l")
+# (test-utils)
