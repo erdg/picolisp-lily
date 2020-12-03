@@ -18,6 +18,14 @@
    (call *Lily File)
    (call 'evince (pack File ".pdf") ]
 
+# just compile
+(de _lilypond (File . Music)
+   (out (pack File ".ly")  # write file
+      (lyVersion)
+      (lyLayout)
+      (run Music) )
+   (call *Lily File) )
+
 [de lilypondSVG (File . Music)
    # write lilypond code to file
    (out (pack File ".ly")
