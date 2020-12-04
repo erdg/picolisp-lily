@@ -203,6 +203,43 @@
             (4 . (random-rhythms-from "4/4" (8 8 16 "8." "16.")))
             (4 . (random-rhythms-from "4/4" (8  16 16))) ) ) ) )
 
-(de render-cg23 () 
+(de render-cg23 ()
    (_lilypond "cg23" (with-midi (cg23)))
    (lilypond "cg23" (cg23)) )
+
+
+(de cg24 ()
+   (lyPiano
+      (let Oct ""
+         (make
+            (do 4
+               (chain
+                  (let Notes (ring (map-octave Oct '("des" "f" "aes" "c'")))
+                     (arp-in "4/4" (++ Notes)
+                        (random-rhythms-from "4/4" (2 4))
+                        (random-rhythms-from "4/4" (4 8))
+                        (random-rhythms-from "4/4" (8 16))
+                        (random-rhythms-from "4/4" (16 32)) ) ) )
+               (setq Oct (pack Oct "'")) ) ) ) ) )
+
+(de render-cg24 ()
+   (_lilypond "cg24" (with-midi (cg24)))
+   (lilypond "cg24" (cg24)) )
+
+(de cg25 ()
+   (lyPiano
+      (let Oct ""
+         (make
+            (do 4
+               (chain
+                  (let Notes (ring (map-octave Oct '("des" "f" "aes" "c'")))
+                     (arp-in-rrf "4/4" (++ Notes)
+                        (2 4)
+                        (4 8)
+                        (8 16)
+                        (16 32) ) ) )
+               (setq Oct (pack Oct "'")) ) ) ) ) )
+
+(de render-cg25 ()
+   (_lilypond "cg25" (with-midi (cg25)))
+   (lilypond "cg25" (cg25)) )
