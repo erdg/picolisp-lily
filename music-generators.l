@@ -672,6 +672,15 @@
                (arp-no-wrap @Notes
                   ^ Rhythms ) ) ) ) ) )
 
+(de arp-in-rrf Lst
+   (let [(@Meter @Notes . Rhythms) Lst]
+      (macro
+         (arp-in @Meter @Notes
+            ^(make
+               (for @R Rhythms
+                  (link (macro '(random-rhythms-from @Meter '@R))) ) ) ) ) ) )
+
+
 ###
 # scales n stuff
 (de chromatic-scale-ascending-sharps ()
