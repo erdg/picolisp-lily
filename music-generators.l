@@ -649,6 +649,14 @@
             # tuplets
             (link (cons 'lyTuplet (cdr L)))) ) ) )
 
+(de make-melody-no-wrap-quote-tuplets (Lst)
+   (make
+      (for L Lst
+         (if (atom L)
+            (link L)
+            # tuplets
+            (link (cons 'quote (cons 'lyTuplet (cdr L)))) ) ) ) )
+
 (de arp Lst
    (let [(@Notes . Rhythms) Lst]
       (macro
@@ -669,8 +677,9 @@
          (list
             '(lyTime @Meter)
             ^(macro
-               (arp-no-wrap @Notes
-                  ^ Rhythms ) ) ) ) ) )
+               (make-melody-no-wrap-quote-tuplets
+                  (pack-rhythms '@Notes
+                     (make-rhythms ^ Rhythms) ) ) ) ) ) ) )
 
 (de arp-in-rrf Lst
    (let [(@Meter @Notes . Rhythms) Lst]
