@@ -5,6 +5,8 @@
 # version
 (setq *Version "2.19.82")
 
+(load (pack (car (file)) "music-generators.l"))
+
 # lilypond REPL - compiles lilypond files and opens pdf
 # to continue development, return to PL terminal and hit ^C
 #
