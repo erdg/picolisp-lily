@@ -243,3 +243,58 @@
 (de render-cg25 ()
    (_lilypond "cg25" (with-midi (cg25)))
    (lilypond "cg25" (cg25)) )
+
+
+# this has potential - C lydian
+(de cg26 ()
+   (lyPiano
+      (let Notes (circ "<e' fis' b'>" "<d' fis' a'>")
+         (arp-in "13/16" (++ Notes) (8 . (random-rhythms-from "13/16" (2 4 4 8 8 16)))) )
+      (let Notes (circ "c," "g," "e" "g," "d" "a" "d" "g," "e" "g,")
+         (arp-in "13/16" (++ Notes) (8 . (random-rhythms-from "13/16" (2 4 4 8 8 16)))) ) ) )
+
+(de render-cg26 ()
+   (_lilypond "cg26" (with-midi (cg26)))
+   (lilypond "cg26" (cg26)) )
+
+
+
+(de cg27 ()
+   (lyPiano
+      (let Notes (circ "f'" "g'" "bes'" "c''")
+         (arp-in "4/4" (++ Notes)
+            (4 . (4 . 4))  # 4 groups of 4 quarter notes
+            (2 . (8 . 8))  # 8 groups of 8 eighth notes
+            (2 (4 (T "3/2" 8)))
+            ) )
+      (let Notes (circ "<f a bes c'>" "<ees bes c'>")
+         (arp-in "4/4" (++ Notes)
+            (4 . (2 . 2))
+            (2 . 1)
+            (2 (T "3/2" 2))
+            ) )
+      ) )
+
+(de render-cg27 ()
+   (_lilypond "cg27" (with-midi (cg27)))
+   (lilypond "cg27" (cg27)) )
+
+
+# tuplets work here
+(de cg28 ()
+   # (lyWrap
+   (lyPiano
+      (let Notes (circ "f'" "g'" "bes'" "c''")
+         (arp-no-wrap (++ Notes)
+            (4 . (4 . 4))  # 4 groups of 4 quarter notes
+            (2 . (8 . 8))  # 8 groups of 8 eighth notes
+            (8 (T "3/2" 8))
+            ) ) ) )
+
+(de render-cg28 ()
+   # (_lilypond "cg28" (with-midi (cg28)))
+   (lilypond "cg28" (cg28)) )
+
+
+
+
