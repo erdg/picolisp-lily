@@ -263,15 +263,23 @@
    (lyPiano
       (let Notes (circ "f'" "g'" "bes'" "c''")
          (arp-in "4/4" (++ Notes)
-            (4 . (4 . 4))  # 4 groups of 4 quarter notes
+            (2 . (4 . 4))  # 4 groups of 4 quarter notes
             (2 . (8 . 8))  # 8 groups of 8 eighth notes
-            (2 (4 (T "3/2" 8)))
+            (4 (T "3/2" 8))
+            (2 (2 . ((T "7/4" 16)(T "5/4" 16))))  # NOTE - must use 'dot' for 'run'-like behavior
+            (8 (T "7/4" 32))
+            (4 (random-measure-of-durations "4/4"))
+            (2 (random-rhythms "4/4"))
             ) )
       (let Notes (circ "<f a bes c'>" "<ees bes c'>")
          (arp-in "4/4" (++ Notes)
-            (4 . (2 . 2))
+            (2 . (2 . 2))
             (2 . 1)
-            (2 (T "3/2" 2))
+            (T "3/2" 2)
+            (2 (T "5/4" 4))
+            (random-rhythms-from "4/4" (8 16 "8." "16." 4))
+            (4 (random-measure-of-durations "4/4"))
+            (2 (random-rhythms "4/4"))
             ) )
       ) )
 
