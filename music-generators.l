@@ -689,6 +689,12 @@
                (for @R Rhythms
                   (link (macro '(random-rhythms-from @Meter '@R))) ) ) ) ) ) )
 
+(de arp-chain Lst
+   (macro
+      '(make
+         ^(make
+            (for L Lst
+               (link (macro '(chain ^ L))) ) ) ) ) )
 
 ###
 # scales n stuff
