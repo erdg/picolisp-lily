@@ -288,21 +288,77 @@
    (lilypond "cg27" (cg27)) )
 
 
-# tuplets work here
+# prototype arpeggio chain, variations on Notes
 (de cg28 ()
-   # (lyWrap
    (lyPiano
-      (let Notes (circ "f'" "g'" "bes'" "c''")
-         (arp-no-wrap (++ Notes)
-            (4 . (4 . 4))  # 4 groups of 4 quarter notes
-            (2 . (8 . 8))  # 8 groups of 8 eighth notes
-            (8 (T "3/2" 8))
-            ) ) ) )
+      # LH
+      (lyWrap
+         ~(let Notes '("f'" "g'" "bes'" "c''")
+            (make
+               (chain
+                  (let Ns (ring Notes)
+                     (arp-in "4/4" (++ Ns)
+                        (4 . ((T "5/4" 16) (T "3/2" 8))) # need "dot" for 'run' behavior
+                      ) ) )
+               (chain
+                  (let Ns (ring (map-octave "'" Notes))  # octave up
+                     (arp-in "4/4" (++ Ns)
+                        (4 . ((T "5/4" 16) (T "3/2" 8)))
+                     ) ) )
+            ) ) )
+      # RH
+      (lyWrap
+         ~(let Notes '("f" "g" "bes" "c'")
+            (make
+               (chain
+                  (let Ns (ring Notes)
+                     (arp-in "4/4" (++ Ns)
+                        (8 . ((T "5/4" 32) (2 (T "3/2" 32))))
+                      ) ) )
+               (chain
+                  (let Ns (ring (map-octave "'" Notes))  # octave up
+                     (arp-in "4/4" (++ Ns)
+                        (8 . ((T "5/4" 32) (2 (T "3/2" 32))))
+                     ) ) )
+            ) ) )
+   ) )
 
 (de render-cg28 ()
-   # (_lilypond "cg28" (with-midi (cg28)))
+   (_lilypond "cg28" (with-midi (cg28)))
    (lilypond "cg28" (cg28)) )
 
+# always hated the name 'lyWrap'
+(def '\{ lyWrap)
 
+# same as above, introduce 'arp-chain'
+(de cg29 ()
+   (lyPiano
+      # LH
+      (\{
+         ~(let Notes '("f'" "g'" "bes'" "c''")
+            (arp-chain
+               (let Ns (ring Notes)
+                  (arp-in "4/4" (++ Ns)
+                     (4 . ((T "5/4" 16) (T "3/2" 8))) # need "dot" for 'run' behavior
+                   ) ) )
+               (let Ns (ring (map-octave "'" Notes))  # octave up
+                  (arp-in "4/4" (++ Ns)
+                     (4 . ((T "5/4" 16) (T "3/2" 8)))
+                  ) ) ) )
+      # RH
+      (\{
+         ~(let Notes '("f" "g" "bes" "c'")
+            (arp-chain
+               (let Ns (ring Notes)
+                  (arp-in "4/4" (++ Ns)
+                     (8 . ((T "5/4" 32) (2 (T "3/2" 32))))
+                   ) ) )
+               (let Ns (ring (map-octave "'" Notes))
+                  (arp-in "4/4" (++ Ns)
+                     (8 . ((T "5/4" 32) (2 (T "3/2" 32))))
+                  ) ) ) )
+) )
 
-
+(de render-cg29 ()
+   (_lilypond "cg29" (with-midi (cg29)))
+   (lilypond "cg29" (cg29)) )
