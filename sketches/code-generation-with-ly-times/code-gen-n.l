@@ -364,3 +364,135 @@
 (de render-cg29 ()
    (_lilypond "cg29" (with-midi (cg29)))
    (lilypond "cg29" (cg29)) )
+
+
+
+# holy shit, this works! nested read-macros lol!
+#
+# comparing 29 to 30...
+#
+#  if 'arp-chain' is "naked" (see below), nested read-macros are needed. if
+#  'arp-chain' is wrapped in a 'let', use the '~' read-macro on the 'let' form.
+#
+# this is because 'lyWrap' (or '\{') expects "picolisp-lily/pond.l" code.
+# everything needs to be either "music atoms" (e.g. "d4.") or 'ly[Function]'
+# calls at run-time. most of the examples in this file eventually end up as a
+# variation of the following:
+#
+#  (lyWrap "a4" "b4" (lyTuplet "3/2" ...) "more" "notes" (lyTuplet ...))
+
+(de cg30 ()
+   (lyPiano
+      # LH
+      (\{
+         `(arp-chain
+            `(let Notes (with-flats (des|maj7))
+               (arp-in "4/4" (pack (random-element Notes) (random-octave-from-range 1 2))
+                  (4 . ((T "5/4" 16) (T "3/2" 8))) ) ) # need "dot" for 'run' behavior
+            `(let Notes (with-flats (des/lyd))
+               (arp-in "4/4" (pack (random-element Notes) (random-octave-from-range 0 2))
+                  (4 . ((T "5/4" 16) (T "3/2" 8))) ) ) ) )
+      # RH
+      (\{
+         `(arp-chain
+            `(let Notes (with-flats (ees|6))
+               (arp-in "4/4" (pack (random-element Notes) (random-octave-from-range 0 -1))
+                  (8 . ((T "5/4" 32) (2 (T "3/2" 32)))) ) )
+            `(let Notes (with-sharps (d|maj7))
+               (arp-in "4/4" (pack (random-element Notes) (random-octave-from-range 0 -1))
+                  (8 . ((T "5/4" 32) (2 (T "3/2" 32)))) ) ) ) ) ) )
+
+(de render-cg30 ()
+   (_lilypond "cg30" (with-midi (cg30)))
+   (lilypond "cg30" (cg30)) )
+
+
+# introduce 'arps' (better name for 'arp-chain')
+(de cg31 ()
+   (lyPiano
+      # LH
+      (\{
+         `(arps
+            `(let Notes (with-flats (des|maj7))
+               (arp-in "4/4" (pack (random-element-no-repeats Notes) (random-octave-from-range 1 2))
+                  (4 . ((T "5/4" 16) (T "3/2" 8))) ) ) # need "dot" for 'run' behavior
+            `(let Notes (with-flats (des/lyd))
+               (arp-in "4/4" (pack (random-element-no-repeats Notes) (random-octave-from-range 0 2))
+                  (4 . ((T "5/4" 16) (T "3/2" 8))) ) ) ) )
+      # RH
+      (\{
+         `(arps
+            `(let Notes (with-flats (ees|6))
+               (arp-in "4/4" (pack (random-element-no-repeats Notes) (random-octave-from-range 0 -1))
+                  (8 . ((T "5/4" 32) (2 (T "3/2" 32)))) ) )
+            `(let Notes (with-sharps (d|maj7))
+               (arp-in "4/4" (pack (random-element-no-repeats Notes) (random-octave-from-range 0 -1))
+                  (8 . ((T "5/4" 32) (2 (T "3/2" 32)))) ) ) ) ) ) )
+
+(de render-cg31 ()
+   (_lilypond "cg31" (with-midi (cg31)))
+   (lilypond "cg31" (cg31)) )
+
+# test that pattern works outside of 'lyPiano'
+(de cg32 ()
+   (\{
+      `(arps
+         `(let Notes (with-flats (des|maj7))
+            (arp-in "4/4" (pack (random-element Notes) (random-octave-from-range 1 2))
+               (4 . ((T "5/4" 16) (T "3/2" 8))) ) ) # need "dot" for 'run' behavior
+         `(let Notes (with-flats (des/lyd))
+            (arp-in "4/4" (pack (random-element Notes) (random-octave-from-range 0 2))
+               (4 . ((T "5/4" 16) (T "3/2" 8))) ) ) ) )
+)
+
+(de render-cg32 ()
+   (_lilypond "cg32" (with-midi (cg32)))
+   (lilypond "cg32" (cg32)) )
+
+# this works and is roughly the syntax i want, but way too many-readmacros...
+(de cg33 ()
+   `(piano
+      # LH
+      `(arps
+         `(let Notes (with-flats (des|maj7))
+            (arp-in "4/4" (pack (random-element-no-repeats Notes) (random-octave-from-range 1 2))
+               (4 . ((T "5/4" 16) (T "3/2" 8))) ) )
+         `(let Notes (with-flats (des/lyd))
+            (arp-no-wrap (pack (random-element-no-repeats Notes) (random-octave-from-range 0 2))
+               (4 . ((T "5/4" 16) (T "3/2" 8))) ) ) )
+      # RH
+      `(arps
+         `(let Notes (with-flats (ees|6))
+            (arp-in "4/4" (pack (random-element-no-repeats Notes) (random-octave-from-range 0 -1))
+               (2 . ((T "5/4" 8) (2 (T "3/2" 4)))) ) )
+         `(let Notes (with-flats (aes|maj7))
+            (arp-in "4/4" (pack (random-element-no-repeats Notes) (random-octave-from-range 0 -1))
+               (2 . ((T "5/4" 8) (2 (T "3/2" 4)))) ) ) ) ) )
+
+(de render-cg33 ()
+   (_lilypond "cg33" (with-midi (cg33)))
+   (lilypond "cg33" (cg33)) )
+
+# better... but i'm not committed yet.
+(de cg34 ()
+   (piano%
+      # LH
+      (arps%
+         (let Notes (with-flats (des|maj7))
+            (arp-in "4/4" (pack (random-element-no-repeats Notes) (random-octave-from-range 1 2))
+               (4 . ((T "5/4" 16) (T "3/2" 8))) ) )
+         (let Notes (with-flats (des/lyd))
+            (arp-no-wrap (pack (random-element-no-repeats Notes) (random-octave-from-range 0 2))
+               (4 . ((T "5/4" 16) (T "3/2" 8))) ) ) )
+      # RH
+      (arps%
+         (let Notes (with-flats (ees|6))
+            (arp-in "4/4" (pack (random-element-no-repeats Notes) (random-octave-from-range 0 -1))
+               (2 . ((T "5/4" 8) (2 (T "3/2" 4)))) ) )
+         (let Notes (with-flats (aes|maj7))
+            (arp-in "4/4" (pack (random-element-no-repeats Notes) (random-octave-from-range 0 -1))
+               (2 . ((T "5/4" 8) (2 (T "3/2" 4)))) ) ) ) ) )
+
+(de render-cg34 ()
+   (_lilypond "cg34" (with-midi (cg34)))
+   (lilypond "cg34" (cg34)) )
