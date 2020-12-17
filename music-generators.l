@@ -696,6 +696,30 @@
             (for L Lst
                (link (macro '(chain ^ L))) ) ) ) ) )
 
+# better name, don't want to break older examples
+(def 'arps 'arp-chain)
+
+(de arps% Lst
+   (macro
+      '(make
+         ^(make
+            (for L Lst
+               (link (macro '(chain ^ (eval L)))) ) ) ) ) )
+
+(de piano Lst
+   (let [(@LH @RH) Lst]
+      (macro
+         '(lyPiano
+            (lyWrap @LH)
+            (lyWrap @RH) ) ) ) )
+
+(de piano% (@LH @RH)
+   (macro
+      (lyPiano
+         (lyWrap @LH)
+         (lyWrap @RH) ) ) )
+
+
 ###
 # scales n stuff
 (de chromatic-scale-ascending-sharps ()
