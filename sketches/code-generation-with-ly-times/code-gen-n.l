@@ -1,5 +1,7 @@
 (load "../../pond.l")
 
+(once (make-all-patterns))
+
 ###
 
 (de code-gen-8 ()
