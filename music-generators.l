@@ -318,6 +318,28 @@
                (link
                   M ) ) ) ) ) )
 
+# abbrev of examples above
+(de times-rr Lst
+   (let [(@Meter @Notes) Lst]
+      (let [(@A @B) (mapcar any (mapcar pack (split (chop @Meter) "/")))]
+         (macro
+            (make-ly-times-alt @B @A
+               (map-notes @Notes (random-rhythms @Meter)) ) ) ) ) )
+
+# using random-rhythms-from
+(de times-rrf Lst
+   (let [(@Meter @Notes @From) Lst]
+      (let [(@A @B) (mapcar any (mapcar pack (split (chop @Meter) "/")))]
+         (macro
+            (make-ly-times-alt @B @A
+               (map-notes @Notes (random-rhythms-from @Meter @From)) ) ) ) ) )
+
+(de random-times-rr Lst
+   (let [(@Notes) Lst]
+      (let @Time (pack (rand 1 33) "/" (random-element (2 4 8 16)))
+         (macro
+            (times-rr @Time @Notes) ) ) ) )
+
 (de make-ly-times-random-rhythms (@X @Y @R @Fn @Notes)
    (let @Rhythms (random-rhythms (pack @Y "/" @R) @R)
       (macro
