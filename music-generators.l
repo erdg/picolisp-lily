@@ -76,8 +76,7 @@
    (default Time "4/4")
    (let [Lst  (mapcar '((L) (any (pack L))) (split (chop Time) "/"))  # e.g. "17/16" -> (17 16)
          Full (* (car Lst) (duration-as-128th-notes (cadr Lst)))      # length of measure as 128th notes
-         Curr 0
-         ]  # current count of 128th notes as measure is built
+         Curr 0 ] # current count of 128th notes as measure is built
       (make
          (loop
             (T (= Curr Full))
