@@ -496,3 +496,27 @@
 (de render-cg34 ()
    (_lilypond "cg34" (with-midi (cg34)))
    (lilypond "cg34" (cg34)) )
+
+
+(de cg35 ()
+   (\{
+      (make-ly-times-alt 4 11 (map-notes (with-flats (des|maj9)) (random-rhythms-from "11/4" (4 8 16 16))))
+      (make-ly-times-alt 8 19 (map-notes (with-flats (des|maj9)) (random-rhythms-from "19/8" (2 4 8 8 16))))
+      (times-rr "5/4" (with-flats (des/lyd)))
+      (times-rr "9/16" (with-flats (bes/lyd)))
+      (times-rrf "27/16" (with-sharps (e/lyd)) (2 4 16))
+      (times-rrf "7/4" (with-sharps (fis/lyd)) (4 8 "8." 16))
+      (random-times-rr (map-octave "'" (with-flats (aes/lyd))))
+      (random-times-rr (map-octave "''" (with-flats (aes/lyd))))
+      # (times-rr "7/4" (with-flats (d/lyd)))
+      # (make-ly-times-random-rhythms 5 11 8 ++ (ring (with-flats (des|maj9))))
+      # (make-ly-times-random-rhythms 3 7 8 ++ (ring (with-flats (des|maj9))))
+      # (make-ly-times-random-rhythms% 5 16 2 8 ++ (ring (with-flats (des|maj9))))
+      # (random-ly-times 1 random-element (with-sharps (d|maj9)))
+      # (random-ly-times 1 random-element (with-sharps (e|maj9)))
+      # (random-ly-times 1 random-element (with-sharps (f|maj9)))
+      ) )
+
+(de render-cg35 ()
+   (_lilypond "cg35" (with-midi (cg35)))
+   (lilypond "cg35" (cg35)) )
