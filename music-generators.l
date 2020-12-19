@@ -248,10 +248,10 @@
             (or (= Pitch (car P)) (= Pitch (cdr P))) )
          I ) ) )
 
-# NOTE - the following two functions should probably be implemented as
-# a class. That way it could be instantiated with a new starting note
-# each time it is called, the 'Last' note wouldn't carry over from the
-# previous set of calls, etc.
+# NOTE - the following two functions should probably be implemented as a class
+# or maybe a generator(?). That way it could be instantiated with a new
+# starting note each time it is called, the 'Last' note wouldn't carry over
+# from the previous set of calls, etc.
 
 # this kinda works, but the results are rather uninspiring.
 (de random-pitch-within-n-semitones (N Start)
