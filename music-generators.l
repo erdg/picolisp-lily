@@ -92,6 +92,9 @@
                # increment count of current measure
                (inc 'Curr (cdr Dur)) ) ) ) ) )
 
+# better name
+(def 'totally-random-measure random-measure-of-durations)
+
 (de duration-as-128th-notes (D)
    (let [C    (chop D)
          Ds (1 2 4 8 16 32 64 128)
