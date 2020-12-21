@@ -1,4 +1,4 @@
-(load "../pond.l")
+(load "../../pond.l")
 
 (de the-girl-from-ipanema ()
    (lyHeader "The Girl from Ipanema" "Jobim")
