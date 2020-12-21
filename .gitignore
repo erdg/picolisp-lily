@@ -2,4 +2,5 @@
 *.ly
 *.midi
 *.wav
-/test/
+
+db/
