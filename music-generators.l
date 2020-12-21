@@ -1,4 +1,15 @@
-(load (pack (car (file)) "utils.l"))
+# utils
+(de nthcar (N Lst)
+   (car (nth Lst N)) )
+
+(de ring @
+   # create a circular list from (evaluated) args
+   (apply circ
+      (make
+         (for "L" (rest)
+            (if (atom "L")
+               (link "L")
+               (chain "L") ) ) ) ) )
 
 ###
 #
@@ -326,6 +337,28 @@
             (make-ly-times-alt @B @A
                (map-notes @Notes (random-rhythms @Meter)) ) ) ) ) )
 
+(de times-rr-in Lst
+   (let [(@Meter @Notes) Lst]
+      (let [(@A @B) (mapcar any (mapcar pack (split (chop @Meter) "/")))]
+         (let @X (rand 1 33)
+            (macro
+               (lyTime @Meter)
+               (make-ly-times-alt @A @X
+                  (map-notes @Notes (random-rhythms (pack @X "/" @B)) ) ) ) ) ) ) )
+
+# these things are impossible to name
+(de random-times-rr Lst
+   (let [(@Notes) Lst]
+      (let @Time (pack (rand 1 33) "/" (random-element (2 4 8 16)))
+         (macro
+            (times-rr @Time @Notes) ) ) ) )
+
+(de random-times-rr-in Lst
+   (let [(@Notes) Lst]
+      (let @Time (pack (rand 1 33) "/" (random-element (2 4 8 16)))
+         (macro
+            (times-rr-in @Time @Notes) ) ) ) )
+
 # using random-rhythms-from
 (de times-rrf Lst
    (let [(@Meter @Notes @From) Lst]
@@ -334,11 +367,15 @@
             (make-ly-times-alt @B @A
                (map-notes @Notes (random-rhythms-from @Meter @From)) ) ) ) ) )
 
-(de random-times-rr Lst
-   (let [(@Notes) Lst]
-      (let @Time (pack (rand 1 33) "/" (random-element (2 4 8 16)))
-         (macro
-            (times-rr @Time @Notes) ) ) ) )
+(de times-rrf-in Lst
+   (let [(@Meter @Notes @From) Lst]
+      (let [(@A @B) (mapcar any (mapcar pack (split (chop @Meter) "/")))]
+         (let @X (rand 1 33)
+            (macro
+               (lyTime @Meter)
+               (make-ly-times-alt @A @X
+                  (map-notes @Notes
+                     (macro (random-rhythms-from ^(list (pack @X "/" @B)) @From)) ) ) ) ) ) ) )
 
 (de make-ly-times-random-rhythms (@X @Y @R @Fn @Notes)
    (let @Rhythms (random-rhythms (pack @Y "/" @R) @R)
@@ -758,122 +795,6 @@
 (de chromatic-scale-descending-flats ()
    (rot (reverse (chromatic-scale-ascending-flats)) ) )
 
-# first attempt
-#
-# (de c-major-scale ()
-#    (make
-#       (for N '(1 3 5 6 8 10 12)
-#          (link
-#             (nthcar N (chromatic-scale-ascending-sharps)) ) ) ) )
-#
-# many scales to generate, write a function
-#
-# first draft
-# (de make-major-scale (Base)
-#    (make
-#       (for N '(1 3 5 6 8 10 12)
-#          (link
-#             (nthcar N Base) ) ) ) )
-#
-# now can write
-#
-# (de c-major-scale () (make-major-scale 1 (chromatic-scale-ascending-sharps)))
-#
-# that's better, how about the next few scales?
-#
-# (de des-major-scale ()
-#    (make-major-scale
-#       (nth
-#          (ring-from-list (chromatic-scale-ascending-flats))  NOTE - flats
-#          2 ) ) )
-#
-# (de d-major-scale ()
-#    (make-major-scale
-#       (nth
-#          (ring-from-list (chromatic-scale-ascending-sharps)) NOTE - sharps
-#          3 ) ) )
-#
-# (de ees-major-scale ()
-#    (make-major-scale
-#       (nth
-#          (ring-from-list (chromatic-scale-ascending-flats))  NOTE - flats
-#          4 ) ) )
-#
-# another pattern, another function
-
-# final draft
-(de make-major-scale (Offset Base)
-   (make
-      (for N '(1 3 5 6 8 10 12)
-         (link
-            (nthcar N (nth (ring-from-list Base) Offset)) ) ) ) )
-
-# (de des-major-scale ()
-#    (make-major-scale 2 (chromatic-scale-ascending-flats)) )  NOTE - flats
-#
-# (de ees-major-scale ()
-#    (make-major-scale 4 (chromatic-scale-ascending-flats)) )  NOTE - sharps
-#
-# (de e-major-scale ()
-#    (make-major-scale 5 (chromatic-scale-ascending-sharps)) ) NOTE - flats
-#
-# ...
-#
-# another pattern, another function
-#
-# first draft
-# (de make-all-major-scales ()
-#    (for @N 12
-#       (let
-#          @Base
-#          (case (% @N 2)
-#             (0 'chromatic-scale-ascending-flats)
-#             (T 'chromatic-scale-ascending-sharps) )
-#          (macro
-#             (de ^(list (any (pack (nthcar @N (@Base)) "-major-scale"))) NIL
-#                (make-major-scale @N (@Base)) ) ) ) ) )
-#
-# this is technically correct but some scales have "incorrect" note names - like
-# b-flat-major as a-sharp-major, e.g. ("ais" "c" "d" "dis" "f" "g" "a"). no one
-# can write/read music like that.
-#
-# solution is to swap the base scales halfway (i.e. at f-sharp, halfway around the circle of 5ths)
-
-# final draft
-(de make-all-major-scales ()
-   (for @N 12
-      (let
-         @Base
-         (case (% @N 2)
-            # swap scales
-            (0 (if (< @N 7) 'chromatic-scale-ascending-flats 'chromatic-scale-ascending-sharps))
-            (T (if (< @N 7) 'chromatic-scale-ascending-sharps 'chromatic-scale-ascending-flats)) )
-         (macro
-            (de ^(list (any (pack (nthcar @N (@Base)) "-major-scale"))) NIL
-               (make-major-scale @N (@Base)) ) ) ) ) )
-
-# expanding on this idea...
-
-# make-all-scales-of-type
-#
-# technically correct again, but weird strange scale names/notes, e.g.
-#
-#   (des-dorian-scale) -> ("des" "ees" "e" "ges" "aes" "bes" "b")
-#
-# which should be 'cis-dorian-scale', with sharps instead of flats.
-# probably will need to rewrite based on circle of fifths...
-(de make-all-scales-of-type (Name @Pattern)
-   (for @N 12
-      (let
-         @Base
-         (case (% @N 2)
-            # swap scales
-            (0 (if (< @N 7) 'chromatic-scale-ascending-flats 'chromatic-scale-ascending-sharps))
-            (T (if (< @N 7) 'chromatic-scale-ascending-sharps 'chromatic-scale-ascending-flats)) )
-         (macro
-            (de ^(list (any (pack (nthcar @N (@Base)) "-" Name "-scale"))) NIL
-               (make-scale-from-pattern-list @Pattern @N (@Base)) ) ) ) ) )
-
 # here we go!
 (de circle-of-fifths ()
    (circ
@@ -890,31 +811,9 @@
       (cons "ais" "bes")   # 11
       "f" ) )              # 12
 
-(de list-of-fifths ()
-   (list
-      "c"                  # 1
-      "g"                  # 2
-      "d"                  # 3
-      "a"                  # 4
-      "e"                  # 5
-      (cons "b"   "ces")   # 6
-      (cons "fis" "ges")   # 7
-      (cons "cis" "des")   # 8
-      (cons "gis" "aes")   # 9
-      (cons "dis" "ees")   # 10
-      (cons "ais" "bes")   # 11
-      "f" ) )              # 12
-
-
 ### circle of fifths patterns
 # major scale -> (1 3 5 12 2 4 6)
 # dorian scale -> (1 3 10 12  2 4 11)
-
-(de make-scale-from-pattern-list (Pattern Offset Base)
-   (make
-      (for N Pattern
-         (link
-            (nthcar N (nth (ring-from-list Base) Offset)) ) ) ) )
 
 (de make-scale-from-pattern-ring (Pattern Offset Base)
    (make
@@ -938,22 +837,6 @@
             (macro
                (de ^(list (any (pack (cdr @Note) Name))) NIL
                   (make-scale-from-pattern-ring @Pattern @N (@Base)) ) ) ) ) ) )
-
-# (de circle-of-fifths ()
-#    (circ
-#       "c"                  # 1
-#       "g"                  # 2
-#       "d"                  # 3
-#       "a"                  # 4
-#       "e"                  # 5
-#       (cons "b"   "ces")   # 6
-#       (cons "fis" "ges")   # 7
-#       (cons "cis" "des")   # 8
-#       (cons "gis" "aes")   # 9
-#       (cons "dis" "ees")   # 10
-#       (cons "ais" "bes")   # 11
-#       "f" ) )              # 12
-
 
 # NOTE - take care to use the 'with-[sharps|flats]' helper functions with these patterns, e.g.
 #
