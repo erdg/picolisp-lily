@@ -1,6 +1,6 @@
 (load 
    "../pond.l" 
-   "../entities.l"
+   "entities.l"
    "lib/picolisp-json/json.l" 
    "lib/picolisp-minimal-http/http.l"
 )
