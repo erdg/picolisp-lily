@@ -1,11 +1,10 @@
 # /path/to/lilypond
 (setq *Lily "/home/erik/bin/lilypond")
-# /path/to/picolisp-lily
-(setq *PicoLispLily "/home/erik/code/pl/picolisp-lily")
 # version
 (setq *Version "2.19.82")
 
 (once (load (pack (car (file)) "music-generators.l")))
+(once (make-all-patterns))
 
 # lilypond REPL - compiles lilypond files and opens pdf
 # to continue development, return to PL terminal and hit ^C
@@ -37,12 +36,6 @@
    # create SVGs
    (call *Lily "-dcrop" "-dbackend=svg" File)
 ]
-
-# edit fn's from anywhere
-[de lyVi (Fn)
-   (chdir *PicoLispLily
-      (vi Fn)
-      (ld) ]
 
 [de lyVersion () (prinl "\\version \"" *Version "\"")]
 
