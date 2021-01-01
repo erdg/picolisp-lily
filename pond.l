@@ -6,6 +6,16 @@
 (once (load (pack (car (file)) "music-generators.l")))
 (once (make-all-patterns))
 
+# start lilypond server on port 12321
+(de lyServer ()
+   (call 'sh "-c" "lilypond lilypond-stuff/server.ly &") )
+
+(de lyc (File . Music)
+    (out (pack File ".ly")  # write file
+      (lyVersion)
+      (lyLayout)
+      (run Music) )
+    (call 'sh "-c" (pack "./lilypond-stuff/lyc " File ".ly")) )
 # lilypond REPL - compiles lilypond files and opens pdf
 # to continue development, return to PL terminal and hit ^C
 #
