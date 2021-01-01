@@ -9,7 +9,7 @@
    (transform
       (lyread File) ) )
 
-(def 'LYREADSTRING "_-=!?<>$*',:/")
+(def 'LYREADSTRING "_-=!?<>$*',:/|")
 # read a macro file ("File.m.l" by convention)
 (de lyread (File)
    (in File
@@ -26,17 +26,21 @@
       (any @) ) )
 
 
-# NOTE - time signatures must still be transient symbols (e.g. "4/4", not 4/4)
-# BUG - misses "basic" notes (e.g. a8 b16 cis8)
+# BUG - time signatures must still be transient symbols (e.g. "4/4", not 4/4)
 (de lySym? (Sym)
-   (let C (cdr (chop Sym))
+   (let [(Car Cdr) (chop Sym)]
       (and
          (or
-            (member "'" C)    # notes
-            (member "," C)
-            (member "." C)
-            (member ":" C)    # chords
-            (member "/" C) )  # time signatures
+            # basics
+            (member Sym '(aes a ais bes b bis ces c cis des d dis ees e eis fes f fis ges g gis))
+            (and
+               (member Car '(a b c d e f))
+               (num? (any (last Cdr))) )
+            (member "'" Cdr)    # notes
+            (member "," Cdr)
+            (member "." Cdr)
+            (member ":" Cdr)    # chords
+            (member "/" Cdr) )  # time signatures
          T ) ) )
 
 (de _transform (X)
