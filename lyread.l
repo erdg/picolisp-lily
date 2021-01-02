@@ -6,24 +6,45 @@
 #  -> (lyWrap "a'4" "b'4" "c''2")
 
 (de lyload (File)
-   (transform
+   (lytransform
       (lyread File) ) )
 
 (def 'LYREADSTRING "_-=!?<>$*',:/\|.~")
-# read a macro file ("File.m.l" by convention)
+
 (de lyread (File)
    (in File
       (make
          (while (read LYREADSTRING)
             (link @) ) ) ) )
 
-(de transform (Lst)
+(de lytransform (Lst)
    (and
-      (_transform Lst)
+      (_lytransform Lst)
       (mapcar pack @)
       (mapcar '((S) (if (lySym? S) (sym S) S)) @)
       (glue " " @)
       (any @) ) )
+
+(de _lytransform (X)
+   (recur (X Acc)
+      (ifn X
+         (flip Acc)
+         (case (car X)
+            ("{" (recurse (cdr X) (cons 'lyWrap (char 40) Acc)))  # { ... } = (lyWrap ...)
+            ("}" (recurse (cdr X) (cons (char 41) Acc)))
+            (T
+               (cond
+                  # time signatures
+                  ((and (num? (car X)) (pre? "/" (cadr X)))
+                     (recurse (cddr X) (cons (pack (car X) (cadr X)) Acc)) )
+                  # \\functions (because lilypond uses e.g \relative)
+                  ((pre? "\\" (car X))
+                     (recurse (cdr X) (cons (sym (car X)) Acc)) )
+                  # don't mess with transient symbols
+                  ((pair (car X))
+                     (recurse (cdr X) (cons (sym (pack (car X))) Acc)) )
+                  (T
+                     (recurse (cdr X) (cons (car X) Acc)) ) ) ) ) ) ) )
 
 (de lySym? (Sym)
    (let [(Car . Cdr) (chop Sym)]
@@ -41,45 +62,13 @@
             (member "/" Cdr) )  # time signatures
          T ) ) )
 
-# (de _transform (X)
-#    (recur (X Acc)
-#       (ifn X
-#          (flip Acc)
-#          (case (car X)
-#             ("{" (recurse (cdr X) (cons 'lyWrap (char 40) Acc)))  # { ... } = (lyWrap ...)
-#             ("}" (recurse (cdr X) (cons (char 41) Acc)))
-#             (T
-#                # time signatures
-#                (if (and (num? (car X)) (pre? "/" (cadr X)))
-#                   (recurse (cddr X) (cons (pack (car X) (cadr X)) Acc))
-#                   (recurse (cdr X) (cons (car X) Acc)) ) ) ) ) ) )
-
-# BUG - normal transient symbols are not passed through
-(de _transform (X)
-   (recur (X Acc)
-      (ifn X
-         (flip Acc)
-         (case (car X)
-            ("{" (recurse (cdr X) (cons 'lyWrap (char 40) Acc)))  # { ... } = (lyWrap ...)
-            ("}" (recurse (cdr X) (cons (char 41) Acc)))
-            (T
-               (cond
-                  # time signatures
-                  ((and (num? (car X)) (pre? "/" (cadr X)))
-                     (recurse (cddr X) (cons (pack (car X) (cadr X)) Acc)) )
-                  # \\functions (because lilypond uses e.g \relative)
-                  ((pre? "\\" (car X))
-                     (recurse (cdr X) (cons (sym (car X)) Acc)) )
-                  (T
-                     (recurse (cdr X) (cons (car X) Acc)) ) ) ) ) ) ) )
-
 (de ly1 ()
    (prinl "ly1 -- the lilypond repl")
    (prin  ": ")
    (let M (till '^)  # '^' to end
       (prog
          (out (tmp "lyrepl") (prin M))
-         (transform (lyread (tmp "lyrepl"))) ) ) )
+         (lytransform (lyread (tmp "lyrepl"))) ) ) )
 
 (de ly1* ()
    (prinl "ly1* -- the lilypond repl (with pdf output)")
@@ -87,6 +76,6 @@
    (let M (till '^)  # '^' to end
       (and
          (out (tmp "lyrepl") (prin M))
-         (out (tmp "repl.ly") (eval (transform (lyread (tmp "lyrepl")))))
+         (out (tmp "repl.ly") (eval (lytransform (lyread (tmp "lyrepl")))))
          (call 'lilypond (pack "--output=" (tmp)) (tmp "repl.ly"))
          (call 'evince (tmp "repl.pdf")) ) ) )
