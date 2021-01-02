@@ -25,8 +25,6 @@
       (glue " " @)
       (any @) ) )
 
-
-# BUG - time signatures must still be transient symbols (e.g. "4/4", not 4/4)
 (de lySym? (Sym)
    (let [(Car . Cdr) (chop Sym)]
       (and
@@ -43,6 +41,20 @@
             (member "/" Cdr) )  # time signatures
          T ) ) )
 
+# (de _transform (X)
+#    (recur (X Acc)
+#       (ifn X
+#          (flip Acc)
+#          (case (car X)
+#             ("{" (recurse (cdr X) (cons 'lyWrap (char 40) Acc)))  # { ... } = (lyWrap ...)
+#             ("}" (recurse (cdr X) (cons (char 41) Acc)))
+#             (T
+#                # time signatures
+#                (if (and (num? (car X)) (pre? "/" (cadr X)))
+#                   (recurse (cddr X) (cons (pack (car X) (cadr X)) Acc))
+#                   (recurse (cdr X) (cons (car X) Acc)) ) ) ) ) ) )
+
+# BUG - normal transient symbols are not passed through
 (de _transform (X)
    (recur (X Acc)
       (ifn X
@@ -50,7 +62,16 @@
          (case (car X)
             ("{" (recurse (cdr X) (cons 'lyWrap (char 40) Acc)))  # { ... } = (lyWrap ...)
             ("}" (recurse (cdr X) (cons (char 41) Acc)))
-            (T   (recurse (cdr X) (cons (car X) Acc))) ) ) ) )
+            (T
+               (cond
+                  # time signatures
+                  ((and (num? (car X)) (pre? "/" (cadr X)))
+                     (recurse (cddr X) (cons (pack (car X) (cadr X)) Acc)) )
+                  # \\functions (because lilypond uses e.g \relative)
+                  ((pre? "\\" (car X))
+                     (recurse (cdr X) (cons (sym (car X)) Acc)) )
+                  (T
+                     (recurse (cdr X) (cons (car X) Acc)) ) ) ) ) ) ) )
 
 (de ly1 ()
    (prinl "ly1 -- the lilypond repl")
