@@ -9,7 +9,7 @@
    (transform
       (lyread File) ) )
 
-(def 'LYREADSTRING "_-=!?<>$*',:/|.~")
+(def 'LYREADSTRING "_-=!?<>$*',:/\|.~")
 # read a macro file ("File.m.l" by convention)
 (de lyread (File)
    (in File
