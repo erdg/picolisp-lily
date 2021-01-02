@@ -3,10 +3,11 @@
 # version
 (setq *Version "2.19.82")
 
+(once (load (pack (car (file)) "lyread.l")))
 (once (load (pack (car (file)) "music-generators.l")))
 (once (make-all-patterns))
 
-# start lilypond server on port 12321
+# starts lilypond server on port 12321
 (de lyServer ()
    (call 'sh "-c" "lilypond lilypond-stuff/server.ly &") )
 
@@ -429,14 +430,13 @@
 # are added to the progression.
 #
 # (lyChanges 32 "4/4" "bass"
-#    (quote
-#       (16 . "e1:min11")
-#       (8 . "f1:min11")
-#       (8 . "e1:min11") ) )
+#    (16 . "e1:min11")
+#    (8 . "f1:min11")
+#    (8 . "e1:min11") )
 #
 # -> the changes to 'So What' by Miles Davis (bass clef)
 #
-[de lyChanges (N Time Clef "Music")  # number of bars, time signature, clef, music exprs
+[de lyChanges (N Time Clef . "Music")  # number of bars, time signature, clef, music exprs
    (ly<<
       (prinl "\\chords")
       (prinl "{ ")
@@ -493,9 +493,9 @@
 # clef (string), followed by list of chords/rests
 #
 # (lyHits "4/4" "treble"
-#    (list "a4.:min6" "b8:7" "r8" "e8:7" "r8" "c8:maj7") )
+#    "a4.:min6" "b8:7" "r8" "e8:7" "r8" "c8:maj7" )
 #
-[de lyHits (Time Clef "Music")
+[de lyHits (Time Clef . "Music")
    (ly<<
       (prinl "\\chords")
       (prinl "{ ")
