@@ -9,7 +9,7 @@
    (transform
       (lyread File) ) )
 
-(def 'LYREADSTRING "_-=!?<>$*',:/|")
+(def 'LYREADSTRING "_-=!?<>$*',:/|.~")
 # read a macro file ("File.m.l" by convention)
 (de lyread (File)
    (in File
@@ -28,7 +28,7 @@
 
 # BUG - time signatures must still be transient symbols (e.g. "4/4", not 4/4)
 (de lySym? (Sym)
-   (let [(Car Cdr) (chop Sym)]
+   (let [(Car . Cdr) (chop Sym)]
       (and
          (or
             # basics
