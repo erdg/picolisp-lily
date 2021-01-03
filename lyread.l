@@ -81,3 +81,50 @@
          (out (tmp "repl.ly") (eval (lytransform (lyread (tmp "lyrepl")))))
          (call 'lilypond (pack "--output=" (tmp)) (tmp "repl.ly"))
          (call 'evince (tmp "repl.pdf")) ) ) )
+
+*Dbg
+# testing
+(out (tmp "lyrepl") (prin "{ a'4 b'4 c''2 }"))
+(test '(lyWrap "a'4" "b'4" "c''2") (lytransform (lyread (tmp "lyrepl"))))
+
+(de lytest (Str Result)
+   (prog
+      (out (tmp "lyrepl") (prin Str))
+      (test Result (lytransform (lyread (tmp "lyrepl")))) ) )
+
+(lytest "{ aes'2 bes'2 c''1 }"
+   '(lyWrap "aes'2" "bes'2" "c''1") )
+
+(lytest "{ (lyClef \"bass\") a2 b2 c1 }"
+   '(lyWrap (lyClef "bass") "a2" "b2" "c1") )
+
+(lytest "{ (lyClef 'bass) a2 b2 c1 }"
+   '(lyWrap (lyClef 'bass) "a2" "b2" "c1") )
+
+# # hmm, this test fails even though it works with 'ly1' / 'ly1*'.
+# # strange things happen when printing, piping and reading backslashes.
+# (lytest "{ (\\clef 'bass) a2 b2 c1 }"
+#    '(lyWrap (\\clef 'bass) "a2" "b2" "c1") )
+
+# # works in repl, but test fails
+# # recommended to use 'ly<>' for chords (see below)
+# (lytest "{ <c e g>2 <d f a>2 }"
+#    '(lyWrap "<c e g>2" "<d f a>2") )
+
+# test that read-macros and quoted lists still work as normal
+(lytest "{ ~(make (do 4 (link '(ly<> 4 c' e' g')))) }"
+   '(lyWrap
+      (ly<> 4 "c'" "e'" "g'")
+      (ly<> 4 "c'" "e'" "g'")
+      (ly<> 4 "c'" "e'" "g'")
+      (ly<> 4 "c'" "e'" "g'") ) )
+
+(lytest "{ aes1:maj9 }"
+   '(lyWrap "aes1:maj9") )
+
+(lytest "{ bes'1~ bes'1 }"
+   '(lyWrap "bes'1~" "bes'1") )
+
+# test read-macros and ties together
+(lytest "{ ~(need 4 bes'1~) bes'1 }"
+   '(lyWrap "bes'1~" "bes'1~" "bes'1~" "bes'1~" "bes'1") )
