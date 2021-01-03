@@ -21,6 +21,7 @@
    (and
       (_lytransform Lst)
       (mapcar pack @)
+      (compileSlurs @)
       (mapcar '((S) (if (lySym? S) (sym S) S)) @)
       (glue " " @)
       (any @) ) )
@@ -64,6 +65,23 @@
             (member "\\" Cdr)    # dynamics
             (and (= Car "<") (member ">" Cdr)) )   # chords
          T ) ) )
+
+(de compileSlurs (X)
+   (use Slur
+      (recur (X Acc)
+         (ifn X
+            (flip Acc)
+            (cond
+               ((and (not Slur) (lySym? (car X)) (= (cadr X) (char 40)) (lySym? (caddr X)))
+                  (prog
+                     (on Slur)
+                     (recurse (cddr X) (cons (pack (car X) (cadr X)) Acc)) ) )
+               ((and Slur (lySym? (car X)) (= (cadr X) (char 41)))
+                  (prog
+                     (off Slur)
+                     (recurse (cddr X) (cons (pack (car X) (cadr X)) Acc)) ) )
+               (T (recurse (cdr X) (cons (car X) Acc))) ) ) ) ) )
+
 
 (de ly1 ()
    (prinl "ly1 -- the lilypond repl")
@@ -142,3 +160,6 @@
 # # works in repl, test fails
 # (lytest "{ c'1\\pp }"
 #    '(lyWrap "c'1\\pp") )
+
+(lytest "{ a'2( b'2 c''1) }"
+   '(lyWrap "a'2(" "b'2" "c''1)") )
