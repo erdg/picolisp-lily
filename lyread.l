@@ -52,14 +52,16 @@
          (or
             # basics
             (member Sym '(aes a ais bes b bis ces c cis des d dis ees e eis fes f fis ges g gis))
+            (= (last Cdr) "~")   # tied notes
             (and
                (member Car '(a b c d e f))
                (num? (any (last Cdr))) )
-            (member "'" Cdr)    # notes
+            (member "'" Cdr)     # notes
             (member "," Cdr)
             (member "." Cdr)
-            (member ":" Cdr)    # chords
-            (member "/" Cdr) )  # time signatures
+            (member ":" Cdr)     # chord names
+            (member "/" Cdr)     # time signatures
+            (and (= Car "<") (member ">" Cdr)) )   # chords
          T ) ) )
 
 (de ly1 ()
