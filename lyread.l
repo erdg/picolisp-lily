@@ -51,7 +51,7 @@
       (and
          (or
             # basics
-            (member Sym '(aes a ais bes b bis ces c cis des d dis ees e eis fes f fis ges g gis))
+            (member Sym '(aes a ais bes b bis ces c cis des d dis ees e eis fes f fis ges g gis |))
             (= (last Cdr) "~")   # tied notes
             (and
                (member Car '(a b c d e f))
@@ -92,8 +92,9 @@
       (out (tmp "lyrepl") (prin Str))
       (test Result (lytransform (lyread (tmp "lyrepl")))) ) )
 
-(lytest "{ aes'2 bes'2 c''1 }"
-   '(lyWrap "aes'2" "bes'2" "c''1") )
+# test basic sharps / flats
+(lytest "{ aes'2 bes'2 cis''1 }"
+   '(lyWrap "aes'2" "bes'2" "cis''1") )
 
 (lytest "{ (lyClef \"bass\") a2 b2 c1 }"
    '(lyWrap (lyClef "bass") "a2" "b2" "c1") )
@@ -128,3 +129,15 @@
 # test read-macros and ties together
 (lytest "{ ~(need 4 bes'1~) bes'1 }"
    '(lyWrap "bes'1~" "bes'1~" "bes'1~" "bes'1~" "bes'1") )
+
+(lytest "{ (lyTime 7/8) a'8 b' a' b' a' b' c'' cis'' }"
+   '(lyWrap (lyTime "7/8") "a'8" "b'" "a'" "b'" "a'" "b'" "c''" "cis''") )
+
+# test bar checks
+(lytest "{ (lyTime 2/4) f'4 g'4 | a'2 }"
+   '(lyWrap (lyTime "2/4") "f'4" "g'4" "|" "a'2") )
+
+# # test dynamics - must use "\\" (e.g. c1\\ff) instead of "\" (as in normal lilypond)
+# # works in repl, test fails
+# (lytest "{ c'1\\pp }"
+#    '(lyWrap "c'1\\pp") )
