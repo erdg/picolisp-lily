@@ -232,7 +232,7 @@
 #
 # it's a neat little piece of code, nonetheless.
 #
-# MISC - duration goes outside the chord, e.g. "<g b d>4"
+# NOTE - duration goes outside the chord, e.g. "<g b d>4"
 #
 [de ly<> (Dur . @Notes)
    (macro (prinl "<" ^(list (glue " " @Notes)) ">" Dur) ]
