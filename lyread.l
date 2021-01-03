@@ -59,8 +59,9 @@
             (member "'" Cdr)     # notes
             (member "," Cdr)
             (member "." Cdr)
-            (member ":" Cdr)     # chord names
             (member "/" Cdr)     # time signatures
+            (member ":" Cdr)     # chord names
+            (member "\\" Cdr)    # dynamics
             (and (= Car "<") (member ">" Cdr)) )   # chords
          T ) ) )
 
