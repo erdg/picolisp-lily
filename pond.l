@@ -123,6 +123,12 @@
    (mapc eval Music)
    (prinl "}") ]
 
+(de lyStaffGroup Music
+   (prinl "\\new StaffGroup")
+   (prinl "<<")
+   (lyEval Music)
+   (prinl ">>") )
+
 # (lyPianoStaff
 #    (lyStaff (lyMelody "c'" (lyClef "treble") "c4" "e" "d" "f" "e1"))
 #    (lyStaff (lyMelody "c" (lyClef "bass") "c4" "e" "d" "f" "g1")) )
