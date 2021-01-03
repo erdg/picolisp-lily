@@ -262,6 +262,8 @@
 [de lyClef (Clef)
    (prinl "\\clef " Clef) ]
 
+(def '\\clef lyClef)
+
 #
 # melodies
 #
