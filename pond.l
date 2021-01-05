@@ -258,6 +258,8 @@
 [de lyKey (Note Type)
    (prinl "\\key " Note " \\" Type) ]
 
+(def '\\key lyKey)
+
 # time signatures
 [de lyTime (Time)
    (if (= Time "4/4")
@@ -466,6 +468,8 @@
       (prinl)
       (prinl "}")
       (lySlashes N Time Clef) ]
+
+(def '\\changes lyChanges)
 
 [de lySlashes (N Time Clef)  # number of bars, time signature, clef
    (let [S     (split (chop Time) "/")
