@@ -229,6 +229,11 @@
    (mapc eval Music)
    (prinl ">>") ]
 
+(de << "Music"
+   (prinl "<<")
+   (lyEval "Music")
+   (prinl ">>") )
+
 # chords
 #
 # (ly<> "g" "b" "d") -> G major chord
