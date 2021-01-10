@@ -17,6 +17,7 @@
       (lyLayout)
       (run Music) )
     (call 'sh "-c" (pack "./lilypond-stuff/lyc " File ".ly")) )
+
 # lilypond REPL - compiles lilypond files and opens pdf
 # to continue development, return to PL terminal and hit ^C
 #
