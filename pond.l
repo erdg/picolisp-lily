@@ -96,6 +96,9 @@
       (prinl "composer = \"" Composer "\"") )
    (prinl "}") ]
 
+
+# NOTE - pretty sure this is the same as the built-in 'prEval'
+#
 # lyEval - recursively evaluates music expressions
 #
 # if Obj is an atom (e.g. "aes4." - an Ab dotted quarter note), it's printed
@@ -153,8 +156,8 @@
    (let [(@L @R) Music] # left/right hand
       (macro
          (lyPianoStaff
-            (lyStaff (lyClef "treble") (lyEval @L))
-            (lyStaff (lyClef "bass")   (lyEval @R)) ]
+            (lyStaff (lyClef "treble") (prEval @L))
+            (lyStaff (lyClef "bass")   (prEval @R)) ]
 
 # lyPianoChords - lyPiano with chords
 #
@@ -217,10 +220,10 @@
 # sequential music
 # wraps music expressions in curly braces
 #
-[de lyWrap Music
+(de lyWrap Music
    (prinl "{")
-   (lyEval Music)
-   (prinl "}") ]
+   (prEval Music)
+   (prinl "}") )
 
 # simultaneous music
 # wraps music expressions with angle braces
@@ -232,7 +235,7 @@
 
 (de << "Music"
    (prinl "<<")
-   (lyEval "Music")
+   (prEval "Music")
    (prinl ">>") )
 
 # chords
