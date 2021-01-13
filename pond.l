@@ -268,6 +268,9 @@
       (prinl "\\defaultTimeSignature") )
    (prinl "\\time " Time) ]
 
+# time signatures (with optional beat structure)
+#  (\\time "3/4)
+#  (\\time (2 2 3) "7/8")
 (de \\time Lst
    (ifn (pair (car Lst))
       (prinl "\\time " (car Lst))
