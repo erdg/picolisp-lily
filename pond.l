@@ -268,6 +268,12 @@
       (prinl "\\defaultTimeSignature") )
    (prinl "\\time " Time) ]
 
+(de \\time Lst
+   (ifn (pair (car Lst))
+      (prinl "\\time " (car Lst))
+      (prin "\\time #'") (print @) (prinl " " (cadr Lst)) ) )
+
+
 # clef options - "treble", "bass", etc...
 #
 # currently only "treble", "bass", and "percussion" clefs
