@@ -55,21 +55,22 @@
          (not (pre? "\\\\" Sym))
          (or
             # basics
-            (member Sym '(aes a ais bes b bis ces c cis des d dis ees e eis fes f fis ges g gis |))
+            (member Sym '(aes a ais bes b bis ces c cis des d dis ees e eis fes f fis ges g gis | r))
             (= (last Cdr) "~")   # tied notes
-            (member (last Cdr) '("(" ")"))
+            (member (last Cdr) '("(" ")"))   # slurs
             (member "[" Cdr)
             (member "]" Cdr)
-            (and
-               (member Car '(a b c d e f))
+            (and                 # notes
+               (member Car '(a b c d e f g r))
                (num? (any (last Cdr))) )
-            (member "'" Cdr)     # notes
+            (member "'" Cdr)
             (member "," Cdr)
             (member "." Cdr)
             (member "/" Cdr)     # time signatures
             (member ":" Cdr)     # chord names
-            (member "\\" Cdr)    # dynamics
-            (and (= Car "<") (member ">" Cdr)) )   # chords
+            (member "\\" Cdr)    # dynamics / markup
+            (and (= Car "<") (member (car Cdr) '(a b c d e f g)))
+            (member ">" Cdr) )   # chords
          T ) ) )
 
 (de compileSlurs (X)
