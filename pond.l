@@ -102,7 +102,7 @@
 # with 'prinl'. if it's a list, it's evaluated. allows for nested musical
 # structures.
 #
-# Note - most functions use the (mapc eval Music) pattern
+# Note - most functions use the (run Music) pattern
 #
 [de lyEval (Lst)
    (mapc
@@ -115,13 +115,13 @@
 [de lyScore Music
    (prinl "\\score")
    (prinl "{")
-   (mapc eval Music)
+   (run Music)
    (prinl "}") ]
 
 [de lyStaff Music
    (prinl "\\new Staff")
    (prinl"{")
-   (mapc eval Music)
+   (run Music)
    (prinl "}") ]
 
 (de lyStaffGroup Music
@@ -137,7 +137,7 @@
 [de lyPianoStaff Music
    (prinl "\\new PianoStaff")
    (prinl "<<")
-   (mapc eval Music)
+   (run Music)
    (prinl ">>") ]
 
 # lyPiano - quickly sketch piano music
@@ -212,7 +212,7 @@
    (ifn Music
       (prinl "\\" Name)
       (prinl Name " =")
-      (mapc eval Music) ]
+      (run Music) ]
 
 # sequential music
 # wraps music expressions in curly braces
@@ -227,7 +227,7 @@
 #
 [de ly<< Music
    (prinl "<<")
-   (mapc eval Music)
+   (run Music)
    (prinl ">>") ]
 
 (de << "Music"
@@ -293,7 +293,7 @@
 [de lyRelative (Note . Music)
    (prinl "\\relative " (pack Note))
    (prinl "{")
-   (mapc eval Music)
+   (run Music)
    (prinl "}") ]
 
 #
@@ -399,7 +399,7 @@
 [de lyAlternative Music
    (prinl "\\alternative ")
    (prinl "{")
-   (mapc eval Music)
+   (run Music)
    (prinl "}") ]
 
 [de lyMultiMeasureRests Music
@@ -665,7 +665,7 @@
    (out (pack File ".ly")
       (lyVersion)
       (lyLayout)
-      (mapc eval Music) )
+      (run Music) )
    # create SVGs
    (t (call *Lily "-dpreview" "-dbackend=svg" File))
    (let [Svg (pack File ".production.svg")
@@ -739,7 +739,7 @@
    (out (pack File ".ly")
       (lyVersion)
       (lyLayout)
-      (mapc eval Music) )
+      (run Music) )
    # create svg
    (t (call *Lily "-dpreview" "-dbackend=svg" File))
    (let [Svg (pack File ".production.svg")
