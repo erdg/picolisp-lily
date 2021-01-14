@@ -119,30 +119,32 @@
 (out (tmp "lyrepl") (prin "{ a'4 b'4 c''2 }"))
 (test '(lyWrap "a'4" "b'4" "c''2") (lytransform (lyread (tmp "lyrepl"))))
 
+# NOTE - "\\\\" is used below because 'lytest' 'prin's a string to a temporary
+# file (backquotes must be escaped again). "\\" is used in actual code.
 (de lytest (Str Result)
    (prog
       (out (tmp "lyrepl") (prin Str))
       (test Result (lytransform (lyread (tmp "lyrepl")))) ) )
 
-# test basic sharps / flats
+# basic sharps / flats
 (lytest "{ aes'2 bes'2 cis''1 }"
    '(lyWrap "aes'2" "bes'2" "cis''1") )
 
+# function calls with transient symbols
 (lytest "{ (lyClef \"bass\") a2 b2 c1 }"
    '(lyWrap (lyClef "bass") "a2" "b2" "c1") )
 
+# function calls with internal symbols
 (lytest "{ (lyClef 'bass) a2 b2 c1 }"
    '(lyWrap (lyClef 'bass) "a2" "b2" "c1") )
 
-# # hmm, this test fails even though it works with 'ly1' / 'ly1*'.
-# # strange things happen when printing, piping and reading backslashes.
-# (lytest "{ (\\clef 'bass) a2 b2 c1 }"
-#    '(lyWrap (\\clef 'bass) "a2" "b2" "c1") )
+# \\function calls
+(lytest "{ (\\\\clef 'bass) a2 b2 c1 }"
+   '(lyWrap (\\clef 'bass) "a2" "b2" "c1") )
 
-# # works in repl, but test fails
-# # recommended to use 'ly<>' for chords (see below)
-# (lytest "{ <c e g>2 <d f a>2 }"
-#    '(lyWrap "<c e g>2" "<d f a>2") )
+# chords
+(lytest "{ <c e g>2 <d f a>2 }"
+   '(lyWrap "<c" "e" "g>2" "<d" "f" "a>2") )
 
 # test that read-macros and quoted lists still work as normal
 (lytest "{ ~(make (do 4 (link '(ly<> 4 c' e' g')))) }"
@@ -169,10 +171,9 @@
 (lytest "{ (lyTime 2/4) f'4 g'4 | a'2 }"
    '(lyWrap (lyTime "2/4") "f'4" "g'4" "|" "a'2") )
 
-# # test dynamics - must use "\\" (e.g. c1\\ff) instead of "\" (as in normal lilypond)
-# # works in repl, test fails
-# (lytest "{ c'1\\pp }"
-#    '(lyWrap "c'1\\pp") )
+# test dynamics - must use "\\" (e.g. c1\\ff) instead of "\" (as in normal lilypond)
+(lytest "{ c'1\\\\pp }"
+   '(lyWrap "c'1\\pp") )
 
 (lytest "{ a'2( b'2 c''1) }"
    '(lyWrap "a'2(" "b'2" "c''1)") )
