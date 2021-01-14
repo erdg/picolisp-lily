@@ -1106,6 +1106,12 @@
 (de map-octave (Oct Notes)
    (mapcar '((N) (pack N Oct)) Notes) )
 
+(de map-octave-1up (Notes)
+   (mapcar '((N) (pack N "'")) Notes) )
+
+(de map-octave-1dn (Notes)
+   (mapcar '((N) (pack N ",")) Notes) )
+
 # scale helpers
 (de with-sharps (Scale)
    (mapcar
