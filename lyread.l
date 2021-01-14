@@ -26,6 +26,18 @@
       (glue " " @)
       (any @) ) )
 
+# KNOWN GOTCHA - no way to map single "octave ticks" to notes
+# in lilypond syntax
+#
+#  (map-octave ' ...)
+#  (map-octave , ...)
+#  (map-octave "'" ...)
+#  (map-octave "," ...)
+#
+# are all broken (with lilypond syntax).
+# Use 'map-octave-1up' / 'map-octave-1dn' instead, or just
+# use normal PicoLisp.
+
 (de _lytransform (X)
    (recur (X Acc)
       (ifn X
