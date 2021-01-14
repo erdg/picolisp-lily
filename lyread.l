@@ -9,7 +9,7 @@
    (lytransform
       (lyread File) ) )
 
-(def 'LYREADSTRING "_-=!?<>$*',:/\|.~[]")
+(def 'LYREADSTRING "_-+=!?<>$*',:/\|.~[]")
 
 (de lyread (File)
    (in File
