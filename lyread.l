@@ -45,6 +45,10 @@
          (case (car X)
             ("{" (recurse (cdr X) (cons 'lyWrap (char 40) Acc)))  # { ... } = (lyWrap ...)
             ("}" (recurse (cdr X) (cons (char 41) Acc)))
+            # special rule for '++'
+            ("+" (if (= (cadr X) "+")
+                     (recurse (cddr X) (cons "++" Acc))
+                     (recurse (cdr X) (cons (car X) Acc)) ) )
             (T
                (cond
                   # time signatures
