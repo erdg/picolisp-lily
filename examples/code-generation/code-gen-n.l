@@ -94,7 +94,7 @@
 
 
 (de cg14 ()
-   (arp (random-element (with-flats (d/lyd)))
+   (arp-wrapped (random-element (with-flats (d/lyd)))
       (4 . (T "3/2" 8))
       (4 . (T "5/4" 16))
       (4 . (T "6/4" 16))
@@ -105,7 +105,7 @@
 
 (de cg15 ()
    (let Notes '("des" "ees" "f" .)
-      (arp (++ Notes)
+      (arp-wrapped (++ Notes)
          (4 . (T "3/2" 8))
          (4 . (T "5/4" 16))
          (4 . (T "6/4" 16))
@@ -116,7 +116,7 @@
 
 (de cg16 ()
    (let Notes (ring (make-multi-octave-scale (with-flats (des|maj7)) "'" "''"))
-      (arp (++ Notes)
+      (arp-wrapped (++ Notes)
          (4 . (T "3/2" 8))
          (4 . (T "5/4" 16))
          (4 . (T "6/4" 16))
@@ -127,7 +127,7 @@
 
 (de cg17 ()
    (let Notes (ring (make-multi-octave-scale (with-flats (des|maj7)) "'" "''"))
-      (arp (++ Notes)
+      (arp-wrapped (++ Notes)
          (4 . (T "3/2" 8))
          (7 . (random-rhythms-from "7/8" '(4 4 8 8 8 16 16 16 "8." "4.")))
          (4 . (T "5/4" 16))
@@ -139,7 +139,7 @@
 
 (de cg18 ()
    (let Notes (ring (map-octave "'" '("f"  "ees" "f" "aes" "bes")))
-      (arp (++ Notes)
+      (arp-wrapped (++ Notes)
          (lyTime "7/8")
          (7 . (random-rhythms-from "7/8" '(4 4 8 8 8 16 16 16 "8." "4."))) ) ) )
 

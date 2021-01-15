@@ -718,19 +718,24 @@
             # tuplets
             (link (cons 'quote (cons 'lyTuplet (cdr L)))) ) ) ) )
 
-(de arp Lst
+# original 'arp', changed because wrapping is easy now with "the notebook"
+(de arp-wrapped Lst
    (let [(@Notes . Rhythms) Lst]
       (macro
          (make-melody
             (pack-rhythms '@Notes
                (make-rhythms ^ Rhythms) ) ) ) ) )
 
+# everything uses this function
 (de arp-no-wrap Lst
    (let [(@Notes . Rhythms) Lst]
       (macro
          (make-melody-no-wrap
             (pack-rhythms '@Notes
                (make-rhythms ^ Rhythms) ) ) ) ) )
+
+# so it was renamed
+(def 'arp arp-no-wrap)
 
 (de arp-in Lst
    (let [(@Meter @Notes . Rhythms) Lst]
