@@ -127,6 +127,12 @@
    (run Music)
    (prinl "}") ]
 
+(de lyDynamics "Music"
+   (prinl "\\new Dynamics")
+   (prinl"{")
+   (run "Music")
+   (prinl "}") )
+
 (de lyStaffGroup Music
    (prinl "\\new StaffGroup")
    (prinl "<<")
