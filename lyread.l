@@ -22,6 +22,7 @@
       (_lytransform Lst)
       (mapcar pack @)
       (compileSlurs @)
+      (mapcar convertLySym @)
       (mapcar '((S) (if (lySym? S) (sym S) S)) @)
       (glue " " @)
       (any @) ) )
@@ -94,6 +95,19 @@
             (and (= Car "<") (member (car Cdr) '(a b c d e f g)))
             (member ">" Cdr) )               # chords
          T ) ) )
+
+# TODO - this function should somehow be combined with 'lySym?' in
+# the same '(mapcar ...)' statement to avoid doing the work multiple
+# times. But see if it's useful for now...
+
+# convert forward slashes to backslashes for slightly less noisy
+# (picolisp) lilypond code
+# "a'2->/fp/<"  ->  "a'2->\\fp\\<"
+(de convertLySym (Sym)
+   (let C (chop Sym)
+      (ifn (and (not (sub? ":" Sym)) (lySym? Sym) (not (format (split C "/"))))
+         Sym
+         (pack (replace C "/" "\\")) ) ) )
 
 (de compileSlurs (X)
    (use Slur
@@ -189,6 +203,10 @@
 
 # test dynamics - must use "\\" (e.g. c1\\ff) instead of "\" (as in normal lilypond)
 (lytest "{ c'1\\\\pp }"
+   '(lyWrap "c'1\\pp") )
+
+# test forward slash conversion
+(lytest "{ c'1/pp }"
    '(lyWrap "c'1\\pp") )
 
 (lytest "{ a'2( b'2 c''1) }"
