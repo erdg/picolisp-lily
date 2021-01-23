@@ -2,14 +2,24 @@
 (de nthcar (N Lst)
    (car (nth Lst N)) )
 
+# create a circular list from (evaluated) args
 (de ring @
-   # create a circular list from (evaluated) args
    (apply circ
       (make
          (for "L" (rest)
             (if (atom "L")
                (link "L")
                (chain "L") ) ) ) ) )
+
+# multiple 'remove'
+(de removes (Lst . Ns)
+   (use L
+      (setq L Lst)
+      (for (I . N) Ns
+         (setq L (remove (- N (- I 1)) L)) ) ) )
+
+(de linkN (@N . Exe)
+   (macro (do @N (link ^ Exe))) )
 
 ###
 #
