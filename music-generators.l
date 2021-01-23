@@ -1130,7 +1130,11 @@
       '((Note) (if (pair Note) (car @) Note))
       Scale ) )
 
+(def 'sharps with-sharps)
+
 (de with-flats (Scale)
    (mapcar
       '((Note) (if (pair Note) (cdr @) Note))
       Scale ) )
+
+(def 'flats with-flats)
