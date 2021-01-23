@@ -186,7 +186,12 @@
 (de make-octaves Lst
    (make
       (for L Lst
-         (do (car L) (link (cdr L))) ) ) )
+         (do (car L)
+            (if (num? (cdr L))
+               (link (number-to-octave-tick @))
+               (link (cdr L)) ) ) ) ) )
+
+(def 'octaves make-octaves)
 
 #  (octave-tick-to-number "''") -> 2
 #  (octave-tick-to-number ",") -> -1
@@ -197,6 +202,12 @@
          (if (pre? "'" Tick)
             Len
             (- Len) ) ) ) )
+
+(de number-to-octave-tick (N)
+   (cond
+      ((=0 N) "")
+      ((gt0 N) (pack (need N "'")))
+      ((lt0 N) (pack (need N ","))) ) )
 
 # note + octave
 (de random-pitch ()
