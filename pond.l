@@ -51,10 +51,30 @@
 
 [de lyVersion () (prinl "\\version \"" *Version "\"")]
 
-[de lyJazz ()
-   ### jazz font
-   (lyInclude "lilyjazz.ily")
-   (lyInclude "jazzchords.ly") ]
+# fonts
+(de lyJazzFont ()
+   (if (= "picolisp-lily" (stem (chop (pwd)) "/"))
+      (prog
+         (lyInclude "lilypond-stuff/stylesheets/lilyjazz.ily")
+         (lyInclude "lilypond-stuff/stylesheets/jazzchords.ily") )
+      (prog
+         (lyInclude "picolisp-lily/lilypond-stuff/stylesheets/lilyjazz.ily")
+         (lyInclude "picolisp-lily/lilypond-stuff/stylesheets/jazzchords.ily") ) ) )
+
+(de lyBeethovenFont ()
+   (if (= "picolisp-lily" (stem (chop (pwd)) "/"))
+      (lyInclude "lilypond-stuff/stylesheets/beethoven.ily")
+      (lyInclude "picolisp-lily/lilypond-stuff/stylesheets/beethoven.ily") ) )
+
+(de lyImprovisoFont ()
+   (if
+      (= "picolisp-lily" (stem (chop (pwd)) "/"))
+         (prog
+            (lyInclude "lilypond-stuff/stylesheets/improviso.ily")
+            (lyInclude "lilypond-stuff/stylesheets/jazzchords.ily") )
+         (prog
+            (lyInclude "picolisp-lily/lilypond-stuff/stylesheets/improviso.ily")
+            (lyInclude "picolisp-lily/lilypond-stuff/stylesheets/jazzchords.ily") ) ) )
 
 [de lyLayout ()
    (prinl "\\layout")
