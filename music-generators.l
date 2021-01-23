@@ -87,9 +87,6 @@
             (nth Ds (index X Ds))
             (head (index Y Ds) Ds) ) ) ) )
 
-(de random-duration-from (Lst)
-   (random-element Lst) )
-
 ###
 # (random-measure-of-durations)
 # (random-measure-of-durations "17/16")
@@ -139,17 +136,6 @@
             (for Dot '("" "." ".." "..." "...." "....." "......" ".......")
                (let It (pack Dur Dot)
                   (link (cons It (duration-as-128th-notes It))) ) ) ) ) ) )
-###
-
-###
-# (map-random-notes-from-list-to-durations
-#    (with-flats (des-lydian-scale))
-#    (make (do 8 (chain (random-measure-of-durations "7/8")))) )
-#
-(de map-random-notes-from-list-to-durations (Notes Durations)
-   (mapcar
-      '((D) (pack (random-element Notes) D))
-      Durations ) )
 ###
 
 (de chord-inversions (Notes)
