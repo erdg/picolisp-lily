@@ -66,6 +66,11 @@
       (lyInclude "lilypond-stuff/stylesheets/beethoven.ily")
       (lyInclude "picolisp-lily/lilypond-stuff/stylesheets/beethoven.ily") ) )
 
+(de lyHaydnFont ()
+   (if (= "picolisp-lily" (stem (chop (pwd)) "/"))
+      (lyInclude "lilypond-stuff/stylesheets/haydn.ily")
+      (lyInclude "picolisp-lily/lilypond-stuff/stylesheets/haydn.ily") ) )
+
 (de lyImprovisoFont ()
    (if
       (= "picolisp-lily" (stem (chop (pwd)) "/"))
