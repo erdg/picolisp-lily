@@ -330,15 +330,33 @@
    (run Music)
    (prinl "}") ]
 
+
+# melody with abbreviated tuplet syntax
+# can optionally use 'lyWrap' (looks better with lilypond syntax)
 #
-# same as 'lyRelative, but uses 'lyEval
-# no need to explicitly use 'lyWrap
+#  (lyMelody "c''"
+#     "c4" "b" "a" "g" (T "3/2" "f" "e" "f") (T "3/2" "g" "a" "b") "c1" )
+
+#  (lyMelody "c''"
+#     (lyWrap "c4" "b" "a" "g" (T "3/2" "f" "e" "f") (T "3/2" "g" "a" "b") "c1" ) )
 #
-[de lyMelody (Note . Music)
-   (prinl "\\relative " (pack Note))
-   (prinl "{")
-   (lyEval Music)
-   (prinl "}") ]
+#  (lyMelody c''
+#     c4 b a g (T 3/2 f e f) (T 3/2 g a b) c1 )
+#
+#  (lyMelody c'' { c4 b a g (T 3/2 f e f) (T 3/2 g a b) c1 })
+
+(de lyMelody (Note . Music)
+   (macro
+      (prinl "\\relative " (pack Note))
+      (prinl "{")
+      (prEval
+         '(^(make
+               (for M (if (= (caar Music) 'lyWrap) (cdar Music) Music)
+                  (cond
+                     ((and (pair M) (=T (car @)))
+                        (link (cons 'lyTuplet (cdr M))) )
+                     (T (link M)) ) ) ) ) )
+   (prinl "}") ) )
 
 # tuplets
 #
