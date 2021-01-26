@@ -294,6 +294,7 @@
    (prinl "\\key " Note " \\" Type) ]
 
 (def '\\key lyKey)
+(def 'keySig lyKey)
 
 # time signatures
 [de lyTime (Time)
@@ -320,6 +321,7 @@
    (prinl "\\clef " Clef) ]
 
 (def '\\clef lyClef)
+(def 'clef lyClef)
 
 #
 # melodies
@@ -330,7 +332,47 @@
    (run Music)
    (prinl "}") ]
 
+(de relative (Note . Music)
+   (prinl "\\relative " (pack Note))
+   (prEval Music) )
 
+# melody - relative, but better
+#
+#  (melody c'' {...})   # auto clef detection ("'"s = treble, [","s|" "] = bass)
+#  (melody cis' minor bass 7/8 {...})  # clef override and modifiers (in any order)
+#
+# args should generally be 1 or several atoms, followed by a list (generally
+# 'lyWrap', or { ... } in lilypond syntax)
+
+(de melody Lst
+   (let ((Note . Music) Lst)
+      (prinl "\\relative " Note)
+      (prinl "{")
+      (if (= (last (chop Note)) "'")
+         (clef "treble")
+         (clef "bass") )
+      (while (++ Music)
+         (cond
+            ((pair @) (eval @))
+            ((timeSig? @) (lyTime @))
+            ((keyMod? @) (lyKey Note @))
+            ((clef? @) (lyClef @)) ) )
+      (prinl "}") ) )
+
+(de timeSig? (Sym)
+   (and (sub? "/" Sym) (format (split (chop @) "/")) Sym) )
+
+(de clef? (Sym)
+   (and (member Sym '(bass "bass" treble "treble"))
+      Sym ) )
+
+# key modifier
+(de keyMod? (Sym)
+   (or
+      (pre? Sym "major")
+      (pre? Sym "minor") ) )
+
+# NOTE - this is not really needed with 'tup' abbrev of 'lyTuplet'
 # melody with abbreviated tuplet syntax
 # can optionally use 'lyWrap' (looks better with lilypond syntax)
 #
@@ -340,6 +382,7 @@
 #  (lyMelody "c''"
 #     (lyWrap "c4" "b" "a" "g" (T "3/2" "f" "e" "f") (T "3/2" "g" "a" "b") "c1" ) )
 #
+#  # lilypond syntax
 #  (lyMelody c''
 #     c4 b a g (T 3/2 f e f) (T 3/2 g a b) c1 )
 #
@@ -368,6 +411,7 @@
    (lyEval Music)
    (prinl "}") ]
 
+(def 'tup lyTuplet)
 
 [de lyTuplet% (Sig Base . Music)
    (prinl "\\tuplet " Sig " " Base)
