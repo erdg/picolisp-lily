@@ -372,13 +372,12 @@
       (pre? Sym "major")
       (pre? Sym "minor") ) )
 
-# NOTE - this is not really needed with 'tup' abbrev of 'lyTuplet'
 # melody with abbreviated tuplet syntax
 # can optionally use 'lyWrap' (looks better with lilypond syntax)
 #
 #  (lyMelody "c''"
 #     "c4" "b" "a" "g" (T "3/2" "f" "e" "f") (T "3/2" "g" "a" "b") "c1" )
-
+#
 #  (lyMelody "c''"
 #     (lyWrap "c4" "b" "a" "g" (T "3/2" "f" "e" "f") (T "3/2" "g" "a" "b") "c1" ) )
 #
@@ -387,6 +386,8 @@
 #     c4 b a g (T 3/2 f e f) (T 3/2 g a b) c1 )
 #
 #  (lyMelody c'' { c4 b a g (T 3/2 f e f) (T 3/2 g a b) c1 })
+#
+# NOTE - this is not really needed with 'tup' abbrev of 'lyTuplet'
 
 (de lyMelody (Note . Music)
    (macro
@@ -439,9 +440,12 @@
 #
 # (lyPickup "2" "a4 b4") -> 2 quarter notes
 #
-(de lyPickup (N . Music)
+(de lyPartial (N . Music)
    (prinl "\\partial " N " ")
-   (lyEval Music) )
+   (prEval Music) )
+
+(de bar (Sym)
+   (prinl "\\bar \"" Sym "\"") )
 
 # single bar (lilypond bar check)
 [de ly| () (prinl "\\bar \"|\" ")]

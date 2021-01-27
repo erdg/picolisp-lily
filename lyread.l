@@ -24,6 +24,7 @@
       (compileSlurs @)
       (mapcar convertLySym @)
       (mapcar '((S) (if (lySym? S) (sym S) S)) @)
+      (mapcar autoBarLines @)
       (glue " " @)
       (any @) ) )
 
@@ -70,6 +71,13 @@
          # no functions
          (not (pre? "ly" Sym))
          (not (pre? "\\\\" Sym))
+         # no bar lines (because 'autoBarLines')
+         (not (pre? "|" Sym))
+         (not (pre? "." Sym))
+         (not (pre? ":" Sym))
+         (not (pre? "[" Sym))
+         # (not (= "!" Sym))  # not needed, but these are bar lines
+         # (not (= ";" Sym))
          (or
             # basics
             (member Sym '(aes a ais bes b bis ces c cis des d dis ees e eis fes f fis ges g gis | r))
@@ -108,6 +116,12 @@
       (ifn (and (not (sub? ":" Sym)) (lySym? Sym) (not (format (split C "/"))))
          Sym
          (pack (replace C "/" "\\")) ) ) )
+
+(de autoBarLines (Sym)
+   (if (member Sym '("||" ".|" "|." "|.|" ";" "!"
+                     ".|:" ":|." ":..:" ":.|.:" ":|.|:" "[|:" ":|]" ":|][|:") )
+      (pack "(bar " (sym Sym) ")")
+      Sym ) )
 
 (de compileSlurs (X)
    (use Slur
