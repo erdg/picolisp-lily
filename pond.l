@@ -348,6 +348,7 @@
    (let ((Note . Music) Lst)
       (prinl "\\relative " Note)
       (prinl "{")
+      (accidentalStyle "neo-modern-cautionary")
       (if (= (last (chop Note)) "'")
          (clef "treble")
          (clef "bass") )
@@ -363,14 +364,21 @@
    (and (sub? "/" Sym) (format (split (chop @) "/")) Sym) )
 
 (de clef? (Sym)
-   (and (member Sym '(bass "bass" treble "treble"))
-      Sym ) )
+   (and (<= 4 (length Sym))
+      (or
+         (pre? Sym "bass")
+         (pre? Sym "treble")
+         (pre? Sym "percussion") ) ) )
 
 # key modifier
 (de keyMod? (Sym)
-   (or
-      (pre? Sym "major")
-      (pre? Sym "minor") ) )
+   (and (< 1 (length Sym))
+      (or
+         (pre? Sym "major")
+         (pre? Sym "minor") ) ) )
+
+(de accidentalStyle Lst
+   (prinl "\\accidentalStyle " (++ Lst)) )
 
 # melody with abbreviated tuplet syntax
 # can optionally use 'lyWrap' (looks better with lilypond syntax)
@@ -402,6 +410,9 @@
                      (T (link M)) ) ) ) ) )
       (prinl "}") ) )
 
+(de transpose (From To . Music)
+   (prinl (text "\\transpose @1 @2" From To))
+   (prEval Music) )
 
 # tuplets
 #
@@ -561,7 +572,7 @@
 #    (8 . "e1:min11") )
 #
 # -> the changes to 'So What' by Miles Davis (bass clef)
-#
+
 [de lyChanges (N Time Clef . "Music")  # number of bars, time signature, clef, music exprs
    (ly<<
       (prinl "\\chords")
@@ -582,7 +593,35 @@
 
 (def '\\changes lyChanges)
 
+# same as 'lyChanges' with defaults and optional overrides
+#
+#  (changes 2 "c1:7" "f:min9") -> defaults to treble clef, 4/4
+#  (changes 8 bass 3/4 (4 . "bes1:min9") (4 . "aes:maj7"))
+#
+# NOTE - works with 'lyWrap' { ... } if no lists in wrap.
+(de changes Lst
+   (let ((N . "Music") Lst)
+      (use (Time Clef)
+         (ly<<
+            (prinl "\\chords")
+            (prinl "{ ")
+            (prinl "\\set chordChanges = ##t")
+            (while (++ "Music")
+               (let Mus @
+                  (cond
+                     ((pair @)
+                        (let L @  # current list
+                           (if (num? (car @))
+                              (do @ (prinl (cdr L)))
+                              (eval L) ) ) )
+                     ((timeSig? @) (setq Time (lyTime @)))
+                     ((clef? @)    (setq Clef (lyClef @)))
+                     (T (prinl Mus)) ) ) )
+            (prinl "}")
+            (lySlashes N Time Clef) ) ) ) )
+
 [de lySlashes (N Time Clef)  # number of bars, time signature, clef
+   (default Time "4/4" Clef "treble")
    (let [S     (split (chop Time) "/")
          Beats (any (pack (car S)))
          Pulse (any (pack (cdr S))) ]
