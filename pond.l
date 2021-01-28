@@ -152,6 +152,12 @@
    (run Music)
    (prinl "}") ]
 
+(de lyRhythmicStaff Music
+   (prinl "\\new RhythmicStaff")
+   (prinl "{")
+   (run Music)
+   (prinl "}") )
+
 (de lyDynamics "Music"
    (prinl "\\new Dynamics")
    (prinl"{")
@@ -555,6 +561,49 @@
 
 (def 'leadsheet 'lyLeadsheet)
 
+
+# leadsheet with rhythmic hits below the chord names
+#
+#  (leadsheet/hits
+#     { d4.:min7 g8:7~ g4:7 c4:maj7 }  # chords / hits
+#     (relative c''                    # melody
+#        { d8 des ais b g f e c' } ) )
+
+(de leadsheet/hits Music
+   (let [(@Chords @Melody @Lyrics) Music]
+      (macro
+         (lyScore
+            (ly<<
+               (lyChords @Chords)
+               (lyRhythmicStaff
+                  (lyWrap
+                     (prinl "\\override NoteHead.style = #'slash")
+                     (prinl "\\override NoteHead.font-size = #-4")
+                     ^(mapcar removeChord (cdr @Chords)) ) )
+               (lyStaff @Melody)
+               (lyLyrics (lyEval @Lyrics)) )
+            (leadsheet-with-hits-layout) ) ) ) )
+
+# remove chord from lilypond symbol, e.g. "d4.:maj9" -> "d4."
+(de removeChord (Sym)
+   (let Chop (chop Sym)
+      (pack (car (split Chop ":")) (when (= (last Chop) "~") "~")) ) )
+
+(de leadsheet-with-hits-layout ()
+         (prinl "\\layout")
+         (prinl "{")
+         (prinl "\\context")
+         (prinl "{")
+         (prinl "\\RhythmicStaff")
+         (prinl "\\remove \"Time_signature_engraver\"")
+         (prinl "\\remove \"Clef_engraver\"")
+         (prinl "\\override BarLine.transparent = ##t")
+         (prinl "\\override StaffSymbol.line-count = #0")
+         # adjust spacing of rhythmic staff here
+         (prinl "\\override VerticalAxisGroup.staff-staff-spacing.padding = #2")
+         (prinl "}")
+         (prinl "}") )
+
 # chord changes
 #
 # generates sheet music for given chord progression.
@@ -602,7 +651,8 @@
 #  (changes 2 "c1:7" "f:min9") -> defaults to treble clef, 4/4
 #  (changes 8 bass 3/4 (4 . "bes1:min9") (4 . "aes:maj7"))
 #
-# NOTE - works with 'lyWrap' { ... } if no lists in wrap.
+# NOTE - works within 'lyWrap' (e.g. { (changes ...) (changes ...) } if no
+# lists in '...' wrap.
 (de changes Lst
    (let ((N . "Music") Lst)
       (use (Time Clef)
@@ -610,7 +660,7 @@
             (prinl "\\chords")
             (prinl "{ ")
             (prinl "\\set chordChanges = ##t")
-            (while (++ "Music")
+            (while (++ "Music")  # @@@ the most picolisp code of all time @@@
                (let Mus @
                   (cond
                      ((pair @)
