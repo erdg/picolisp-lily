@@ -452,8 +452,10 @@
 # (lyPickup "2" "a4 b4") -> 2 quarter notes
 #
 (de lyPartial (N . Music)
-   (prinl "\\partial " N " ")
+   (prinl "\\partial " N)
    (prEval Music) )
+
+(def 'pickup lyPartial)
 
 (de bar (Sym)
    (prinl "\\bar \"" Sym "\"") )
@@ -550,6 +552,8 @@
                (lyChords (lyEval @Chords))
                (lyStaff  (lyEval @Melody))
                (lyLyrics (lyEval @Lyrics)) ]
+
+(def 'leadsheet 'lyLeadsheet)
 
 # chord changes
 #
