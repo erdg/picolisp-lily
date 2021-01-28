@@ -66,43 +66,43 @@
                      (recurse (cdr X) (cons (car X) Acc)) ) ) ) ) ) ) )
 
 (de lySym? (Sym)
-   (let [Chop (chop Sym)  (Car . Cdr) Chop]
-      (and
-         # no functions
-         (not (pre? "ly" Sym))
-         (not (pre? "\\\\" Sym))
-         # no bar lines (because 'autoBarLines')
-         (not (pre? "|" Sym))
-         (not (pre? "." Sym))
-         (not (pre? ":" Sym))
-         (not (pre? "[" Sym))
-         # (not (= "!" Sym))  # not needed, but these are bar lines
-         # (not (= ";" Sym))
-         (or
-            # basics
-            (member Sym '(aes a ais bes b bis ces c cis des d dis ees e eis fes f fis ges g gis | r))
-            (= (last Cdr) "~")               # tied notes
-            (member (last Cdr) '("(" ")"))   # slurs
-            (member "[" Cdr)
-            (member "]" Cdr)
-            (and                             # notes
-               (member Car '(a b c d e f g r))
-               (not  # because e.g. 'des/major' or 'c|maj7' generator fns
-                  (or
-                     (member "|" Cdr)
-                     (member "/" Cdr)))
-               (num? (any (last Cdr))) )
-            (member "'" Cdr)
-            (member "," Cdr)
-            (member "." Cdr)
-            (and                             # time signatures
-               (member "/" Cdr)
-               (format (pack (split Chop "/"))) )
-            (member ":" Cdr)                 # chord names
-            (member "\\" Cdr)                # dynamics / markup
-            (and (= Car "<") (member (car Cdr) '(a b c d e f g)))
-            (member ">" Cdr) )               # chords
-         T ) ) )
+   (if (= Sym "|")  # bar checks are symbols
+      T
+      (let [Chop (chop Sym)  (Car . Cdr) Chop]
+         (and
+            # rest of bar lines handled separately (see 'autoBarLines')
+            (not (pre? "|" Sym))
+            (not (pre? "." Sym))
+            (not (pre? ":" Sym))
+            (not (pre? "[" Sym))
+            # no functions
+            (not (pre? "ly" Sym))
+            (not (pre? "\\\\" Sym))
+            (or
+               # basics
+               (member Sym '(aes a ais bes b bis ces c cis des d dis ees e eis fes f fis ges g gis | r))
+               (= (last Cdr) "~")               # tied notes
+               (member (last Cdr) '("(" ")"))   # slurs
+               (member "[" Cdr)
+               (member "]" Cdr)
+               (and                             # notes
+                  (member Car '(a b c d e f g r))
+                  (not  # because e.g. 'des/major' or 'c|maj7' generator fns
+                     (or
+                        (member "|" Cdr)
+                        (member "/" Cdr)))
+                  (num? (any (last Cdr))) )
+               (member "'" Cdr)
+               (member "," Cdr)
+               (member "." Cdr)
+               (and                             # time signatures
+                  (member "/" Cdr)
+                  (format (pack (split Chop "/"))) )
+               (member ":" Cdr)                 # chord names
+               (member "\\" Cdr)                # dynamics / markup
+               (and (= Car "<") (member (car Cdr) '(a b c d e f g)))
+               (member ">" Cdr) )               # chords
+            T ) ) ) )
 
 # TODO - this function should somehow be combined with 'lySym?' in
 # the same '(mapcar ...)' statement to avoid doing the work multiple
