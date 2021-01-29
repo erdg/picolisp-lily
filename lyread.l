@@ -4,12 +4,24 @@
 #  ly1 -- the lilypond repl
 #  : { a'4 b'4 c''2 }^
 #  -> (lyWrap "a'4" "b'4" "c''2")
+#
+# KNOWN GOTCHA - no way to map single "octave ticks" to notes
+# in lilypond syntax
+#
+#  (map-octave ' ...)
+#  (map-octave , ...)
+#  (map-octave "'" ...)
+#  (map-octave "," ...)
+#
+# are all broken (with lilypond syntax).
+# Use 'map-octave-1up' / 'map-octave-1dn' instead, or just
+# use normal PicoLisp.
 
 (de lyload (File)
    (lytransform
       (lyread File) ) )
 
-(def 'LYREADSTRING "_-+=!?<>$*',:/\|.~[]")
+(def 'LYREADSTRING "_-+=!?<>$%*',:/\|.~[]")
 
 (de lyread (File)
    (in File
@@ -23,29 +35,19 @@
       (mapcar pack @)
       (compileSlurs @)
       (mapcar convertLySym @)
-      (mapcar '((S) (if (lySym? S) (sym S) S)) @)
       (mapcar autoBarLines @)
       (glue " " @)
       (any @) ) )
 
-# KNOWN GOTCHA - no way to map single "octave ticks" to notes
-# in lilypond syntax
-#
-#  (map-octave ' ...)
-#  (map-octave , ...)
-#  (map-octave "'" ...)
-#  (map-octave "," ...)
-#
-# are all broken (with lilypond syntax).
-# Use 'map-octave-1up' / 'map-octave-1dn' instead, or just
-# use normal PicoLisp.
 
+# preprocess picolisp lilypond code, get all symbols ready for 'pack'ing
 (de _lytransform (X)
    (recur (X Acc)
       (ifn X
          (flip Acc)
          (case (car X)
-            ("{" (recurse (cdr X) (cons 'lyWrap (char 40) Acc)))  # { ... } = (lyWrap ...)
+            # { ... } = (lyWrap ...)
+            ("{" (recurse (cdr X) (cons 'lyWrap (char 40) Acc)))
             ("}" (recurse (cdr X) (cons (char 41) Acc)))
             # special rule for '++'
             ("+" (if (= (cadr X) "+")
@@ -59,69 +61,20 @@
                   # \\functions (because lilypond uses e.g \relative)
                   ((pre? "\\" (car X))
                      (recurse (cdr X) (cons (sym (car X)) Acc)) )
-                  # don't mess with transient symbols
+                  # "pass through" transient symbols
                   ((pair (car X))
                      (recurse (cdr X) (cons (sym (pack (car X))) Acc)) )
                   (T
                      (recurse (cdr X) (cons (car X) Acc)) ) ) ) ) ) ) )
 
-(de lySym? (Sym)
-   (if (= Sym "|")  # bar checks are symbols
-      T
-      (let [Chop (chop Sym)  (Car . Cdr) Chop]
-         (and
-            # rest of bar lines handled separately (see 'autoBarLines')
-            (not (pre? "|" Sym))
-            (not (pre? "." Sym))
-            (not (pre? ":" Sym))
-            (not (pre? "[" Sym))
-            # no functions
-            (not (pre? "ly" Sym))
-            (not (pre? "\\\\" Sym))
-            (or
-               # basics
-               (member Sym '(aes a ais bes b bis ces c cis des d dis ees e eis fes f fis ges g gis | r))
-               (= (last Cdr) "~")               # tied notes
-               (member (last Cdr) '("(" ")"))   # slurs
-               (member "[" Cdr)
-               (member "]" Cdr)
-               (and                             # notes
-                  (member Car '(a b c d e f g r))
-                  (not  # because e.g. 'des/major' or 'c|maj7' generator fns
-                     (or
-                        (member "|" Cdr)
-                        (member "/" Cdr)))
-                  (num? (any (last Cdr))) )
-               (member "'" Cdr)
-               (member "," Cdr)
-               (member "." Cdr)
-               (and                             # time signatures
-                  (member "/" Cdr)
-                  (format (pack (split Chop "/"))) )
-               (member ":" Cdr)                 # chord names
-               (member "\\" Cdr)                # dynamics / markup
-               (and (= Car "<") (member (car Cdr) '(a b c d e f g)))
-               (member ">" Cdr) )               # chords
-            T ) ) ) )
 
-# TODO - this function should somehow be combined with 'lySym?' in
-# the same '(mapcar ...)' statement to avoid doing the work multiple
-# times. But see if it's useful for now...
-
-# convert forward slashes to backslashes for slightly less noisy
-# (picolisp) lilypond code
-# "a'2->/fp/<"  ->  "a'2->\\fp\\<"
-(de convertLySym (Sym)
-   (let C (chop Sym)
-      (ifn (and (not (sub? ":" Sym)) (lySym? Sym) (not (format (split C "/"))))
-         Sym
-         (pack (replace C "/" "\\")) ) ) )
-
-(de autoBarLines (Sym)
-   (if (member Sym '("||" ".|" "|." "|.|" ";" "!"
-                     ".|:" ":|." ":..:" ":.|.:" ":|.|:" "[|:" ":|]" ":|][|:") )
-      (pack "(bar " (sym Sym) ")")
-      Sym ) )
+# hacks to allow lilypond slur notation
+#
+#  { a'2(  b'2  |  c''1) } -> (lyWrap "a'2(" "b'2" "|" "c''1)")
+#
+# this is likely the source of "EOF" errors when using lilypond syntax
+# and can be turned off by commenting out the '(mapcar compileSlurs @)
+# in the definition of 'lytransform' above.
 
 (de compileSlurs (X)
    (use Slur
@@ -140,6 +93,69 @@
                (T (recurse (cdr X) (cons (car X) Acc))) ) ) ) ) )
 
 
+# applies 'sym' to any 'lySym?'s and converts forward slashes to backslashes
+# for slightly less noisy (picolisp) lilypond code
+(de convertLySym (Sym)
+   (ifn (lySym? Sym)
+      Sym
+      (let Chop (chop Sym)
+         (ifn (member "/" Chop)
+            (sym Sym)
+            (ifn (and (not (sub? ":" Sym)) (not (format (split Chop "/"))))
+               (sym Sym)
+               # "a'2->/fp/<"  ->  "a'2->\\fp\\<"
+               (sym (pack (replace Chop "/" "\\"))) ) ) ) ) )
+
+(de lySym? (Sym)
+   (if (= Sym "|")  # bar checks
+      T
+      (let [Chop (chop Sym)  (Car . Cdr) Chop]
+         (and
+            # rest of bar lines handled separately (see 'autoBarLines')
+            (not (pre? "|" Sym))
+            (not (pre? "." Sym))
+            (not (pre? ":" Sym))
+            (not (pre? "[" Sym))
+            # no functions
+            (not (pre? "ly" Sym))
+            (not (pre? "\\\\" Sym))
+            (or
+               # basics
+               (member Sym '(aes a ais bes b bis ces c cis des d dis ees e eis fes f fis ges g gis | r))
+               (= (last Cdr) "~")               # tied notes
+               (member (last Cdr) '("(" ")"))   # slurs
+               (member "[" Cdr)                 # manual beaming
+               (member "]" Cdr)
+               (and                             # notes
+                  (member Car '(a b c d e f g r))
+                  (not  # because e.g. 'des/major' or 'c|maj7' chordscale generator fns
+                     (or
+                        (member "|" Cdr)
+                        (member "/" Cdr)))
+                  (num? (any (last Cdr))) )
+               (member "'" Cdr)
+               (member "," Cdr)
+               (member "." Cdr)
+               (and
+                  (member "/" Cdr)
+                  (or
+                     (format (pack (split Chop "/")))    # time signatures
+                     (not (val (any Sym))) ) )           # abbreviated backslashes, e.g. "c/pp/<"
+               (member ":" Cdr)                 # chord names
+               (member "\\" Cdr)                # dynamics / markup
+               (and (= Car "<") (member (car Cdr) '(a b c d e f g)))
+               (member ">" Cdr) )               # chords
+            T ) ) ) )
+
+
+(de autoBarLines (Sym)
+   (if (member Sym '("||" ".|" "|." "|.|" ";" "!"
+                     ".|:" ":|." ":..:" ":.|.:" ":|.|:" "[|:" ":|]" ":|][|:") )
+      (pack "(bar " (sym Sym) ")")
+      Sym ) )
+
+
+# repls
 (de ly1 ()
    (prinl "ly1 -- the lilypond repl")
    (prin  ": ")
@@ -148,6 +164,7 @@
          (out (tmp "lyrepl") (prin M))
          (lytransform (lyread (tmp "lyrepl"))) ) ) )
 
+# repl with pdf output
 (de ly1* ()
    (prinl "ly1* -- the lilypond repl (with pdf output)")
    (prin  ": ")
@@ -158,8 +175,9 @@
          (call 'lilypond (pack "--output=" (tmp)) (tmp "repl.ly"))
          (call 'evince (tmp "repl.pdf")) ) ) )
 
+
 *Dbg
-# testing
+# TESTING
 (out (tmp "lyrepl") (prin "{ a'4 b'4 c''2 }"))
 (test '(lyWrap "a'4" "b'4" "c''2") (lytransform (lyread (tmp "lyrepl"))))
 
@@ -223,5 +241,12 @@
 (lytest "{ c'1/pp }"
    '(lyWrap "c'1\\pp") )
 
+# slurs
 (lytest "{ a'2( b'2 c''1) }"
    '(lyWrap "a'2(" "b'2" "c''1)") )
+
+# test automatic bar lines
+(lytest "{ a'2 b'2 || c''1 |. }"
+   '(lyWrap "a'2" "b'2" (bar "||") "c''1" (bar "|.")) )
+
+(test T (lySym? "c/pp/<"))
