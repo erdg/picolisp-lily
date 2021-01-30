@@ -686,9 +686,7 @@
 #       (make-rhythms (2 . ((T "3/2" 8) (2 . (T "5/4" 16)) (T "3/2" 8)))) ) )
 #
 # combine notes with a list of rhythms and create a melody/arpeggio.
-# this function should auto-generate tuplets, likely via 'macro' that
-# creates a 'lyWrap'ed list with whatever is needed
-#
+
 (de make-melody (Lst)
    (macro
       (lyWrap
@@ -725,7 +723,7 @@
             # tuplets
             (link (cons 'quote (cons 'lyTuplet (cdr L)))) ) ) ) )
 
-# original 'arp', changed because wrapping is easy now with "the notebook"
+# original 'arp', changed because wrapping is easy now with "lilypond syntax"
 (de arp-wrapped Lst
    (let [(@Notes . Rhythms) Lst]
       (macro
