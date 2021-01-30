@@ -3,9 +3,9 @@
 # version
 (setq *Version "2.19.82")
 
-(once (load (pack (car (file)) "lyread.l")))
 (once (load (pack (car (file)) "music-generators.l")))
 (once (make-all-patterns))
+(once (load (pack (car (file)) "lyread.l")))
 
 # starts lilypond server on port 12321
 (de lyServer ()
