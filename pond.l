@@ -317,6 +317,28 @@
       (prinl "\\time " (car Lst))
       (prin "\\time #'") (print @) (prinl " " (cadr Lst)) ) )
 
+#  (lyTempo 4 120)            -> 4 = 120 (quarter note = 120)
+#  (lyTempo 4 120 126)        -> 4 = 120 - 126
+#  (lyTempo "Allegro")        -> Allegro
+#  (lyTempo "Allegro" 4 132)  -> Allegro (4 = 132)
+#  (lyTempo " " 4 132)        -> (4 = 132)
+#
+# NOTE - must use " " instead of "" when using lilypond syntax
+
+(de lyTempo @
+   (prin "\\tempo ")
+   (case (length (rest))
+      (1 (prinl (sym (next))))
+      (2 (prinl (next) " = " (next)))
+      (3 (cond
+            ((not (arg 1))
+               (prog (next) (prinl "\"\" " (next) " = " (next)) ) )
+            ((num? (arg 1))
+               (prinl (next) " = " (next) " - " (next)) )
+            (T (prinl (sym (next)) " " (next) " = " (next))) ) ) ) )
+
+(def 'tempo lyTempo)
+
 
 # clef options - "treble", "bass", etc...
 #
