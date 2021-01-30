@@ -250,3 +250,17 @@
    '(lyWrap "a'2" "b'2" (bar "||") "c''1" (bar "|.")) )
 
 (test T (lySym? "c/pp/<"))
+(test T (lySym? "bes2/f/!"))
+(test T (lySym? "bes2\\f\\!"))
+(test T (lySym? "a'2"))
+(test T (lySym? "g,2("))
+(test T (lySym? "<e'"))
+(test T (lySym? "gis'"))
+(test T (lySym? "b>"))
+(test T (lySym? "d4."))
+(test T (lySym? "3/4"))
+(test T (lySym? "des1:maj9"))
+(test T (lySym? "d:min7"))
+
+(test NIL (lySym? "aes/min7"))
+(test NIL (lySym? "g|maj7"))
