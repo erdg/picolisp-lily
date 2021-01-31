@@ -36,6 +36,21 @@
    (make
       (for "L" Lst
          (link (pack (eval "Gen") "L") ) ) ) )
+
+(de map-generator-auto-tuplets ("G" Lst)
+   # G - music generator, see example above
+   # Lst - list of rhythms
+   (make
+      (for "L" Lst
+         (cond
+            ((atom "L") (link (pack (eval "G") "L")))
+            (T
+               (link
+                  (make
+                     (link 'tup)
+                     (link (cadr "L"))
+                     (for X (cddr "L") (link (pack (eval "G") X))) ) ) ) ) ) ) )
+
 ###
 
 #####
@@ -47,7 +62,7 @@
 #  used, might as well make a function
 #
 (de map-notes (Ns Lst)
-   (map-generator
+   (map-generator-auto-tuplets
       (if (circ? Ns)
          '(++ Ns)
          '(random-element Ns) )
