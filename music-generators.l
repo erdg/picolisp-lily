@@ -403,8 +403,7 @@
    (let @Rhythms (random-rhythms (pack @Y "/" @R) @R)
       (macro
          (lyTimes (pack @X "/" @Y)
-            (prinl "\\once \\override TupletNumber.text =
-               #(tuplet-number::non-default-fraction-with-notes "@Y" \""@R"\" "@X" \""@R"\")")
+            (prinl "\\once \\override TupletNumber.text = #(tuplet-number::non-default-fraction-with-notes "@Y" \""@R"\" "@X" \""@R"\")")
             ^(make
                (for R @Rhythms
                   (link
@@ -418,8 +417,7 @@
    (let @Rhythms (random-rhythms (pack @X "/" @Y) @Y)
       (macro
          (lyTimes (pack @A "/" @X)
-            (prinl "\\once \\override TupletNumber.text =
-               #(tuplet-number::non-default-fraction-with-notes "@X" \""@Y"\" "@A" \""@B"\")")
+            (prinl "\\once \\override TupletNumber.text = #(tuplet-number::non-default-fraction-with-notes "@X" \""@Y"\" "@A" \""@B"\")")
             ^(make
                (for R @Rhythms
                   (link
