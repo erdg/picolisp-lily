@@ -1,7 +1,7 @@
 # /path/to/lilypond
 (setq *Lily "/home/erik/bin/lilypond")
 # version
-(setq *Version "2.19.82")
+(setq *Version "2.20.0")
 
 (once (load (pack (car (file)) "music-generators.l")))
 (once (make-all-patterns))
