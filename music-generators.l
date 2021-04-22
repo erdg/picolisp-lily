@@ -1149,3 +1149,27 @@
       Scale ) )
 
 (def 'flats with-flats)
+
+# used as a read-macro in a 'changes' form
+#
+#   (changes 8 ~(ii-V-I "c") ~(ii-V-I "a"))
+#
+# NOTE - right now it defaults to a 4-bar ii-V-I
+
+(de ii-V-I (Key)
+   (let
+      (Scale ((if (member Key '(c g d a e b fis cis gis dis)) 'sharps 'flats)
+               ((any (pack Key "/major"))))
+         ii (pack (nthcar 2 Scale) "1:min7")
+         V  (pack (nthcar 5 Scale) "1:7")
+         I  (cons 2 (pack Key "1:maj7")) )
+      (list ii V I) ) )
+
+(de ii*-V-i (Key)
+   (let
+      (Scale ((if (member Key '(a e b fis cis gis dis ais)) 'sharps 'flats)
+               ((any (pack Key "/min7"))))
+         ii* (pack (nthcar 2 Scale) "1:dim7")
+         V  (pack (nthcar 5 Scale) "1:7")
+         i  (cons 2 (pack Key "1:min7")) )
+      (list ii* V i) ) )
