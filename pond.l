@@ -678,6 +678,7 @@
 (de changes Lst
    (let ((N . "Music") Lst)
       (use (Time Clef)
+         (default Time "4/4" Clef "treble")
          (ly<<
             (prinl "\\chords")
             (prinl "{ ")
