@@ -1177,3 +1177,100 @@
          V  (pack (nthcar 5 Scale) "1:7")
          i  (cons 2 (pack Key "1:min7")) )
       (list ii* V i) ) )
+
+# read-macro used within 'changes' form
+#
+#  (changes 8
+#     ~(with-changes-in (sharps (c/maj)) ii V I I) |
+#     ~(in-key (sharps (c/maj))
+#        ii V I I ) )
+#
+# BUG - using two '~' read-macros in a row within 'lilypond syntax' form
+# does not work. the easy workaround is to include a '|' (bar check) between
+# the read-macro forms
+#
+# NOTE - 'in-key' is an alias
+#
+#  (in-key (sharps (c/maj))
+#     I -III:7 IV -vi*2:7 -VII2:6 I )
+#  -> ("c1:maj" "ees1:7" "f1:maj" "aes2:dim7" "bes2:maj6" "c1:maj")
+
+(de with-changes-in (Key . Changes)
+   (make
+      (for C Changes
+         (link
+            (pack
+               (let Curr (nthcar (with-changes-symbol-to-number C) Key)
+                  (cond
+                     ((pre? "+" C)
+                        (cond
+                           ((sub? "es" Curr) (car (chop Curr)))
+                           ((= Curr "e") "f")
+                           ((= Curr "b") "c")
+                           (T (pack Curr "is")) ) )
+                     ((pre? "-" C)
+                        (cond
+                           ((sub? "is" Curr) (car (chop Curr)))
+                           ((= Curr "f") "e")
+                           ((= Curr "c") "b")
+                           (T (pack Curr "es")) ) )
+                     (T Curr) ) )
+               (with-changes-symbol-duration C)
+               ":"
+               (with-changes-symbol-chord-quality C)
+               (with-changes-symbol-chord-modifiers C) ) ) ) ) )
+
+(def 'in-key with-changes-in)
+
+# so this implementation is fine for a first draft, but there is a lot
+# of extra chopping and filtering going on here.
+
+(de with-changes-symbol-to-number (Sym)
+   (case (pack
+            (filter
+               '((X)
+                  (and
+                     (not (num? (any X)))
+                     (not (member X '("+" "-" "*"))) ) )
+               (car (split-with-changes-symbol Sym)) ) )
+      (("i" "I")     1)
+      (("ii" "II")   2)
+      (("iii" "III") 3)
+      (("iv" "IV")   4)
+      (("v" "V")     5)
+      (("vi" "VI")   6)
+      (("vii" "VII") 7) ) )
+
+(de split-with-changes-symbol (Sym)
+   (split (chop Sym) ":") )
+
+(de with-changes-symbol-duration (Sym)
+   (or
+      (filter '((X) (num? (any X))) (chop (car (split-with-changes-symbol Sym))))
+      1 ) )
+
+(de with-changes-symbol-chord-quality (Sym)
+   (let S (filter
+            '((X)
+               (and
+                  (not (num? (any X)))
+                  (not (member X '("+" "-"))) ) )
+            (car (split-with-changes-symbol Sym)) )
+      (cond
+         ((= (last S) "*") "dim")
+         ((low? (pack S)) "min")
+         ((and
+            (upp? (pack S))
+            (let Mods (with-changes-symbol-chord-modifiers Sym)
+               (or
+                  (pre? 6 Mods)
+                  (pre? 7 Mods)
+                  (pre? 9 Mods)
+                  (pre? 11 Mods)
+                  (pre? 13 Mods)
+                  (pre? "maj" Mods) ) ) )
+          NIL )
+         (T "maj") ) ) )
+
+(de with-changes-symbol-chord-modifiers (Sym)
+   (and (sub? ":" Sym) (last (split-with-changes-symbol Sym))) )
