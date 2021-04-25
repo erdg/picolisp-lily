@@ -49,10 +49,21 @@
             # { ... } = (lyWrap ...)
             ("{" (recurse (cdr X) (cons 'lyWrap (char 40) Acc)))
             ("}" (recurse (cdr X) (cons (char 41) Acc)))
-            # special rule for '++'
-            ("+" (if (= (cadr X) "+")
-                     (recurse (cddr X) (cons "++" Acc))
-                     (recurse (cdr X) (cons (car X) Acc)) ) )
+            ("+"
+               (cond
+                  # special rule for '++'
+                  ((= (cadr X) "+")
+                     (recurse (cddr X) (cons "++" Acc)) )
+                  # e.g. +ii:dim7
+                  ((member (car (chop (cadr X))) '(i I v V))
+                     (recurse (cddr X) (cons (pack "+" (cadr X)) Acc)) )
+                  (T (recurse (cdr X) (cons (car X) Acc))) ) )
+            # e.g. -III
+            ("-"
+               (cond
+                  ((member (car (chop (cadr X))) '(i I v V))
+                     (recurse (cddr X) (cons (pack "-" (cadr X)) Acc)) )
+                  (T (recurse (cdr X) (cons (car X) Acc))) ) )
             (T
                (cond
                   # time signatures
