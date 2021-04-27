@@ -1250,7 +1250,7 @@
                         (and (low? BaseSym) "min")
                         (and (upp? BaseSym) "maj") ) ) ) ) ) ) ) )
 
-(test '("c1:maj" "ees1:6" "f1:maj7" "aes2:dim7" "bes2:6" "c1:maj")
-   (in-key (sharps (c/maj))
-      I  -III:6  IV:maj7  -vi2:dim7  -VII2:6  I ) )
+# (test '("c1:maj" "ees1:6" "f1:maj7" "aes2:dim7" "bes2:6" "c1:maj")
+#    (in-key (sharps (c/maj))
+#       I  -III:6  IV:maj7  -vi2:dim7  -VII2:6  I ) )
 
