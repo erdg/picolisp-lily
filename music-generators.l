@@ -1196,59 +1196,61 @@
 (de in-key (Key . Changes)
    (make
       (for C Changes
-         (let [Split
-                  (split (chop C) ":")
-               Duration
-                  (or
-                     (filter '((X) (or (= X ".") (num? (any X)))) (car Split))
-                     1 )
-               BaseSym  # base chord symbol (e.g. ii, III, etc)
+         (link
+            (if (pre? "r" C)
+               (pack C)
+               (let [Split
+                        (split (chop C) ":")
+                     Duration
+                        (or
+                           (filter '((X) (or (= X ".") (num? (any X)))) (car Split))
+                           1 )
+                     BaseSym  # base chord symbol (e.g. ii, III, etc)
+                        (pack
+                           (filter
+                              '((X)
+                                 (and
+                                    (not (num? (any X)))
+                                    (not (member X '("+" "-" "."))) ) )
+                              (car Split) ) )
+                     BaseNum
+                        (case BaseSym
+                           (("i" "I")     1)
+                           (("ii" "II")   2)
+                           (("iii" "III") 3)
+                           (("iv" "IV")   4)
+                           (("v" "V")     5)
+                           (("vi" "VI")   6)
+                           (("vii" "VII") 7) )
+                     BaseNote
+                        (let Curr (nthcar BaseNum Key)
+                           (cond
+                              ((pre? "+" C)
+                                 (cond
+                                    ((sub? "es" Curr) (car (chop Curr)))
+                                    ((= Curr "e") "f")
+                                    ((= Curr "b") "c")
+                                    (T (pack Curr "is")) ) )
+                              ((pre? "-" C)
+                                 (cond
+                                    ((sub? "is" Curr) (car (chop Curr)))
+                                    ((= Curr "f") "e")
+                                    ((= Curr "c") "b")
+                                    (T (pack Curr "es")) ) )
+                              (T Curr) ) )
+                     Mods (and (= 2 (length Split)) (last Split))
+                     ]
                   (pack
-                     (filter
-                        '((X)
-                           (and
-                              (not (num? (any X)))
-                              (not (member X '("+" "-" "."))) ) )
-                        (car Split) ) )
-               BaseNum
-                  (case BaseSym
-                     (("i" "I")     1)
-                     (("ii" "II")   2)
-                     (("iii" "III") 3)
-                     (("iv" "IV")   4)
-                     (("v" "V")     5)
-                     (("vi" "VI")   6)
-                     (("vii" "VII") 7) )
-               BaseNote
-                  (let Curr (nthcar BaseNum Key)
-                     (cond
-                        ((pre? "+" C)
-                           (cond
-                              ((sub? "es" Curr) (car (chop Curr)))
-                              ((= Curr "e") "f")
-                              ((= Curr "b") "c")
-                              (T (pack Curr "is")) ) )
-                        ((pre? "-" C)
-                           (cond
-                              ((sub? "is" Curr) (car (chop Curr)))
-                              ((= Curr "f") "e")
-                              ((= Curr "c") "b")
-                              (T (pack Curr "es")) ) )
-                        (T Curr) ) )
-               Mods (and (= 2 (length Split)) (last Split))
-               ]
-            (link
-               (pack
-                  BaseNote
-                  Duration
-                  ":"
-                  (or
-                     (and (num? (any (car Mods))) (low? BaseSym) (pack "min" Mods))
-                     Mods
-                     (and (low? BaseSym) "min")
-                     (and (upp? BaseSym) "maj") ) ) ) ) ) ) )
+                     BaseNote
+                     Duration
+                     ":"
+                     (or
+                        (and (num? (any (car Mods))) (low? BaseSym) (pack "min" Mods))
+                        Mods
+                        (and (low? BaseSym) "min")
+                        (and (upp? BaseSym) "maj") ) ) ) ) ) ) ) )
 
-# (test '("c1:maj" "ees1:6" "f1:maj7" "aes2:dim7" "bes2:6" "c1:maj")
-#    (in-key (sharps (c/maj))
-#       I  -III:6  IV:maj7  -vi2:dim7  -VII2:6  I ) )
+(test '("c1:maj" "ees1:6" "f1:maj7" "aes2:dim7" "bes2:6" "c1:maj")
+   (in-key (sharps (c/maj))
+      I  -III:6  IV:maj7  -vi2:dim7  -VII2:6  I ) )
 
