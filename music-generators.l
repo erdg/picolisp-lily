@@ -1189,23 +1189,25 @@
 # does not work. the easy workaround is to include a '|' (bar check) between
 # the read-macro forms (see above)
 #
-#  (in-key (sharps (c/maj))
-#     I -III:7 IV -vi*2:7 -VII2:6 I )
+#  (_in-key (sharps (c/maj))
+#     I -III:7 IV -vi2:dim7 -VII2:6 I )
 #  -> ("c1:maj" "ees1:7" "f1:maj" "aes2:dim7" "bes2:maj6" "c1:maj")
 
-(de in-key (Key . Changes)
+(de _in-key (Key . Changes)
    (make
       (for C Changes
          (link
-            (if (pre? "r" C)
+            (if (pre? "r" C)  # rest
                (pack C)
                (let [Split
-                        (split (chop C) ":")
+                        (split (chop C) ":")    # e.g. (("I" "4" ".") ("m" "a" "j" "7"))
                      Duration
                         (or
-                           (filter '((X) (or (= X ".") (num? (any X)))) (car Split))
+                           (filter
+                              '((X) (or (num? (any X)) (= X ".")))
+                              (car Split) )
                            1 )
-                     BaseSym  # base chord symbol (e.g. ii, III, etc)
+                     ChordSym  # chord symbol (e.g. ii, III, etc)
                         (pack
                            (filter
                               '((X)
@@ -1213,8 +1215,8 @@
                                     (not (num? (any X)))
                                     (not (member X '("+" "-" "."))) ) )
                               (car Split) ) )
-                     BaseNum
-                        (case BaseSym
+                     ChordNum
+                        (case ChordSym
                            (("i" "I")     1)
                            (("ii" "II")   2)
                            (("iii" "III") 3)
@@ -1222,18 +1224,18 @@
                            (("v" "V")     5)
                            (("vi" "VI")   6)
                            (("vii" "VII") 7) )
-                     BaseNote
-                        (let Curr (nthcar BaseNum Key)
+                     ChordNote
+                        (let Curr (nthcar ChordNum Key)
                            (cond
                               ((pre? "+" C)
                                  (cond
-                                    ((sub? "es" Curr) (car (chop Curr)))
+                                    ((sub? "es" Curr) (car (chop Curr))) # remove flat
                                     ((= Curr "e") "f")
                                     ((= Curr "b") "c")
                                     (T (pack Curr "is")) ) )
                               ((pre? "-" C)
                                  (cond
-                                    ((sub? "is" Curr) (car (chop Curr)))
+                                    ((sub? "is" Curr) (car (chop Curr))) # remove sharp
                                     ((= Curr "f") "e")
                                     ((= Curr "c") "b")
                                     (T (pack Curr "es")) ) )
@@ -1241,16 +1243,44 @@
                      Mods (and (= 2 (length Split)) (last Split))
                      ]
                   (pack
-                     BaseNote
+                     ChordNote
                      Duration
                      ":"
                      (or
-                        (and (num? (any (car Mods))) (low? BaseSym) (pack "min" Mods))
+                        (and (num? (any (car Mods))) (low? ChordSym) (pack "min" Mods))
                         Mods
-                        (and (low? BaseSym) "min")
-                        (and (upp? BaseSym) "maj") ) ) ) ) ) ) ) )
+                        (and (low? ChordSym) "min")
+                        (and (upp? ChordSym) "maj") ) ) ) ) ) ) ) )
 
 # (test '("c1:maj" "ees1:6" "f1:maj7" "aes2:dim7" "bes2:6" "c1:maj")
 #    (in-key (sharps (c/maj))
 #       I  -III:6  IV:maj7  -vi2:dim7  -VII2:6  I ) )
+
+
+# in-key -- a syntax macro over '_in-key'
+#
+#  (in-key d maj ...)
+#
+#     vs
+#
+#  (_in-key (sharps (d/maj)) ...)
+#
+# 'in-key' has a nicer syntax, but only works with major / minor keys. would be
+# easy to add lydian, dorian, or any other scale-mode if needed. '_in-key' is
+# be used when something "unusual" (e.g. lydian-dominant) is needed. The
+# 'flats' or 'sharps' helper function must be used with '_in-key'
+
+(de in-key Args
+   (let [(Note Type . Changes) Args]
+      (macro
+         (_in-key
+            ^(list
+               (list
+                  (cond
+                     ((pre? Type "major")
+                        (if (member Note '(c g d a e b fis cis gis dis)) 'sharps 'flats) )
+                     ((pre? Type "minor")
+                        (if (member Note '(a e b fis cis gis dis)) 'sharps 'flats) ) )
+                  (list (any (pack (lowc Note) "/" Type))) ) )
+            ^ Changes ) ) ) )
 
