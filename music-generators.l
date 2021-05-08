@@ -1283,4 +1283,3 @@
                         (if (member Note '(a e b fis cis gis dis)) 'sharps 'flats) ) )
                   (list (any (pack (lowc Note) "/" Type))) ) )
             ^ Changes ) ) ) )
-
