@@ -697,6 +697,40 @@
             (prinl "}")
             (lySlashes N Time Clef) ) ) ) )
 
+#  (complex-changes
+#     7/8 c2..:maj7 ees2..:maj7
+#     4/4 f1:maj7
+#     6/8 aes4.:dim7 bes4.:6 )
+
+(de complex-changes Args
+   (let [TimeSigs
+            (filter timeSig? Args)
+         TimeSigDurations
+            (make
+               (for Sig TimeSigs
+                  (link
+                     (and (split (chop Sig) "/")
+                        (mapcar pack @)
+                        (list (any (car @)) (duration-as-128th-notes (cdr @)))
+                        (apply * @) ) ) ) )
+         ChordLists
+            (cdr (split (mapcar '((X) (if (timeSig? X) T X)) Args) T))
+         ChordDurations
+            (make
+               (for X (mapcar '((L) (mapcar getDuration L)) ChordLists)
+                  (link
+                     (apply + (mapcar duration-as-128th-notes X)) ) ) )
+         Chords
+            (fish atom ChordLists)
+         MeasuresPerTimeSig
+            (mapcar '((X Y) (/ X Y)) ChordDurations TimeSigDurations)
+         @Slashes
+            (cons 'slashes (mapcar '((X Y) (list X Y)) MeasuresPerTimeSig TimeSigs)) ]
+      (macro
+         (<<
+            (lyChords ^ Chords)
+            @Slashes ) ) ) )
+
 [de lySlashes (N Time Clef)  # number of bars, time signature, clef
    (default Time "4/4" Clef "treble")
    (let [S     (split (chop Time) "/")
@@ -724,6 +758,45 @@
                      (T "b" ) )
                   Pulse) ) ) )
       (prinl "}") )
+      (prinl "\\revert NoteHead #'style")
+      (prinl "\\revert Stem #'transparent")
+      (prinl "}")
+      (prinl "}") ]
+
+
+# slashes -- like 'lySlashes' but allows changing time signatures
+#
+#  (slashes (2 "4/4") (2 "7/8"))
+
+[de slashes Args
+      (prinl "\\new Staff {")
+      (prinl "{")
+      (prinl "\\override NoteHead #'style = #'slash")
+      (prinl "\\override Stem #'transparent = ##t")
+      (for A Args
+         (let [(N Time Clef) A]  # number of bars, time signature, clef
+            (default Time "4/4" Clef "treble")
+            (let [S     (split (chop Time) "/")
+                  Beats (any (pack (car S)))
+                  Pulse (any (pack (cdr S))) ]
+               (prinl "\\relative c"
+                  (cond
+                     ((= Clef "bass"))
+                     ((= Clef "percussion") "'")
+                     (T "''") )
+                  " {")
+               (lyTime Time)
+               (lyClef Clef)
+               (do N
+                  (lyEval
+                     (need Beats
+                        (pack
+                           (cond
+                              ((= Clef "bass") "d")
+                              ((= Clef "percussion") "c")
+                              (T "b" ) )
+                           Pulse) ) ) )
+               (prinl "}") )  ) )
       (prinl "\\revert NoteHead #'style")
       (prinl "\\revert Stem #'transparent")
       (prinl "}")
