@@ -11,13 +11,6 @@
                (link "L")
                (chain "L") ) ) ) ) )
 
-# multiple 'remove'
-(de removes (Lst . Ns)
-   (use L
-      (setq L Lst)
-      (for (I . N) Ns
-         (setq L (remove (- N (- I 1)) L)) ) ) )
-
 (de linkN (@N . Exe)
    (macro (do @N (link ^ Exe))) )
 
