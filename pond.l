@@ -146,11 +146,15 @@
    (run Music)
    (prinl "}") ]
 
+(def 'score lyScore)
+
 [de lyStaff Music
    (prinl "\\new Staff")
    (prinl"{")
    (run Music)
    (prinl "}") ]
+
+(def 'staff 'lyStaff)
 
 (de lyRhythmicStaff Music
    (prinl "\\new RhythmicStaff")
@@ -158,17 +162,23 @@
    (run Music)
    (prinl "}") )
 
+(def 'rythmic-staff lyRhythmicStaff)
+
 (de lyDynamics "Music"
    (prinl "\\new Dynamics")
    (prinl"{")
    (run "Music")
    (prinl "}") )
 
+(def 'dynamics lyDynamics)
+
 (de lyStaffGroup Music
    (prinl "\\new StaffGroup")
    (prinl "<<")
    (lyEval Music)
    (prinl ">>") )
+
+(def 'staff-group lyStaffGroup)
 
 # (lyPianoStaff
 #    (lyStaff (lyMelody "c'" (lyClef "treble") "c4" "e" "d" "f" "e1"))
@@ -179,6 +189,8 @@
    (prinl "<<")
    (run Music)
    (prinl ">>") ]
+
+(def 'piano-staff lyPianoStaff)
 
 # lyPiano - quickly sketch piano music
 #
@@ -225,6 +237,8 @@
             (lyChords @Chords))
             (lyPiano @L @R)
             (lyLyrics @Lyrics) ]
+
+(def 'piano-leadsheet lyPianoLeadsheet)
 
 [de lySet (Prop Val)    # context property, value
    (prinl "\\set " Prop " = " Val) ]
@@ -316,6 +330,8 @@
    (ifn (pair (car Lst))
       (prinl "\\time " (car Lst))
       (prin "\\time #'") (print @) (prinl " " (cadr Lst)) ) )
+
+(def 'meter \\time)
 
 #  (lyTempo 4 120)            -> 4 = 120 (quarter note = 120)
 #  (lyTempo 4 120 126)        -> 4 = 120 - 126
@@ -823,6 +839,8 @@
       (prinl "}")
       (lyRhythms Time Clef "Music") ]
 
+(def 'hits lyHits)
+
 # rhythmic notation
 [de lyRhythms (Time Clef "Music")
    (prinl "\\new Staff")
@@ -842,6 +860,8 @@
    (prinl "}")
    (prinl "}")
    (prinl "}") ]
+
+(def 'rhythms lyRhythms)
 
 # don't like the name of this function
 #
