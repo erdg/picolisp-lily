@@ -268,6 +268,13 @@
       (prinl Name " =")
       (run Music) ]
 
+(de variable Args
+   (let [(Name . Music) Args]
+      (ifn Music
+         (prinl "\\" Name)
+         (prinl Name " =")
+         (run Music) ) ) )
+
 # sequential music
 # wraps music expressions in curly braces
 #
