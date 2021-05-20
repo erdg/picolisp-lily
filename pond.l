@@ -613,11 +613,15 @@
    (lyEval "Music")
    (prinl "}") ]
 
+(def 'chords lyChords)
+
 [de lyLyrics Lyrics
    (prinl "\\addlyrics")
    (prinl "{")
    (lyEval Lyrics)
    (prinl "}") ]
+
+(def 'lyrics lyLyrics)
 
 # simple leadsheets - a melody with chords and (optionally) lyrics
 #
