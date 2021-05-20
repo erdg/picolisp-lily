@@ -778,7 +778,7 @@
             (cdr (split (mapcar '((X) (if (timeSig? X) T X)) Args) T))
          ChordDurations
             (make
-               (for X (mapcar '((L) (mapcar getDuration L)) ChordLists)
+               (for X (mapcar '((L) (mapcar '((Y) (or (getDuration Y) "1")) L)) ChordLists)
                   (link
                      (apply + (mapcar duration-as-128th-notes X)) ) ) )
          Chords
