@@ -275,13 +275,45 @@
          (prinl Name " =")
          (run Music) ) ) )
 
+#####
 # sequential music
 # wraps music expressions in curly braces
+
+# # original
+# (de lyWrap Music
+#    (prinl "{")
+#    (prEval Music)
+#    (prinl "}") )
+
+
+# with automatic timesigs
 #
+#  (melody c
+#    { 3/4 a4 b c |
+#      2/4 (tup 3/2 e8 e) })
+#
+#     vs
+#
+#  (melody c
+#    { (meter 3/4) a4 b c |
+#      (meter 2/4) (tup 3/2 e8 e) })
+#
+# atomic time signatures (see 'timeSig?') are converted to '(meter ...)', which
+# is 'prEval'ed and yields the lilypond code '\time ...'
+
 (de lyWrap Music
    (prinl "{")
-   (prEval Music)
+   (macro
+      (prEval
+         '(^(make
+               (for M Music
+                  (link
+                     (if (and (atom M) (timeSig? M))
+                        (list 'meter M)
+                        M ) ) ) ) ) ) )
    (prinl "}") )
+
+#####
 
 # simultaneous music
 # wraps music expressions with angle braces
