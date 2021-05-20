@@ -460,6 +460,8 @@
          (pre? Sym "major")
          (pre? Sym "minor") ) ) )
 
+(de chordSym? (Sym) (and (lySym? Sym) (sub? ":" Sym)))
+
 (de accidentalStyle Lst
    (prinl "\\accidentalStyle " (++ Lst)) )
 
