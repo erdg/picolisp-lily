@@ -1034,16 +1034,13 @@
 #
 # (getDuration "r4.") -> "r4."
 # (getDuration "a4.:maj9") -> "4."
-#
-[de getDuration (Obj)
+
+(de getDuration (Obj)
    (if (pre? "r" Obj)   # ignore if a rest
       (pack @)
       (let Dur (mapcar any (car (split (chop Obj) ":")))
          (pack
-            (member
-               (find num? Dur)
-               Dur ]
-
+            (member (find num? Dur) Dur) ) ) ) )
 
 # the following functions generate svg "musical icons", to be used in a
 # a web app
