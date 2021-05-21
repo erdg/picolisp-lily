@@ -642,7 +642,95 @@
                (lyStaff  (lyEval @Melody))
                (lyLyrics (lyEval @Lyrics)) ]
 
-(def 'leadsheet 'lyLeadsheet)
+# (def 'leadsheet 'lyLeadsheet)
+
+(de leadsheet Music
+   (let [(@Chords @Melody @Lyrics) Music]
+      (macro
+         (score
+            (<<
+               (chords (prEval @Chords))
+               (staff  (prEval @Melody))
+               (lyrics (prEval @Lyrics)) ) ) ) ) )
+
+# linear leadsheet, melody and chords are interleaved in code
+#
+#  (lleadsheet
+#     | 4/4 d:min9 {...} |
+#     | g:7 {...} |
+#     | c:maj7 {...} |
+#     | d2:min7 {...} g2:min7 {...} | )
+#
+# or use automatic barlines
+#
+#  (lleadsheet
+#     |: 4/4 d:min9 {...} |
+#     | g:7 {...} ||
+#     | c:maj7 {...} |
+#     | d2:min7 {...} g2:min7 {...} :| )
+
+(de lleadsheet Music
+   (let Args   # | d:min7 {...} | c:maj7 {...} | -> ((d:min7 {...}) (c:maj7 {...}))
+         (and Music
+            (split @ "|")
+            (filter '((X) (n== X NIL)) @) )
+      (use (Chords Melody)    # Chords <- (d:min7 c:maj7)
+         (for A Args          # Melody <- ({...} {...})
+            (while (++ A)
+               (if (chordSym? @)
+                  (queue 'Chords @)
+                  (if (atom@ @)
+                     (queue 'Melody @)
+                     (queue 'Melody (cdr @)) ) ) ) )
+         (macro
+            (leadsheet
+               (lyWrap
+                  ^(mapcar
+                     '((X)
+                        (if (and (chordSym? X) (not (getDuration X)))
+                           (autoChordDuration X)
+                           X ) )
+                     Chords ) )
+               (melody "c'"
+                  (lyWrap
+                     ^(apply append
+                        (make
+                           (for @M Melody
+                              (cond
+                                 ((pair @M)
+                                    (if (barLine? (car @M))
+                                       (link (macro '((bar ^(list (car @M))))))  # auto bar line hacking
+                                       (link @M) ) )
+                                 (T (link (macro '(@M)))) ) ) ) ) ) ) ) ) ) ) )
+
+# maybe useful for debugging 'lleadsheet' in the future, if changes are made.
+# comment out '(macro ...)' in the definition of 'lleadsheet' and replace with
+# the following:
+#
+#          (list
+#             (mapcar
+#                '((X)
+#                   (if (and (chordSym? X) (not (getDuration X)))
+#                      (autoChordDuration X)
+#                      X ) )
+#                Chords )
+#             (apply append
+#                (make
+#                   (for @M Melody
+#                      (cond
+#                         ((pair @M)
+#                            (if (barLine? (car @M))
+#                               (link (macro '((bar ^(list (car @M))))))  # auto bar line hacking :[
+#                               (link @M) ) )
+#                         (T (link (macro '(@M)))) ) ) )
+
+# like atom, but returns the atom instead of T
+(de atom@ (Sym) (and (atom Sym) Sym))
+
+(de autoChordDuration (ChordSym)
+   (let C (chop ChordSym)
+      (pack (insert (index ":" C) C "1")) ) )
+
 
 
 # leadsheet with rhythmic hits below the chord names
