@@ -42,13 +42,28 @@
 
 # preprocess picolisp lilypond code, get all symbols ready for 'pack'ing
 (de _lytransform (X)
-   (recur (X Acc)
+   (recur (X Acc LeftParenLast)
       (ifn X
          (flip Acc)
          (case (car X)
+            ("(" (recurse (cdr X) (cons (car X) Acc) T))
             # { ... } = (lyWrap ...)
             ("{" (recurse (cdr X) (cons 'lyWrap (char 40) Acc)))
             ("}" (recurse (cdr X) (cons (char 41) Acc)))
+            ### not entirely sold yet
+            ("<<"
+               (if LeftParenLast
+                  (recurse (cdr X) (cons (car X) Acc))
+                  (recurse (cdr X) (cons '<< (char 40) Acc)) ) )
+            (">>"
+               (recurse (cdr X) (cons (char 41) Acc)) )   # masks built-in '>>'
+            ("<</"
+               (if LeftParenLast
+                  (recurse (cdr X) (cons (car X) Acc))
+                  (recurse (cdr X) (cons '<</ (char 40) Acc)) ) )
+            ("/>>"
+               (recurse (cdr X) (cons (char 41) Acc)) )
+            ###
             ("+"
                (cond
                   # special rule for '++'
@@ -276,6 +291,21 @@
 # test automatic bar lines
 (lytest "{ a'2 b'2 || c''1 |. }"
    '(lyWrap "a'2" "b'2" (bar "||") "c''1" (bar "|.")) )
+
+# test lilypond << >>
+(lytest "<< {a b c} {d e f} >>"
+   '(<< (lyWrap "a" "b" "c") (lyWrap "d" "e" "f")) )
+
+(lytest "(<< {a b c} {d e f})"
+   '(<< (lyWrap "a" "b" "c") (lyWrap "d" "e" "f")) )
+
+# test lilypond << \\ >>
+(lytest "(<</ {a b c} {d e f})"
+   '(<</ (lyWrap "a" "b" "c") (lyWrap "d" "e" "f")) )
+
+(lytest "<</ {a b c} {d e f} />>"
+   '(<</ (lyWrap "a" "b" "c") (lyWrap "d" "e" "f")) )
+
 
 (test T (lySym? "c/pp/<"))
 (test T (lySym? "bes2/f/!"))
