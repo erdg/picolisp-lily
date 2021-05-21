@@ -328,6 +328,20 @@
    (prEval "Music")
    (prinl ">>") )
 
+
+# the double backslash construct
+#
+#  << {...} \\ {...} >>
+#
+# (except backslashes are dumb)
+
+(de <</ Music
+   (let Mus (make (for M Music (link M "\\\\")))
+      (prinl "<<")
+      (prEval Mus)
+      (prinl ">>") ) )
+
+
 # chords
 #
 # (ly<> "g" "b" "d") -> G major chord
