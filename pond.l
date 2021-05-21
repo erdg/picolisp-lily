@@ -693,9 +693,7 @@
             (while (++ A)
                (if (chordSym? @)
                   (queue 'Chords @)
-                  (if (atom@ @)
-                     (queue 'Melody @)
-                     (queue 'Melody (cdr @)) ) ) ) )
+                  (queue 'Melody @) ) ) )
          (macro
             (leadsheet
                (lyWrap
@@ -712,9 +710,13 @@
                            (for @M Melody
                               (cond
                                  ((pair @M)
-                                    (if (barLine? (car @M))
-                                       (link (macro '((bar ^(list (car @M))))))  # auto bar line hacking
-                                       (link @M) ) )
+                                    (cond
+                                       ((= (car @M) 'lyWrap)
+                                          (link (cdr @M)) )
+                                       # auto bar line hacking
+                                       ((barLine? (car @M))
+                                          (link (macro '((bar ^(list (car @M)))))) )
+                                       (T (link (macro '(@M))) ) ) )
                                  (T (link (macro '(@M)))) ) ) ) ) ) ) ) ) ) ) )
 
 # maybe useful for debugging 'lleadsheet' in the future, if changes are made.
