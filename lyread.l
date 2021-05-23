@@ -133,7 +133,7 @@
                (sym (pack (replace Chop "/" "\\"))) ) ) ) ) )
 
 (de lySym? (Sym)
-   (if (= Sym "|")  # bar checks
+   (if (member Sym '("|" "\\\\"))  # bar checks and (solo) double backslashes
       T
       (let [Chop (chop Sym)  (Car . Cdr) Chop]
          (and
@@ -300,12 +300,11 @@
    '(<< (lyWrap "a" "b" "c") (lyWrap "d" "e" "f")) )
 
 # test lilypond << \\ >>
-(lytest "(<</ {a b c} {d e f})"
-   '(<</ (lyWrap "a" "b" "c") (lyWrap "d" "e" "f")) )
+(lytest "(<< {a b c} \\\\ {d e f})"
+   '(<< (lyWrap "a" "b" "c") "\\\\" (lyWrap "d" "e" "f")) )
 
-(lytest "<</ {a b c} {d e f} />>"
-   '(<</ (lyWrap "a" "b" "c") (lyWrap "d" "e" "f")) )
-
+(lytest "<< {a b c} \\\\ {d e f} >>"
+   '(<< (lyWrap "a" "b" "c") "\\\\" (lyWrap "d" "e" "f")) )
 
 (test T (lySym? "c/pp/<"))
 (test T (lySym? "bes2/f/!"))

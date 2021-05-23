@@ -323,23 +323,26 @@
    (run Music)
    (prinl ">>") ]
 
+# can be used the lisp way
+#
+#  (<< {...} {...})
+#
+# or the lilypond way
+#
+#  << {...} {...} >>
+#
+# and also with "double backslash notation"
+#
+# (<< {...} \\ {...})
+#
+# << {...} \\ {...} >>
+#
+# (<< (lyWrap ...) "\\\\" (lyWrap ...)) -- without lilypond syntax
+
 (de << "Music"
    (prinl "<<")
    (prEval "Music")
    (prinl ">>") )
-
-
-# the double backslash construct
-#
-#  << {...} \\ {...} >>
-#
-# (except backslashes are dumb)
-
-(de <</ Music
-   (let Mus (make (for M Music (link M "\\\\")))
-      (prinl "<<")
-      (prEval Mus)
-      (prinl ">>") ) )
 
 
 # chords
