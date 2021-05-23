@@ -290,13 +290,13 @@
 #
 #  (melody c
 #    { 3/4 a4 b c |
-#      2/4 (tup 3/2 e8 e) })
+#      2/4 (tup 3/2 e4 e e) })
 #
 #     vs
 #
 #  (melody c
 #    { (meter 3/4) a4 b c |
-#      (meter 2/4) (tup 3/2 e8 e) })
+#      (meter 2/4) (tup 3/2 e4 e e) })
 #
 # atomic time signatures (see 'timeSig?') are converted to '(meter ...)', which
 # is 'prEval'ed and yields the lilypond code '\time ...'
