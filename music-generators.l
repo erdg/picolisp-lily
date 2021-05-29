@@ -1156,19 +1156,28 @@
    (mapcar '((N) (pack N ",")) Notes) )
 
 # scale helpers
+
+# (with-sharps (d/maj))
 (de with-sharps (Scale)
    (mapcar
       '((Note) (if (pair Note) (car @) Note))
       Scale ) )
 
-(def 'sharps with-sharps)
+# (sharps d/maj)
+(de sharps Args
+   (let [(@Scale) Args]
+      (macro (with-sharps (@Scale))) ) )
 
+# (with-flats (ees|6))
 (de with-flats (Scale)
    (mapcar
       '((Note) (if (pair Note) (cdr @) Note))
       Scale ) )
 
-(def 'flats with-flats)
+# (flats aes|9)
+(de flats Args
+   (let [(@Scale) Args]
+      (macro (with-flats (@Scale))) ) )
 
 # used as a read-macro in a 'changes' form
 #
