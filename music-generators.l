@@ -748,6 +748,26 @@
 # so it was renamed
 (def 'arp arp-no-wrap)
 
+# random arpeggios (uses 'random-element for next note)
+# (arp* (sharps d|maj9) ...)
+(de arp* Lst
+   (let [(@Notes . Rhythms) Lst]
+      (macro
+         (let Notes @Notes
+            (arp-no-wrap
+               (random-element Notes)
+               ^ Rhythms ) ) ) ) )
+
+# sequential arpeggios (uses '++ to step through notes)
+# (arp+ (flats des|maj) ...)
+(de arp+ Lst
+   (let [(@Notes . Rhythms) Lst]
+      (macro
+         (let Notes (ring @Notes)
+            (arp-no-wrap
+               (++ Notes)
+               ^ Rhythms ) ) ) ) )
+
 (de arp-in Lst
    (let [(@Meter @Notes . Rhythms) Lst]
       (macro
