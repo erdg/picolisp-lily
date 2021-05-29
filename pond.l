@@ -208,6 +208,8 @@
             (lyStaff (lyClef "treble") (prEval @L))
             (lyStaff (lyClef "bass")   (prEval @R)) ]
 
+(def 'piano lyPiano)
+
 # lyPianoChords - lyPiano with chords
 #
 # (lyPianoChords
@@ -221,6 +223,8 @@
          (ly<<
             (lyChords (lyEval @Chords))
             (lyPiano @L @R) ]
+
+(def 'piano-chords lyPianoChords)
 
 # lyPianoLeadsheet - lyPiano with chords/lyrics
 #

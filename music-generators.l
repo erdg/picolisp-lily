@@ -803,12 +803,15 @@
             (for L Lst
                (link (macro '(chain ^ (eval L)))) ) ) ) ) )
 
-(de piano Lst
-   (let [(@LH @RH) Lst]
-      (macro
-         '(lyPiano
-            (lyWrap @LH)
-            (lyWrap @RH) ) ) ) )
+# # commenting this out breaks 'code-gen-n.l' 'cg33'
+# # but lyPiano should be 'piano' because wrapping is easy
+# # with lilypond syntax
+# (de piano Lst
+#    (let [(@LH @RH) Lst]
+#       (macro
+#          '(lyPiano
+#             (lyWrap @LH)
+#             (lyWrap @RH) ) ) ) )
 
 (de piano% (@LH @RH)
    (macro
