@@ -1278,7 +1278,7 @@
                         (and (upp? ChordSym) "maj") ) ) ) ) ) ) ) )
 
 # (test '("c1:maj" "ees1:6" "f1:maj7" "aes2:dim7" "bes2:6" "c1:maj")
-#    (in-key (sharps (c/maj))
+#    (_in-key (with-sharps (c/maj))
 #       I  -III:6  IV:maj7  -vi2:dim7  -VII2:6  I ) )
 
 
@@ -1303,8 +1303,8 @@
                (list
                   (cond
                      ((pre? Type "major")
-                        (if (member Note '(c g d a e b fis cis gis dis)) 'sharps 'flats) )
+                        (if (member Note '(c g d a e b fis cis gis dis)) 'with-sharps 'with-flats) )
                      ((pre? Type "minor")
-                        (if (member Note '(a e b fis cis gis dis)) 'sharps 'flats) ) )
+                        (if (member Note '(a e b fis cis gis dis)) 'with-sharps 'with-flats) ) )
                   (list (any (pack (lowc Note) "/" Type))) ) )
             ^ Changes ) ) ) )
