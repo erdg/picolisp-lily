@@ -996,11 +996,22 @@
       (prinl "\\set chordChanges = ##t")
       (prinl "\\set minorChordModifier = \\markup { - }")
       (prinl "\\set noChordSymbol = \"\"")   # hide 'N.C.'s
-      (lyEval "Music")
+      (prEval "Music")
       (prinl "}")
       (lyRhythms Time Clef "Music") ]
 
-(def 'hits lyHits)
+# (def 'hits lyHits)
+
+(de hits (Time Clef . Music)
+   (<<
+      "\\chords"
+      "{"
+      "\\set chordChanges = ##t"
+      "\\set minorChordModifier = \\markup { - }"
+      "\\set noChordSymbol = \"\""   # hide 'N.C.'s
+      (prEval Music)
+      "}"
+      (lyRhythms Time Clef Music) ) )
 
 # rhythmic notation
 [de lyRhythms (Time Clef "Music")
