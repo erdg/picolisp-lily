@@ -843,8 +843,6 @@
       (prinl "}")
       (lySlashes N Time Clef) ]
 
-(def '\\changes lyChanges)
-
 # same as 'lyChanges' with defaults and optional overrides
 #
 #  (changes 2 "c1:7" "f:min9") -> defaults to treble clef, 4/4
