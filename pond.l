@@ -343,11 +343,16 @@
 #
 # (<< (lyWrap ...) "\\\\" (lyWrap ...)) -- without lilypond syntax
 
-(de << "Music"
+(de << Music
    (prinl "<<")
-   (prEval "Music")
+   (prEval Music)
    (prinl ">>") )
 
+(de <| Music
+   (let Mus (make (for M Music (link M "\\\\")))
+      (prinl "<<")
+      (prEval Mus)
+      (prinl ">>") ) )
 
 # chords
 #

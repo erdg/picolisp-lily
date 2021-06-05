@@ -57,12 +57,12 @@
                   (recurse (cdr X) (cons '<< (char 40) Acc)) ) )
             (">>"
                (recurse (cdr X) (cons (char 41) Acc)) )   # masks built-in '>>'
-            ("<</"
-               (if LeftParenLast
-                  (recurse (cdr X) (cons (car X) Acc))
-                  (recurse (cdr X) (cons '<</ (char 40) Acc)) ) )
-            ("/>>"
-               (recurse (cdr X) (cons (char 41) Acc)) )
+             ("<|"
+                (if LeftParenLast
+                   (recurse (cdr X) (cons (car X) Acc))
+                   (recurse (cdr X) (cons '<| (char 40) Acc)) ) )
+             ("|>"
+                (recurse (cdr X) (cons (char 41) Acc)) )
             ###
             ("+"
                (cond
