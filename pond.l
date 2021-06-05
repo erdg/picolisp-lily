@@ -1027,7 +1027,7 @@
    (lyClef Clef)
    (prinl "{")
    (prinl "\\override NoteHead #'style = #'slash")
-   (lyEval (packDurations "Music" Clef))  # eg. -> b4 b4 b4 b4
+   (lyEval (packDurations (filter lySym? "Music") Clef))  # eg. -> b4 b4 b4 b4
    (prinl "\\revert NoteHead #'style")
    (prinl "}")
    (prinl "}")
