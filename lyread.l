@@ -21,7 +21,7 @@
    (lytransform
       (lyread File) ) )
 
-(def 'LYREADSTRING "_-+=!?<>$%*',:/\|.~[]")
+(def 'LYREADSTRING "_-+=!?<>$%*',:/\|.~[]\^")
 
 (de lyread (File)
    (in File
@@ -50,6 +50,7 @@
             # { ... } = (lyWrap ...)
             ("{" (recurse (cdr X) (cons 'lyWrap (char 40) Acc)))
             ("}" (recurse (cdr X) (cons (char 41) Acc)))
+            ("\^" (recurse (cdr X) (cons (pack "\\" (car X)) Acc)))
             ### not entirely sold yet
             ("<<"
                (if LeftParenLast
@@ -159,9 +160,10 @@
                         (member "|" Cdr)
                         (member "/" Cdr)))
                   (num? (any (last Cdr))) )
-               (member "'" Cdr)
+               (member "'" Cdr)  # octaves
                (member "," Cdr)
-               (member "." Cdr)
+               (member "." Cdr)  # dotted durations
+               (member "\^" Cdr)
                (and
                   (member "/" Cdr)
                   (or
@@ -306,6 +308,12 @@
 (lytest "<< {a b c} \\\\ {d e f} >>"
    '(<< (lyWrap "a" "b" "c") "\\\\" (lyWrap "d" "e" "f")) )
 
+(lytest "{ a'1\^/markup { \"text\" } }"
+  '(lyWrap "a'1\^\\markup" (lyWrap "text")) )
+
+(lytest "{ a'1-\^ }"
+   '(lyWrap "a'1-\^") )
+
 (test T (lySym? "c/pp/<"))
 (test T (lySym? "bes2/f/!"))
 (test T (lySym? "bes2\\f\\!"))
@@ -318,6 +326,7 @@
 (test T (lySym? "3/4"))
 (test T (lySym? "des1:maj9"))
 (test T (lySym? "d:min7"))
+(test T (lySym? "a'1\^/markup"))
 
 (test NIL (lySym? "aes/min7"))
 (test NIL (lySym? "g|maj7"))
