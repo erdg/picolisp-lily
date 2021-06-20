@@ -154,7 +154,11 @@
    (run Music)
    (prinl "}") ]
 
-(def 'staff 'lyStaff)
+# (def 'staff 'lyStaff)
+(de staff Music
+   (prinl "\\new Staff")
+   (prEval Music) )
+
 
 (de lyRhythmicStaff Music
    (prinl "\\new RhythmicStaff")
