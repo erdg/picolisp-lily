@@ -916,7 +916,7 @@
          Beats (any (pack (car S)))
          Pulse (any (pack (cdr S))) ]
       (prinl "\\new Staff {")
-      (prinl "{")
+      # (prinl "{")
       (prinl "\\override NoteHead #'style = #'slash")
       (prinl "\\override Stem #'transparent = ##t")
       (prinl "\\relative c"
@@ -936,7 +936,7 @@
                      ((= Clef "percussion") "c")
                      (T "b" ) )
                   Pulse) ) ) )
-      (prinl "}") )
+      # (prinl "}")
       (prinl "\\revert NoteHead #'style")
       (prinl "\\revert Stem #'transparent")
       (prinl "}")
