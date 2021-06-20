@@ -147,6 +147,7 @@
             (not (pre? "ly" Sym))
             (not (pre? "\\\\" Sym))
             (or
+               (pre? "/" Sym)
                # basics
                (member Sym '(aes a ais bes b bis ces c cis des d dis ees e eis fes f fis ges g gis | r))
                (= (last Cdr) "~")               # tied notes
