@@ -947,7 +947,7 @@
 #
 #  (slashes (2 "4/4") (2 "7/8"))
 
-[de slashes Args
+(de slashes Args
    (prinl "\\new Staff {")
    (prinl "{")
    (prinl "\\override NoteHead #'style = #'slash")
@@ -979,8 +979,38 @@
    (prinl "\\revert NoteHead #'style")
    (prinl "\\revert Stem #'transparent")
    (prinl "}")
-   (prinl "}") ]
+   (prinl "}") )
 
+# no implicit staff / wrap
+(de inline-slashes Args
+   (prinl "\\override NoteHead #'style = #'slash")
+   (prinl "\\override Stem #'transparent = ##t")
+   (for A Args
+      (let [(N Time Clef) A]  # number of bars, time signature, clef
+         (default Time "4/4" Clef "treble")
+         (let [S     (split (chop Time) "/")
+               Beats (any (pack (car S)))
+               Pulse (any (pack (cdr S))) ]
+            (prinl "\\relative c"
+               (cond
+                  ((= Clef "bass"))
+                  ((= Clef "percussion") "'")
+                  (T "''") )
+               " {")
+            (lyTime Time)
+            (lyClef Clef)
+            (do N
+               (lyEval
+                  (need Beats
+                     (pack
+                        (cond
+                           ((= Clef "bass") "d")
+                           ((= Clef "percussion") "c")
+                           (T "b" ) )
+                        Pulse) ) ) )
+            (prinl "}") )  ) )
+   (prinl "\\revert NoteHead #'style")
+   (prinl "\\revert Stem #'transparent") )
 
 # hits
 #
