@@ -547,6 +547,8 @@
    (lyEval Music)
    (prinl "}") ]
 
+(def 'tup* lyTuplet%)
+
 # times - like tuplets, but crazier
 #
 # (lyTimes "2/3" "a4" "b4" "c4") -> 1/4 note triplets
