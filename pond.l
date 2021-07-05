@@ -735,6 +735,42 @@
                                        (T (link (macro '(@M))) ) ) )
                                  (T (link (macro '(@M)))) ) ) ) ) ) ) ) ) ) ) )
 
+# same as above, absolute pitch
+(de lleadsheet-ap Music
+   (let Args   # | d:min7 {...} | c:maj7 {...} | -> ((d:min7 {...}) (c:maj7 {...}))
+         (and Music
+            (split @ "|")
+            (filter '((X) (n== X NIL)) @) )
+      (use (Chords Melody)    # Chords <- (d:min7 c:maj7)
+         (for A Args          # Melody <- ({...} {...})
+            (while (++ A)
+               (if (chordSym? @)
+                  (queue 'Chords @)
+                  (queue 'Melody @) ) ) )
+         (macro
+            (leadsheet
+               (lyWrap
+                  ^(mapcar
+                     '((X)
+                        (if (and (chordSym? X) (not (getDuration X)))
+                           (autoChordDuration X)
+                           X ) )
+                     Chords ) )
+                  (lyWrap
+                     ^(apply append
+                        (make
+                           (for @M Melody
+                              (cond
+                                 ((pair @M)
+                                    (cond
+                                       ((= (car @M) 'lyWrap)
+                                          (link (cdr @M)) )
+                                       # auto bar line hacking
+                                       ((barLine? (car @M))
+                                          (link (macro '((bar ^(list (car @M)))))) )
+                                       (T (link (macro '(@M))) ) ) )
+                                 (T (link (macro '(@M)))) ) ) ) ) ) ) ) ) ) )
+
 # maybe useful for debugging 'lleadsheet' in the future, if changes are made.
 # comment out '(macro ...)' in the definition of 'lleadsheet' and replace with
 # the following:
