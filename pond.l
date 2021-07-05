@@ -1150,8 +1150,9 @@
 
 # note with staff/clef for pitch reference. no key/time signature
 (de lyNoteIcon (Note Clef)
-   (lySetGlobalStaffSize 100)
-   (lyInclude "lilyjazz.ily")
+   # (lySetGlobalStaffSize 100)
+   (lySetGlobalStaffSize 66)
+   # (lyInclude "lilyjazz.ily")
    (lyStaff
       (lyClef Clef)
       (prinl "\\omit Staff.KeySignature")
@@ -1207,7 +1208,7 @@
 (scl 4)
 
 # generic note icons with clickable staff lines/spaces
-[de lilypondNoteIconSVG (File Clef . Music)
+[de lilypondNoteIconSvg (File Clef . Music)
    # write lilypond code to file
    (out (pack File ".ly")
       (lyVersion)
@@ -1238,27 +1239,38 @@
             (out (pack "+" Svg)
                (if (pre? "<line" @) # -> @
                   (prog
+                     (<javascript>
+                        "var touchSvgEvent = function (note) {
+                           window.parent.postMessage(note, '*')
+                        };" )
                      # next pitch
                      (pop 'Notes)
-                     # clickable line
-                     (prinl "<a onclick=\"alert('line " (car Notes) "')\">")   # EDIT ONCLICK FN HERE
+                     ### clickable line
+                     # (prinl "<a onclick=\"alert('line " (car Notes) "')\">")   # EDIT ONCLICK FN HERE
+                     (prinl "<a onclick=\"touchSvgEvent('" (car Notes) "')\">")
+                     ###
                      (pipe
                         (prinl @) # <- 'if'
                         (prinl
                            (use Str
                               (setq Str (split (till (eol)) " "))
                               (patch Str '(~(chop "stroke-width=\"") @N "\"") "stroke-width=\"0.5\"")
-                              (patch Str '(~(chop "stroke=\"currentColor\"")) "stroke=\"white\"")
+                              # (patch Str '(~(chop "stroke=\"currentColor\"")) "stroke=\"white\"")
+                              (patch Str '(~(chop "stroke=\"currentColor\"")) "stroke=\"#faf5f0\"")
                               (glue " " (mapcar pack Str)) ) ) )
                      (prinl "</a>")
-                     # print line as is, clickable
-                     (prinl "<a onclick=\"alert('line " (car Notes) "')\">")   # EDIT ONCLICK FN HERE
+                     ### print line as is, clickable
+                     # (prinl "<a onclick=\"alert('line " (car Notes) "')\">")   # EDIT ONCLICK FN HERE
+                     (prinl "<a onclick=\"touchSvgEvent('" (car Notes) "')\">")
+                     ###
                      (prinl @) # <- 'if'
                      (prinl "</a>")
                      # next pitch
                      (pop 'Notes)
-                     # clickable space
-                     (prinl "<a onclick=\"alert('space " (car Notes) "')\">")   # EDIT ONCLICK FN HERE
+                     ### clickable space
+                     # (prinl "<a onclick=\"alert('space " (car Notes) "')\">")   # EDIT ONCLICK FN HERE
+                     (prinl "<a onclick=\"touchSvgEvent('" (car Notes) "')\">")
+                     ###
                      (pipe
                         (prinl @) # <- 'if'
                         (prinl
@@ -1266,7 +1278,8 @@
                            (use Str
                               (setq Str (split (till (eol)) " "))
                               (patch Str '(~(chop "stroke-width=\"") @N "\"") "stroke-width=\"0.5\"")
-                              (patch Str '(~(chop "stroke=\"currentColor\"")) "stroke=\"white\"")
+                              # (patch Str '(~(chop "stroke=\"currentColor\"")) "stroke=\"white\"")
+                              (patch Str '(~(chop "stroke=\"currentColor\"")) "stroke=\"#faf5f0\"")
                               (glue " " (mapcar pack Str)) ) ) )
                      (prinl "</a>") )
                   (prinl @) ) ) ) ) # <- 'if'
@@ -1277,8 +1290,29 @@
       # rename
       (call 'mv Svg (pack File ".svg"))
       # preview in browser
-      (call 'firefox (pack File ".svg"))
+      # (call 'firefox (pack File ".svg"))
 ]
+
+# generate all svgs for a given pitch (e.g. "aes''" or "c,")
+(de pitchGenSvgs (Pitch Clef)
+   (chdir "wiki/img/svg2"
+      (for X '(1 2 4 8 16 32)  # duration
+         (for Y '("" "." "..") # dots
+            (lilypondNoteIconSvg
+               (pack Pitch X (need (length Y) "d") "-" Clef)
+               Clef
+               (lyNoteIcon (pack Pitch X Y) Clef) ) ) ) ) )
+
+(de restGenSvgs ()
+   (chdir "wiki/img/svg2"
+      (for X '(1 2 4 8 16 32)  # duration
+         (for Y '("" "." "..") # dots
+            (for Clef '("treble" "bass")
+               (lilypondNoteIconSvg
+                  (pack "r" X (need (length Y) "d") "-" Clef)
+                  Clef
+                  (lyNoteIcon (pack "r" X Y) Clef) ) ) ) ) ) )
+
 
 # note icons with clickable staff lines, for interacting with hyperapp-js
 [de lilypondSVG-noteIcon-hyperapp (File Clef . Music)
@@ -1314,7 +1348,8 @@
                            (use Str
                               (setq Str (split (till (eol)) " "))
                               (patch Str '(~(chop "stroke-width=\"") @N "\"") "stroke-width=\"0.5\"")
-                              (patch Str '(~(chop "stroke=\"currentColor\"")) "stroke=\"white\"")
+                              # (patch Str '(~(chop "stroke=\"currentColor\"")) "stroke=\"white\"")
+                              (patch Str '(~(chop "stroke=\"currentColor\"")) "stroke=\"#faf5f0\"")
                               (glue " " (mapcar pack Str)) ) ) )
                      (prinl "</a>")
                      # print line as is, clickable
